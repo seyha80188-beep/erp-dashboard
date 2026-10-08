@@ -19,6 +19,98 @@ const MODULES = [
   { id: 'settings', name: 'ការកំណត់', icon: 'settings' }
 ];
 
+// Team Members and Employees Directory
+const DEFAULT_TEAM_MEMBERS = [
+  {
+    id: 'emp-seyha',
+    name: 'យឹម សីហា (Yem Seyha)',
+    role: 'CEO & Founder / អ្នកគ្រប់គ្រងប្រព័ន្ធ',
+    phone: '088 888 8888',
+    avatar: 'Y',
+    isSeyha: true,
+    status: 'Active',
+    joinDate: '2026-01-01',
+    telegram: '@yemseyha',
+    october: { boxes: 3, revenue: 137.00, commission: 9.00, netProfit: 98.50, deliveryRate: '100%', personalBoxes: 2, companyBoxes: 1 },
+    september: { boxes: 5, revenue: 135.00, commission: 15.00, netProfit: 96.00, deliveryRate: '100%', personalBoxes: 3, companyBoxes: 2 },
+    recentSales: [
+      { date: '2026-10-06', customer: 'ម៉េង ហួរ (ភ្នំពេញ)', product: 'KD-09', qty: 1, amount: 45.00, status: 'បានប្រគល់', payment: 'ABA Bank' },
+      { date: '2026-10-04', customer: 'ចាន់ថា (បាត់ដំបង)', product: 'KD-09', qty: 1, amount: 46.00, status: 'បានប្រគល់', payment: 'Wing' },
+      { date: '2026-10-02', customer: 'សុផល (សៀមរាប)', product: 'KD-09', qty: 1, amount: 46.00, status: 'បានប្រគល់', payment: 'ABA Bank' }
+    ]
+  },
+  {
+    id: 'emp-vathana',
+    name: 'ជា វឌ្ឍនា (Chea Vathana)',
+    role: 'Top Sales Leader / មេក្រុមលក់ឆ្នើម KD-09',
+    phone: '097 777 6666',
+    avatar: 'V',
+    isSeyha: false,
+    status: 'Active',
+    joinDate: '2026-02-15',
+    telegram: '@vathana_kd09',
+    october: { boxes: 7, revenue: 320.00, commission: 81.00, netProfit: 230.00, deliveryRate: '95%', personalBoxes: 0, companyBoxes: 7 },
+    september: { boxes: 27, revenue: 725.00, commission: 81.00, netProfit: 515.00, deliveryRate: '95%', personalBoxes: 0, companyBoxes: 27 },
+    recentSales: [
+      { date: '2026-10-06', customer: 'បូរមី (កំពង់ចាម)', product: 'KD-09', qty: 2, amount: 92.00, status: 'បានប្រគល់', payment: 'ABA Bank' },
+      { date: '2026-10-05', customer: 'សុភាព (ភ្នំពេញ)', product: 'KD-09', qty: 2, amount: 90.00, status: 'បានប្រគល់', payment: 'ABA Bank' },
+      { date: '2026-10-03', customer: 'ដារ៉ា (កណ្តាល)', product: 'KD-09', qty: 2, amount: 92.00, status: 'បានប្រគល់', payment: 'TrueMoney' },
+      { date: '2026-10-01', customer: 'ពិសិដ្ឋ (ព្រៃវែង)', product: 'KD-09', qty: 1, amount: 46.00, status: 'កំពុងដឹក', payment: 'COD' }
+    ]
+  },
+  {
+    id: 'emp-sopha',
+    name: 'ភឿន សុផា (Phoeun Sopha)',
+    role: 'Senior Sales Representative / អ្នកលក់ជាន់ខ្ពស់',
+    phone: '096 555 4444',
+    avatar: 'S',
+    isSeyha: false,
+    status: 'Active',
+    joinDate: '2026-03-01',
+    telegram: '@sopha_sales',
+    october: { boxes: 5, revenue: 228.00, commission: 60.00, netProfit: 164.00, deliveryRate: '92%', personalBoxes: 2, companyBoxes: 3 },
+    september: { boxes: 22, revenue: 590.00, commission: 60.00, netProfit: 420.00, deliveryRate: '92%', personalBoxes: 2, companyBoxes: 20 },
+    recentSales: [
+      { date: '2026-10-06', customer: 'កុសល (កំពត)', product: 'KD-09', qty: 2, amount: 92.00, status: 'បានប្រគល់', payment: 'ABA Bank' },
+      { date: '2026-10-04', customer: 'ស្រីមុំ (ភ្នំពេញ)', product: 'KD-09', qty: 2, amount: 90.00, status: 'បានប្រគល់', payment: 'Wing' },
+      { date: '2026-10-02', customer: 'វិបុល (តាកែវ)', product: 'KD-09', qty: 1, amount: 46.00, status: 'កំពុងដឹក', payment: 'COD' }
+    ]
+  },
+  {
+    id: 'emp-s-pha',
+    name: 'S+PHA (ក្រុមចម្រុះ សុផា & សហការី)',
+    role: 'Sales Partner / ដៃគូលក់រួមគ្នា',
+    phone: '012 333 2222',
+    avatar: 'SP',
+    isSeyha: false,
+    status: 'Active',
+    joinDate: '2026-05-10',
+    telegram: '@spha_partner',
+    october: { boxes: 2, revenue: 92.00, commission: 6.00, netProfit: 66.00, deliveryRate: '90%', personalBoxes: 0, companyBoxes: 2 },
+    september: { boxes: 2, revenue: 90.00, commission: 6.00, netProfit: 64.00, deliveryRate: '90%', personalBoxes: 0, companyBoxes: 2 },
+    recentSales: [
+      { date: '2026-10-05', customer: 'សុធី (ភ្នំពេញ)', product: 'KD-09', qty: 1, amount: 46.00, status: 'បានប្រគល់', payment: 'ABA Bank' },
+      { date: '2026-10-03', customer: 'ផល្លា (កំពង់ស្ពឺ)', product: 'KD-09', qty: 1, amount: 46.00, status: 'បានប្រគល់', payment: 'ABA Bank' }
+    ]
+  },
+  {
+    id: 'emp-v-pha',
+    name: 'V+PHA (ក្រុមចម្រុះ វឌ្ឍនា & សុផា)',
+    role: 'Co-Sales Group / ក្រុមសហការលក់ពិសេស',
+    phone: '070 111 2222',
+    avatar: 'VP',
+    isSeyha: false,
+    status: 'Active',
+    joinDate: '2026-06-01',
+    telegram: '@vpha_team',
+    october: { boxes: 2, revenue: 92.00, commission: 6.00, netProfit: 66.00, deliveryRate: '100%', personalBoxes: 0, companyBoxes: 2 },
+    september: { boxes: 2, revenue: 90.00, commission: 6.00, netProfit: 64.00, deliveryRate: '100%', personalBoxes: 0, companyBoxes: 2 },
+    recentSales: [
+      { date: '2026-10-04', customer: 'រ៉ាដូ (បន្ទាយមានជ័យ)', product: 'KD-09', qty: 2, amount: 92.00, status: 'បានប្រគល់', payment: 'ABA Bank' }
+    ]
+  }
+];
+
 // Google Sheet Configuration
 const SHEET_CONFIG = {
   spreadsheetId: '1Kg74MK_M1ofUbCzDBKh5B1HxDUqTM8rsTNvbWXJdnoE',
@@ -3222,96 +3314,7 @@ function renderProfitLossModule() {
 /**
  * 6. Module បុគ្គលិក & ក្រុមការងារ (Employees & Team Member Performance)
  */
-const DEFAULT_TEAM_MEMBERS = [
-  {
-    id: 'emp-seyha',
-    name: 'យឹម សីហា (Yem Seyha)',
-    role: 'CEO & Founder / អ្នកគ្រប់គ្រងប្រព័ន្ធ',
-    phone: '088 888 8888',
-    avatar: 'Y',
-    isSeyha: true,
-    status: 'Active',
-    joinDate: '2026-01-01',
-    telegram: '@yemseyha',
-    october: { boxes: 3, revenue: 137.00, commission: 9.00, netProfit: 98.50, deliveryRate: '100%', personalBoxes: 2, companyBoxes: 1 },
-    september: { boxes: 5, revenue: 135.00, commission: 15.00, netProfit: 96.00, deliveryRate: '100%', personalBoxes: 3, companyBoxes: 2 },
-    recentSales: [
-      { date: '2026-10-06', customer: 'ម៉េង ហួរ (ភ្នំពេញ)', product: 'KD-09', qty: 1, amount: 45.00, status: 'បានប្រគល់', payment: 'ABA Bank' },
-      { date: '2026-10-04', customer: 'ចាន់ថា (បាត់ដំបង)', product: 'KD-09', qty: 1, amount: 46.00, status: 'បានប្រគល់', payment: 'Wing' },
-      { date: '2026-10-02', customer: 'សុផល (សៀមរាប)', product: 'KD-09', qty: 1, amount: 46.00, status: 'បានប្រគល់', payment: 'ABA Bank' }
-    ]
-  },
-  {
-    id: 'emp-vathana',
-    name: 'ជា វឌ្ឍនា (Chea Vathana)',
-    role: 'Top Sales Leader / មេក្រុមលក់ឆ្នើម KD-09',
-    phone: '097 777 6666',
-    avatar: 'V',
-    isSeyha: false,
-    status: 'Active',
-    joinDate: '2026-02-15',
-    telegram: '@vathana_kd09',
-    october: { boxes: 7, revenue: 320.00, commission: 81.00, netProfit: 230.00, deliveryRate: '95%', personalBoxes: 0, companyBoxes: 7 },
-    september: { boxes: 27, revenue: 725.00, commission: 81.00, netProfit: 515.00, deliveryRate: '95%', personalBoxes: 0, companyBoxes: 27 },
-    recentSales: [
-      { date: '2026-10-06', customer: 'បូរមី (កំពង់ចាម)', product: 'KD-09', qty: 2, amount: 92.00, status: 'បានប្រគល់', payment: 'ABA Bank' },
-      { date: '2026-10-05', customer: 'សុភាព (ភ្នំពេញ)', product: 'KD-09', qty: 2, amount: 90.00, status: 'បានប្រគល់', payment: 'ABA Bank' },
-      { date: '2026-10-03', customer: 'ដារ៉ា (កណ្តាល)', product: 'KD-09', qty: 2, amount: 92.00, status: 'បានប្រគល់', payment: 'TrueMoney' },
-      { date: '2026-10-01', customer: 'ពិសិដ្ឋ (ព្រៃវែង)', product: 'KD-09', qty: 1, amount: 46.00, status: 'កំពុងដឹក', payment: 'COD' }
-    ]
-  },
-  {
-    id: 'emp-sopha',
-    name: 'ភឿន សុផា (Phoeun Sopha)',
-    role: 'Senior Sales Representative / អ្នកលក់ជាន់ខ្ពស់',
-    phone: '096 555 4444',
-    avatar: 'S',
-    isSeyha: false,
-    status: 'Active',
-    joinDate: '2026-03-01',
-    telegram: '@sopha_sales',
-    october: { boxes: 5, revenue: 228.00, commission: 60.00, netProfit: 164.00, deliveryRate: '92%', personalBoxes: 2, companyBoxes: 3 },
-    september: { boxes: 22, revenue: 590.00, commission: 60.00, netProfit: 420.00, deliveryRate: '92%', personalBoxes: 2, companyBoxes: 20 },
-    recentSales: [
-      { date: '2026-10-06', customer: 'កុសល (កំពត)', product: 'KD-09', qty: 2, amount: 92.00, status: 'បានប្រគល់', payment: 'ABA Bank' },
-      { date: '2026-10-04', customer: 'ស្រីមុំ (ភ្នំពេញ)', product: 'KD-09', qty: 2, amount: 90.00, status: 'បានប្រគល់', payment: 'Wing' },
-      { date: '2026-10-02', customer: 'វិបុល (តាកែវ)', product: 'KD-09', qty: 1, amount: 46.00, status: 'កំពុងដឹក', payment: 'COD' }
-    ]
-  },
-  {
-    id: 'emp-s-pha',
-    name: 'S+PHA (ក្រុមចម្រុះ សុផា & សហការី)',
-    role: 'Sales Partner / ដៃគូលក់រួមគ្នា',
-    phone: '012 333 2222',
-    avatar: 'SP',
-    isSeyha: false,
-    status: 'Active',
-    joinDate: '2026-05-10',
-    telegram: '@spha_partner',
-    october: { boxes: 2, revenue: 92.00, commission: 6.00, netProfit: 66.00, deliveryRate: '90%', personalBoxes: 0, companyBoxes: 2 },
-    september: { boxes: 2, revenue: 90.00, commission: 6.00, netProfit: 64.00, deliveryRate: '90%', personalBoxes: 0, companyBoxes: 2 },
-    recentSales: [
-      { date: '2026-10-05', customer: 'សុធី (ភ្នំពេញ)', product: 'KD-09', qty: 1, amount: 46.00, status: 'បានប្រគល់', payment: 'ABA Bank' },
-      { date: '2026-10-03', customer: 'ផល្លា (កំពង់ស្ពឺ)', product: 'KD-09', qty: 1, amount: 46.00, status: 'បានប្រគល់', payment: 'ABA Bank' }
-    ]
-  },
-  {
-    id: 'emp-v-pha',
-    name: 'V+PHA (ក្រុមចម្រុះ វឌ្ឍនា & សុផា)',
-    role: 'Co-Sales Group / ក្រុមសហការលក់ពិសេស',
-    phone: '070 111 2222',
-    avatar: 'VP',
-    isSeyha: false,
-    status: 'Active',
-    joinDate: '2026-06-01',
-    telegram: '@vpha_team',
-    october: { boxes: 2, revenue: 92.00, commission: 6.00, netProfit: 66.00, deliveryRate: '100%', personalBoxes: 0, companyBoxes: 2 },
-    september: { boxes: 2, revenue: 90.00, commission: 6.00, netProfit: 64.00, deliveryRate: '100%', personalBoxes: 0, companyBoxes: 2 },
-    recentSales: [
-      { date: '2026-10-04', customer: 'រ៉ាដូ (បន្ទាយមានជ័យ)', product: 'KD-09', qty: 2, amount: 92.00, status: 'បានប្រគល់', payment: 'ABA Bank' }
-    ]
-  }
-];
+
 
 function renderEmployeesModule() {
   const isOct = state.selectedMonth === '2026-10' || state.selectedMonth === 'all';
