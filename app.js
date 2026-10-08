@@ -266,7 +266,11 @@ async function initApp() {
     if (btnKhr) btnKhr.classList.remove('active');
   }
 
+  // Render initial dashboard immediately so screen never stays blank or unresponsive
+  navigateToModule(state.activeModule);
+
   await fetchSheetData();
+  // Re-render with fetched Google Sheet data
   navigateToModule(state.activeModule);
 }
 
