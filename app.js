@@ -288,7 +288,7 @@ function applyAppTheme() {
   const themeIcon = document.getElementById('theme-icon');
   if (themeBtnLabel) {
     if (theme === 'light') {
-      themeBtnLabel.textContent = state.lang === 'en' ? 'Light' : 'សរថ្លា';
+      themeBtnLabel.textContent = state.lang === 'en' ? 'Soft Frost' : 'សរស្រទន់';
     } else if (theme === 'dark') {
       themeBtnLabel.textContent = state.lang === 'en' ? 'Dark' : 'ងងឹត';
     } else {

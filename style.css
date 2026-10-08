@@ -1839,67 +1839,75 @@ body.theme-dark .sidebar {
   border-right-color: rgba(255, 255, 255, 0.08) !important;
 }
 
-/* ☀️ ពណ៍សរថ្លា (White Glassmorphism Theme) */
+/* ☀️ ពណ៍សរស្រទន់ (Soft Frosted Pearl / Luxury Slate Glass - មិនចាំងភ្នែក) */
 body.theme-light {
-  background-color: #F1F5F9;
-  background-image: 
-    radial-gradient(circle at 10% 20%, rgba(0, 180, 216, 0.12) 0%, transparent 40%),
-    radial-gradient(circle at 90% 40%, rgba(245, 158, 11, 0.08) 0%, transparent 45%),
-    radial-gradient(circle at 50% 90%, rgba(59, 130, 246, 0.1) 0%, transparent 50%) !important;
-  color: #0F172A !important;
+  background-color: #0F172A !important; /* Base smooth slate */
+  background: linear-gradient(135deg, #1E293B 0%, #0F172A 50%, #111827 100%) !important;
+  color: #F8FAFC !important;
 }
 
 body.theme-light .main-wrapper {
-  background-color: transparent !important;
+  background: transparent !important;
 }
 
 body.theme-light .top-header {
-  background: rgba(255, 255, 255, 0.82) !important;
-  backdrop-filter: blur(14px) !important;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.1) !important;
+  background: rgba(30, 41, 59, 0.75) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
 body.theme-light .header-module-title,
 body.theme-light .header-username-text,
 body.theme-light .card-title,
-body.theme-light .metric-value,
 body.theme-light h2, body.theme-light h3,
 body.theme-light .acleda-greeting-user h3 {
-  color: #0F172A !important;
+  color: #F8FAFC !important;
 }
 
 body.theme-light .sidebar {
-  background-color: rgba(255, 255, 255, 0.95) !important;
-  border-right: 1px solid rgba(15, 23, 42, 0.08) !important;
+  background-color: rgba(15, 23, 42, 0.85) !important;
+  backdrop-filter: blur(20px) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
 body.theme-light .sidebar-brand-name {
-  color: #0F172A !important;
+  color: #FFFFFF !important;
 }
 
 body.theme-light .module-item {
-  color: #475569 !important;
+  color: #94A3B8 !important;
 }
 
 body.theme-light .module-item:hover,
 body.theme-light .module-item.active {
-  background: rgba(0, 180, 216, 0.12) !important;
-  color: #0284C7 !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #38BDF8 !important;
 }
 
+/* Frosted Glass Soft Cards with gentle white borders */
 body.theme-light .panel-card,
 body.theme-light .metric-card,
 body.theme-light .dashboard-section-nav,
 body.theme-light .recon-kpi-card {
-  background: rgba(255, 255, 255, 0.85) !important;
-  border: 1px solid rgba(15, 23, 42, 0.08) !important;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06) !important;
-  color: #0F172A !important;
+  background: rgba(255, 255, 255, 0.07) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.2) !important;
+  color: #F8FAFC !important;
+}
+
+body.theme-light .metric-card .metric-value {
+  color: #38BDF8 !important;
 }
 
 body.theme-light .acleda-balance-card {
-  background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%) !important;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
   border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.35) !important;
   color: #FFFFFF !important;
 }
 
@@ -1908,32 +1916,35 @@ body.theme-light .acleda-balance-card * {
 }
 
 body.theme-light .data-table th {
-  background: rgba(241, 245, 249, 0.9) !important;
-  color: #334155 !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #E2E8F0 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
 }
 
 body.theme-light .data-table td {
-  color: #1E293B !important;
-  border-bottom-color: rgba(15, 23, 42, 0.06) !important;
+  color: #F1F5F9 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
 }
 
 body.theme-light .data-table tr:hover {
-  background: rgba(241, 245, 249, 0.6) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
 }
 
 body.theme-light .header-select-dropdown,
 body.theme-light .header-currency-toggle,
 body.theme-light .header-pill-btn {
-  background: rgba(255, 255, 255, 0.9) !important;
-  color: #0F172A !important;
-  border-color: rgba(15, 23, 42, 0.15) !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(12px) !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
 }
 
 body.theme-light .header-curr-pill {
-  color: #64748B !important;
+  color: #CBD5E1 !important;
 }
 
 body.theme-light .header-curr-pill.active {
+  background: rgba(255, 255, 255, 0.3) !important;
   color: #FFFFFF !important;
 }
 
