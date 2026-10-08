@@ -22,7 +22,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" href="style.css?v=20261008_2045">
+  <link rel="stylesheet" href="style.css?v=20261008_2125">
 </head>
 <body>
   <!-- Overlay សម្រាប់ Mobile ពេលបើក Sidebar -->
@@ -131,6 +131,12 @@
           <button type="button" id="btn-curr-usd" class="header-curr-pill active" onclick="setAppDisplayCurrency('USD')">$</button>
           <button type="button" id="btn-curr-khr" class="header-curr-pill" onclick="setAppDisplayCurrency('KHR')">៛</button>
         </div>
+
+        <!-- Add Order Button (Quick Paste from Telegram/Chat) -->
+        <button id="open-order-btn" class="header-action-btn-order" onclick="openOrderModal()" title="បញ្ចូលការកម្ម៉ង់ពី Telegram (Paste Orders)">
+          <i data-lucide="clipboard-paste"></i>
+          <span class="btn-text" id="header-btn-order-text">+ បញ្ចូលការកម្ម៉ង់</span>
+        </button>
 
         <!-- Add Expense Button (Desktop/Tablet) -->
         <button id="open-expense-btn" class="header-action-btn-add hide-on-narrow-mobile" onclick="openExpenseModal()" title="កត់ត្រាចំណាយប្រចាំថ្ងៃ (Add Expense)">
@@ -309,6 +315,81 @@
     </div>
   </div>
 
+  <!-- Modal សម្រាប់បញ្ចូលការកម្ម៉ង់ពី Telegram (Smart Order Paste & Sheet Sync) -->
+  <div id="order-modal-overlay" class="modal-overlay" style="display: none;" onclick="if(event.target === this) closeOrderModal()">
+    <div class="order-modal-card">
+      <div class="modal-header-row">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div class="expense-icon-circle" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); box-shadow: 0 0 16px rgba(16, 185, 129, 0.5);">
+            <i data-lucide="clipboard-paste"></i>
+          </div>
+          <div>
+            <h3 class="modal-title" style="display:flex; align-items:center; gap:8px;">
+              <span>+ បញ្ចូលការកម្ម៉ង់ទំនិញ (Smart Order Paste)</span>
+              <span class="order-tag green">Sync ចូល Sheet ផ្ទាល់</span>
+            </h3>
+            <span class="modal-subtitle">ចម្លង (Copy) ពី Telegram / Chat យកមក Paste នៅទីនេះ ប្រព័ន្ធនឹងញែកទិន្នន័យស្វ័យប្រវត្តិ</span>
+          </div>
+        </div>
+        <button type="button" class="modal-close-icon-btn" onclick="closeOrderModal()" aria-label="បិទ">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <!-- Quick Instruction Chips -->
+      <div style="background:rgba(0,180,216,0.1); border:1px solid rgba(0,180,216,0.25); border-radius:10px; padding:10px 14px; margin-bottom:14px; font-size:12px; color:var(--text-muted); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <i data-lucide="sparkles" style="color:var(--primary-accent); width:16px; height:16px;"></i>
+          <span>អាច Paste ទាំងទម្រង់ <strong>🔔 មានការកុម្មង់...</strong> (Telegram) ឬទម្រង់អត្ថបទសាមញ្ញ <strong>ឈ្មោះ/លេខ/ទីតាំង...</strong></span>
+        </div>
+        <button type="button" class="quick-chip" onclick="pasteSampleOrderTelegram()" style="background:rgba(0,180,216,0.2); color:#00B4D8; border-color:rgba(0,180,216,0.4); font-size:11px;">
+          📋 សាកល្បងគំរូ Telegram
+        </button>
+      </div>
+
+      <!-- Textarea for Pasting -->
+      <div class="form-group">
+        <label for="order-paste-input" style="font-size:13px; font-weight:600; color:#FFFFFF; margin-bottom:6px; display:flex; justify-content:space-between;">
+          <span>ប្រអប់ទម្លាក់ទិន្នន័យ (Paste Order Text Here)</span>
+          <span id="order-parsed-count-badge" style="color:#10B981; font-weight:700;">0 ការកម្ម៉ង់</span>
+        </label>
+        <textarea id="order-paste-input" class="order-paste-textarea" placeholder="Paste ព័ត៌មានកម្ម៉ង់ពី Telegram នៅទីនេះ...
+ឧទាហរណ៍៖
+🔔 មានការកុម្មង់ទំនិញថ្មីចូល 🔔
+🆔 Order Row: #638
+▪️ កាលបរិច្ឆេទ(Date): 21 Aug 2026
+▪️ ឈ្មោះអ្នកលក់: ជា វឌ្ឍនា
+▪️ ផលិតផល(Product) [Kidney Pro]: 1
+▪️ តម្លៃ(Price): 90
+▪️ លេខអ្នកទទួល(Receiver No): 0974999965
+▪️ អាសយដ្ឋាន(Address): ស្រយ៉ង់កោះកេរ្ត៍ (ព្រះវិហារ)
+▪️ ដឹកជញ្ជូនតាម(Delivery): VET(COD)" oninput="onOrderPasteInput(this.value)"></textarea>
+      </div>
+
+      <!-- Parsed Orders Live Preview List -->
+      <div style="margin-top:16px;">
+        <h4 style="font-size:13px; font-weight:700; color:#93C5FD; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+          <i data-lucide="layers" style="width:15px; height:15px;"></i>
+          <span>លទ្ធផលញែកស្វ័យប្រវត្តិ (Parsed Orders Preview)</span>
+        </h4>
+        <div id="order-parsed-list" style="display:flex; flex-direction:column; gap:10px; max-height:240px; overflow-y:auto; padding-right:4px;">
+          <div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12.5px; border:1px dashed rgba(255,255,255,0.15); border-radius:10px;">
+            សូម Copy & Paste អត្ថបទការកម្ម៉ង់ក្នុងប្រអប់ខាងលើ ដើម្បីមើលទិន្នន័យ
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions: Submit to Sheet & Cancel -->
+      <div class="modal-actions-row" style="margin-top:20px;">
+        <button type="button" class="btn-secondary" onclick="closeOrderModal()">បោះបង់</button>
+        <button type="button" class="btn-primary" id="btn-save-orders" onclick="handleSaveParsedOrders()" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);">
+          <i data-lucide="cloud-upload"></i>
+          <span id="btn-save-orders-text">រក្សាទុក និងបញ្ជូនចូល Sheet</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Login Modal Overlay -->
   <div id="login-modal-overlay" class="login-modal-overlay" style="display: none;">
     <div class="login-modal-card">
@@ -336,6 +417,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=20261008_2045"></script>
+  <script src="app.js?v=20261008_2125"></script>
 </body>
 </html>

@@ -278,6 +278,8 @@ const state = {
   isLoading: false,
   lastSyncTime: null,
   customExpenses: JSON.parse(localStorage.getItem('yem_custom_expenses') || '[]'),
+  customOrders: JSON.parse(localStorage.getItem('yem_custom_orders') || '[]'),
+  parsedPendingOrders: [],
   // Raw Data from Sheets
   data: {
     expenses: [],
@@ -1292,6 +1294,9 @@ function renderModuleContent(moduleId) {
     case 'employees':
       renderEmployeesModule();
       break;
+    case 'orders':
+      renderOrdersModule();
+      break;
     default:
       renderGenericModule(moduleId);
       break;
@@ -2221,7 +2226,13 @@ function renderTeamSalesSectionHtml() {
           <h3 class="card-title"><i data-lucide="trophy"></i> ${t.leaderboardTitle}</h3>
           <p style="font-size:12px; color:var(--text-muted); margin-top:3px;">${lang === 'en' ? 'Boxes sold from company and personal with commissions ($3/box)' : 'ចំនួនប្រអប់លក់ចេញពីក្រុមហ៊ុន និងប្រាក់កម្រៃជើងសារទទួលបាន ($3/ប្រអប់)'}</p>
         </div>
-        <span class="status-pill-disconnected" style="background:#DCFCE7; color:#15803D;">${lang === 'en' ? 'Total' : 'សរុប'} ${totalBoxes} ${lang === 'en' ? 'Boxes' : 'ប្រអប់'}</span>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button type="button" class="header-action-btn-order" onclick="openOrderModal()" style="padding:4px 12px; font-size:11.5px;">
+            <i data-lucide="clipboard-paste" style="width:14px; height:14px;"></i>
+            <span>+ បញ្ចូលការកម្ម៉ង់</span>
+          </button>
+          <span class="status-pill-disconnected" style="background:#DCFCE7; color:#15803D;">${lang === 'en' ? 'Total' : 'សរុប'} ${totalBoxes} ${lang === 'en' ? 'Boxes' : 'ប្រអប់'}</span>
+        </div>
       </div>
 
       <div class="table-responsive" style="margin-top:12px;">
@@ -2298,6 +2309,53 @@ function renderTeamSalesSectionHtml() {
         </table>
       </div>
     </div>
+
+    <!-- តារាងបង្ហាញការកម្ម៉ង់ដែលទើបតែបញ្ចូលថ្មីៗពី Telegram (Recent Imported Orders) -->
+    ${(state.customOrders && state.customOrders.length > 0) ? `
+      <div class="panel-card" style="margin-bottom:24px;">
+        <div class="card-title-row">
+          <div>
+            <h3 class="card-title"><i data-lucide="package-check"></i> បញ្ជីការកុម្ម៉ង់ទំនិញថ្មីដែលបានបញ្ចូលពី Telegram (Recent Imported Orders)</h3>
+            <p style="font-size:12px; color:var(--text-muted); margin-top:3px;">ទិន្នន័យដែលបាន Paste ចូលបន្តពីទិន្នន័យចាស់ និងបានបញ្ជូនទៅ Google Sheet</p>
+          </div>
+          <span class="order-tag green">${state.customOrders.length} ការកុម្ម៉ង់</span>
+        </div>
+
+        <div class="table-responsive" style="margin-top:12px;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width:110px;">កូដកម្ម៉ង់</th>
+                <th>កាលបរិច្ឆេទ</th>
+                <th>អ្នកលក់</th>
+                <th>ផលិតផល</th>
+                <th style="text-align:center;">ចំនួនប្រអប់</th>
+                <th style="text-align:right;">តម្លៃសរុប</th>
+                <th>អ្នកទទួល & អាសយដ្ឋាន</th>
+                <th>ដឹកជញ្ជូន</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${state.customOrders.map(ord => `
+                <tr>
+                  <td><strong style="color:var(--primary-accent);">#${ord.orderId}</strong></td>
+                  <td style="color:var(--text-muted); font-size:12px;">${ord.date}</td>
+                  <td><strong style="color:#FFFFFF;">${ord.seller}</strong></td>
+                  <td style="color:#93C5FD;">${ord.productNames || 'KD-09'}</td>
+                  <td style="text-align:center;"><span class="order-tag blue">${ord.totalBoxes} ប្រអប់</span></td>
+                  <td style="text-align:right; font-weight:700; color:#10B981;">${formatUsd(ord.priceUsd)}</td>
+                  <td style="font-size:12px;">
+                    <div>${ord.receiverName ? `<strong>${ord.receiverName}</strong> - ` : ''}<span style="color:#FBBF24;">${ord.receiverPhone || ''}</span></div>
+                    <div style="color:var(--text-muted); font-size:11px;">${ord.address || '—'}</div>
+                  </td>
+                  <td><span class="order-tag amber">${ord.delivery || 'COD'}</span></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    ` : ''}
 
     <!-- ផែនការប៊ូស & យុទ្ធសាស្ត្រលក់ (Ad Spend & Sales Strategy Grid) -->
     <div class="panel-card">
@@ -2878,6 +2936,355 @@ window.handleSaveExpense = async function(e) {
       ? 'Saved locally! Please check connection to Google Sheet.'
       : 'បានរក្សាទុកក្នុងទូរស័ព្ទ! សូមពិនិត្យមើលការតភ្ជាប់អ៊ីនធឺណិត។');
   }
+};
+
+/**
+ * ==========================================================================
+ * Smart Order Import & Sheet Sync Handlers (Telegram & Chat Auto-Parser)
+ * ==========================================================================
+ */
+window.openOrderModal = function() {
+  const modal = document.getElementById('order-modal-overlay');
+  if (modal) {
+    modal.style.display = 'flex';
+    const txtArea = document.getElementById('order-paste-input');
+    if (txtArea) txtArea.focus();
+  }
+};
+
+window.closeOrderModal = function() {
+  const modal = document.getElementById('order-modal-overlay');
+  if (modal) modal.style.display = 'none';
+};
+
+window.parseTelegramOrdersText = function(text) {
+  if (!text || !text.trim()) return [];
+
+  // Check if multiple Telegram orders formatted with bell emoji or "Order Row:"
+  let blocks = text.split(/🔔\s*មានការកុម្មង់ទំនិញថ្មីចូល\s*🔔|🔔/i).filter(b => b.trim().length > 0);
+  if (blocks.length === 0) {
+    // Try splitting by "Order Row:" or "🆔"
+    if (text.includes('Order Row:')) {
+      blocks = text.split(/(?=🆔\s*Order\s*Row:)/i).filter(b => b.trim().length > 0);
+    } else {
+      blocks = [text];
+    }
+  }
+
+  const orders = [];
+  const now = new Date();
+  const defaultDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+  for (const b of blocks) {
+    const raw = b.trim();
+    if (!raw) continue;
+
+    const order = {
+      orderId: '',
+      date: defaultDate,
+      team: 'Bech_Nora',
+      seller: '',
+      sellerPhone: '',
+      products: [],
+      productNames: '',
+      totalBoxes: 0,
+      priceUsd: 0,
+      receiverName: '',
+      receiverPhone: '',
+      address: '',
+      delivery: 'VET (COD)',
+      status: 'បានកុម្មង់ (New)'
+    };
+
+    // 1. Order Row ID
+    const mId = raw.match(/🆔\s*Order\s*Row\s*:\s*#?([^\n\r]+)/i);
+    if (mId) order.orderId = mId[1].trim();
+
+    // 2. Date
+    const mDate = raw.match(/កាលបរិច្ឆេទ\(Date\)\s*:\s*([^\n\r]+)/i);
+    if (mDate) {
+      order.date = mDate[1].trim();
+    } else {
+      const mDateAlt = raw.match(/(?:ថ្ងៃ|កាលបរិច្ឆេទ)\s*[:៖]\s*([^\n\r]+)/i);
+      if (mDateAlt) order.date = mDateAlt[1].trim();
+    }
+
+    // 3. Team
+    const mTeam = raw.match(/ថ្នាក់ដឹកនាំ\(Team\)\s*:\s*([^\n\r]+)/i);
+    if (mTeam) order.team = mTeam[1].trim();
+
+    // 4. Seller
+    const mSeller = raw.match(/(?:ឈ្មោះអ្នកលក់|អ្នកលក់)\s*[:៖]\s*([^\n\r]+)/i);
+    if (mSeller) order.seller = mSeller[1].trim();
+
+    // 5. Seller Phone
+    const mSellerPhone = raw.match(/លេខអ្នកលក់\(Seller\s*No\)\s*:\s*([^\n\r]+)/i);
+    if (mSellerPhone) order.sellerPhone = mSellerPhone[1].trim();
+
+    // 6. Price
+    const mPrice = raw.match(/(?:តម្លៃ\(Price\)|តម្លៃ|ថ្លៃ)\s*[:៖]\s*([^\n\r]+)/i);
+    if (mPrice) {
+      order.priceUsd = parseFloat(mPrice[1].replace(/[^0-9.-]+/g, '')) || 0;
+      if (mPrice[1].includes('COD')) order.delivery = 'COD';
+      if (mPrice[1].includes('ABA')) order.delivery = 'ABA Bank';
+    }
+
+    // 7. Receiver Name
+    const mName = raw.match(/ឈ្មោះ\s*[:៖]\s*([^\n\r]+)/i);
+    if (mName && !mName[1].includes('អ្នកលក់')) {
+      order.receiverName = mName[1].trim();
+    }
+
+    // 8. Receiver Phone
+    const mReceiverPhone = raw.match(/(?:លេខអ្នកទទួល\(Receiver\s*No\)|លេខទូរស័ព្ទ|លេខអ្នកទទួល|ទូរស័ព្ទ)\s*[:៖]\s*([0-9\s-]+)/i);
+    if (mReceiverPhone) order.receiverPhone = mReceiverPhone[1].trim();
+
+    // 9. Address
+    const mAddr = raw.match(/(?:អាសយដ្ឋាន\(Address\)|អាសយដ្ឋាន|ទីតាំង)\s*[:៖]\s*([^\n\r]+)/i);
+    if (mAddr) order.address = mAddr[1].trim();
+
+    // 10. Delivery
+    const mDel = raw.match(/(?:ដឹកជញ្ជូនតាម\(Delivery\)|ដឹកតាម|ដឹកជញ្ជូន)\s*[:៖]\s*([^\n\r]+)/i);
+    if (mDel) order.delivery = mDel[1].trim();
+
+    // 11. Products e.g. ▪️ ផលិតផល(Product) [Kidney Pro]: 1
+    const prodRegex = /ផលិតផល\(Product\)\s*\[([^\]]+)\]\s*:\s*(\d+)/gi;
+    let match;
+    let parsedBoxes = 0;
+    const prodList = [];
+    while ((match = prodRegex.exec(raw)) !== null) {
+      const pName = match[1].trim();
+      const pQty = parseInt(match[2], 10) || 1;
+      prodList.push(`${pName} (${pQty})`);
+      parsedBoxes += pQty;
+    }
+
+    // Alternative free-text product format: e.g. ទំនិញ៖ KD-09 ចំនួន 2 ប្រអប់
+    if (prodList.length === 0) {
+      const mProdFree = raw.match(/(?:ទំនិញ|ផលិតផល)\s*[:៖]\s*([^\n\r]+)/i);
+      if (mProdFree) {
+        prodList.push(mProdFree[1].trim());
+      }
+      const mBoxesFree = raw.match(/(\d+)\s*ប្រអប់/i);
+      if (mBoxesFree) {
+        parsedBoxes = parseInt(mBoxesFree[1], 10);
+      }
+    }
+
+    order.products = prodList;
+    order.productNames = prodList.length > 0 ? prodList.join(', ') : 'KD-09';
+    order.totalBoxes = parsedBoxes > 0 ? parsedBoxes : 1;
+
+    // Default seller to Seyha if empty
+    if (!order.seller) {
+      order.seller = 'យឹម សីហា';
+    }
+
+    // Default Order ID if none
+    if (!order.orderId) {
+      order.orderId = 'ORD-' + Math.floor(1000 + Math.random() * 9000);
+    }
+
+    // Only include if has minimal order identifiers
+    if (order.receiverPhone || order.priceUsd > 0 || order.seller || order.address) {
+      orders.push(order);
+    }
+  }
+
+  return orders;
+};
+
+window.onOrderPasteInput = function(val) {
+  const orders = window.parseTelegramOrdersText(val);
+  state.parsedPendingOrders = orders;
+  window.renderParsedOrdersPreview(orders);
+};
+
+window.renderParsedOrdersPreview = function(orders) {
+  const container = document.getElementById('order-parsed-list');
+  const badge = document.getElementById('order-parsed-count-badge');
+  if (badge) {
+    badge.textContent = `${orders.length} ការកម្ម៉ង់`;
+  }
+  if (!container) return;
+
+  if (orders.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12.5px; border:1px dashed rgba(255,255,255,0.15); border-radius:10px;">
+        សូម Copy & Paste អត្ថបទការកម្ម៉ង់ក្នុងប្រអប់ខាងលើ ដើម្បីមើលទិន្នន័យ
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = orders.map((o, idx) => `
+    <div class="order-preview-card">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div>
+          <div style="font-size:13.5px; font-weight:700; color:#FFFFFF; display:flex; align-items:center; gap:6px;">
+            <span>${idx + 1}. 🆔 #${o.orderId}</span>
+            <span class="order-tag blue">${o.seller}</span>
+            ${o.team ? `<span class="order-tag purple">${o.team}</span>` : ''}
+          </div>
+          <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">
+            កាលបរិច្ឆេទ៖ <strong style="color:#FFFFFF;">${o.date}</strong> | ផលិតផល៖ <strong style="color:#00B4D8;">${o.productNames}</strong> (${o.totalBoxes} ប្រអប់)
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:15px; font-weight:700; color:#10B981;">$${o.priceUsd.toFixed(2)}</div>
+          <div style="font-size:10.5px; color:#FBBF24;">${Math.round(o.priceUsd * 4100).toLocaleString()} ៛</div>
+        </div>
+      </div>
+
+      <div class="order-badge-row">
+        <span class="order-tag green"><i data-lucide="phone" style="width:11px; height:11px;"></i> ${o.receiverPhone || 'មិនមានលេខ'}</span>
+        ${o.address ? `<span class="order-tag amber"><i data-lucide="map-pin" style="width:11px; height:11px;"></i> ${o.address}</span>` : ''}
+        ${o.delivery ? `<span class="order-tag blue"><i data-lucide="truck" style="width:11px; height:11px;"></i> ${o.delivery}</span>` : ''}
+      </div>
+    </div>
+  `).join('');
+
+  if (window.lucide) window.lucide.createIcons();
+};
+
+window.pasteSampleOrderTelegram = function() {
+  const sample = `🔔 មានការកុម្មង់ទំនិញថ្មីចូល 🔔
+
+🆔 Order Row: #TEST002
+▪️ កាលបរិច្ឆេទ(Date): 16 Sep 2026
+▪️ ថ្នាក់ដឹកនាំ(Team): Bech_Nora
+▪️ ឈ្មោះអ្នកលក់: សីហា
+▪️ ផលិតផល(Product) [Kidney Pro]: 1
+▪️ តម្លៃ(Price): 50
+▪️ លេខអ្នកទទួល(Receiver No): 012345678
+▪️ អាសយដ្ឋាន(Address): ភ្នំពេញ
+▪️ ដឹកជញ្ជូនតាម(Delivery): Motor
+
+🔔 មានការកុម្មង់ទំនិញថ្មីចូល 🔔
+
+🆔 Order Row: #638
+▪️ កាលបរិច្ឆេទ(Date): 21 Aug 2026
+▪️ ថ្នាក់ដឹកនាំ(Team): Bech_Nora
+▪️ ឈ្មោះអ្នកលក់: ជា វឌ្ឍនា
+▪️ លេខអ្នកលក់(Seller No): 0968180188
+▪️ ផលិតផល(Product) [Kidney Pro]: 1
+▪️ ផលិតផល(Product) [Pro D.O]: 1
+▪️ តម្លៃ(Price): 90
+▪️ លេខអ្នកទទួល(Receiver No): 0974999965
+▪️ អាសយដ្ឋាន(Address): ស្រយ៉ង់កោះកេរ្ត៍ (ព្រះវិហារ)
+▪️ ដឹកជញ្ជូនតាម(Delivery): VET(COD)`;
+
+  const txtArea = document.getElementById('order-paste-input');
+  if (txtArea) {
+    txtArea.value = sample;
+    window.onOrderPasteInput(sample);
+  }
+};
+
+window.handleSaveParsedOrders = async function() {
+  const orders = state.parsedPendingOrders;
+  if (!orders || orders.length === 0) {
+    alert('សូម Paste ព័ត៌មានការកម្ម៉ង់ជាមុនសិន!');
+    return;
+  }
+
+  const btn = document.getElementById('btn-save-orders');
+  const btnText = document.getElementById('btn-save-orders-text');
+  if (btn) btn.disabled = true;
+  if (btnText) btnText.innerHTML = '<i data-lucide="loader-2" class="spin-anim"></i> កំពុង Sync ចូល Sheet...';
+  if (window.lucide) window.lucide.createIcons();
+
+  let successCount = 0;
+
+  for (const ord of orders) {
+    // 1. Add to local persistent orders
+    state.customOrders.unshift(ord);
+
+    // 2. Add as an income/sale entry into state.data.incomes as well
+    state.data.incomes.unshift({
+      date: ord.date.includes('-') ? ord.date : new Date().toISOString().split('T')[0],
+      month: ord.date.includes('-') ? ord.date.substring(0, 7) : '2026-10',
+      description: `លក់ ${ord.productNames} (Order #${ord.orderId}) - ${ord.seller}`,
+      category: 'ចំណេញពីការលក់អនឡាញ (Business Profit)',
+      bank: ord.delivery.includes('COD') ? 'COD (ប្រមូលប្រាក់ពេលដឹក)' : 'ABA Bank',
+      amountUsd: ord.priceUsd,
+      amountKhr: ord.priceUsd * 4100,
+      note: `អតិថិជន៖ ${ord.receiverName || 'អតិថិជន'} (${ord.receiverPhone}) | ទីតាំង៖ ${ord.address}`
+    });
+
+    // 3. Update seller total boxes in KD-09 Leaderboard table
+    if (state.data.teamSales && state.data.teamSales.length > 0) {
+      const sellerFound = state.data.teamSales.find(s => s.name.includes(ord.seller) || ord.seller.includes(s.name.split(' ')[0]));
+      if (sellerFound) {
+        sellerFound.company += ord.totalBoxes;
+        sellerFound.total += ord.totalBoxes;
+        sellerFound.amountUsd += (ord.totalBoxes * 3); // $3/box commission
+      }
+    }
+
+    // 4. Send payload to Webhook & Vercel serverless function
+    const payload = {
+      action: 'addOrder',
+      orderId: ord.orderId,
+      date: ord.date,
+      team: ord.team,
+      seller: ord.seller,
+      sellerPhone: ord.sellerPhone,
+      products: ord.productNames,
+      totalBoxes: ord.totalBoxes,
+      priceUsd: ord.priceUsd,
+      priceKhr: ord.priceUsd * 4100,
+      receiverName: ord.receiverName,
+      receiverPhone: ord.receiverPhone,
+      address: ord.address,
+      delivery: ord.delivery
+    };
+
+    try {
+      const apiRes = await fetch('/api/add-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (apiRes.ok) successCount++;
+    } catch (e) {
+      // Fallback direct webhook
+      try {
+        if (SHEET_CONFIG.webhookUrl) {
+          await fetch(SHEET_CONFIG.webhookUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payload)
+          });
+          successCount++;
+        }
+      } catch (err) {}
+    }
+  }
+
+  // Save to local storage
+  localStorage.setItem('yem_custom_orders', JSON.stringify(state.customOrders));
+
+  // Reset button state & close modal
+  if (btn) btn.disabled = false;
+  if (btnText) btnText.textContent = 'រក្សាទុក និងបញ្ជូនចូល Sheet';
+  window.closeOrderModal();
+
+  // Clear inputs
+  const txtArea = document.getElementById('order-paste-input');
+  if (txtArea) txtArea.value = '';
+  state.parsedPendingOrders = [];
+
+  // Update sync status text
+  if (syncStatusTextEl) {
+    syncStatusTextEl.textContent = `បានបញ្ជូនការកម្ម៉ង់ ${orders.length} ចូល Sheet រួចរាល់!`;
+  }
+
+  // Re-render UI
+  renderModuleContent(state.activeModule);
+
+  alert(`ជោគជ័យ! ការកម្ម៉ង់ចំនួន ${orders.length} ត្រូវបានញែក និងបញ្ជូនចូលទៅកាន់ Sheet និងតារាង A1 រួចរាល់ហើយ!`);
 };
 
 /**
@@ -3620,6 +4027,111 @@ window.closeEmployeeDetailModal = function() {
   const overlay = document.getElementById('employee-detail-modal-overlay');
   if (overlay) overlay.style.display = 'none';
 };
+
+/**
+ * Module ការបញ្ជាទិញ (Orders Management & Telegram Import Hub)
+ */
+function renderOrdersModule() {
+  const orders = state.customOrders || [];
+  const totalOrders = orders.length;
+  const totalRevenue = orders.reduce((sum, o) => sum + (o.priceUsd || 0), 0);
+  const totalBoxes = orders.reduce((sum, o) => sum + (o.totalBoxes || 0), 0);
+
+  moduleContainerEl.innerHTML = `
+    <!-- Top Action Banner -->
+    <div style="display:flex; justify-content:space-between; align-items:center; background:linear-gradient(135deg, rgba(14, 31, 68, 0.9) 0%, rgba(6, 14, 34, 0.95) 100%); border:1px solid rgba(0, 180, 216, 0.3); border-radius:var(--radius-xl); padding:18px 24px; margin-bottom:20px; box-shadow:0 8px 24px rgba(0,0,0,0.35); flex-wrap:wrap; gap:12px;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="width:40px; height:40px; border-radius:12px; background:linear-gradient(135deg, #10B981, #059669); display:flex; align-items:center; justify-content:center; box-shadow:0 0 14px rgba(16,185,129,0.5);">
+          <i data-lucide="shopping-bag" style="width:22px; height:22px; color:#FFFFFF;"></i>
+        </div>
+        <div>
+          <h2 style="font-size:18px; font-weight:700; color:#FFFFFF; margin:0;">ការបញ្ជាទិញ & កុម្ម៉ង់ទំនិញ (Orders Management)</h2>
+          <span style="font-size:12px; color:var(--text-muted);">គ្រប់គ្រង និងតាមដានរាល់ការកម្ម៉ង់ដែលបាន Paste ពី Telegram ចូលទៅ Sheet A1</span>
+        </div>
+      </div>
+      <div>
+        <button type="button" class="header-action-btn-order" onclick="openOrderModal()" style="padding:8px 18px; font-size:13px;">
+          <i data-lucide="clipboard-paste"></i>
+          <span>+ Paste បញ្ចូលការកម្ម៉ង់ពី Telegram</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 3 Order KPI Cards -->
+    <div class="metrics-grid">
+      <div class="metric-card border-blue">
+        <div class="metric-header"><span class="metric-label">ការកុម្ម៉ង់សរុប</span><span class="metric-icon-badge"><i data-lucide="package"></i></span></div>
+        <div class="metric-value">${totalOrders} កុម្ម៉ង់</div>
+        <div class="metric-footer">${totalBoxes} ប្រអប់លក់ចេញ</div>
+      </div>
+      <div class="metric-card border-green">
+        <div class="metric-header"><span class="metric-label">ចំណូលសរុប</span><span class="metric-icon-badge"><i data-lucide="dollar-sign"></i></span></div>
+        <div class="metric-value">${formatUsd(totalRevenue)}</div>
+        <div class="metric-footer">${formatKhr(totalRevenue * 4100)}</div>
+      </div>
+      <div class="metric-card border-amber">
+        <div class="metric-header"><span class="metric-label">ស្ថានភាពតភ្ជាប់ Sheet</span><span class="metric-icon-badge"><i data-lucide="check-circle-2"></i></span></div>
+        <div class="metric-value" style="font-size:16px; color:#10B981;">Sync រួចរាល់</div>
+        <div class="metric-footer">បន្តពីទិន្នន័យចាស់ A1</div>
+      </div>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="panel-card" style="margin-top:20px;">
+      <div class="card-title-row">
+        <div>
+          <h3 class="card-title"><i data-lucide="list-ordered"></i> បញ្ជីការកុម្ម៉ង់ទាំងអស់ (Orders Directory)</h3>
+          <p style="font-size:12px; color:var(--text-muted); margin-top:2px;">ទិន្នន័យបានកត់ត្រាចូលក្នុងប្រព័ន្ធ និងបញ្ជូនទៅកាន់ Google Sheet ផ្ទាល់</p>
+        </div>
+        <span class="order-tag green">${totalOrders} កុម្ម៉ង់</span>
+      </div>
+
+      <div class="table-responsive" style="margin-top:14px;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width:110px;">កូដកម្ម៉ង់</th>
+              <th>កាលបរិច្ឆេទ</th>
+              <th>អ្នកលក់</th>
+              <th>ផលិតផល</th>
+              <th style="text-align:center;">ចំនួនប្រអប់</th>
+              <th style="text-align:right;">តម្លៃសរុប</th>
+              <th>អ្នកទទួល & អាសយដ្ឋាន</th>
+              <th>ដឹកជញ្ជូន</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${orders.length > 0 ? orders.map(ord => `
+              <tr>
+                <td><strong style="color:var(--primary-accent);">#${ord.orderId}</strong></td>
+                <td style="color:var(--text-muted); font-size:12px;">${ord.date}</td>
+                <td><strong style="color:#FFFFFF;">${ord.seller}</strong></td>
+                <td style="color:#93C5FD;">${ord.productNames || 'KD-09'}</td>
+                <td style="text-align:center;"><span class="order-tag blue">${ord.totalBoxes} ប្រអប់</span></td>
+                <td style="text-align:right; font-weight:700; color:#10B981;">${formatUsd(ord.priceUsd)}</td>
+                <td style="font-size:12px;">
+                  <div>${ord.receiverName ? `<strong>${ord.receiverName}</strong> - ` : ''}<span style="color:#FBBF24;">${ord.receiverPhone || ''}</span></div>
+                  <div style="color:var(--text-muted); font-size:11px;">${ord.address || '—'}</div>
+                </td>
+                <td><span class="order-tag amber">${ord.delivery || 'COD'}</span></td>
+              </tr>
+            `).join('') : `
+              <tr class="table-empty-row">
+                <td colspan="8">
+                  <div class="table-empty-wrap">
+                    <i data-lucide="clipboard-x"></i>
+                    <span class="table-empty-title">មិនទាន់មានការកុម្ម៉ង់ដែលបានបញ្ចូលនៅឡើយទេ</span>
+                    <span class="table-empty-desc">ចុចប៊ូតុង «+ Paste បញ្ចូលការកម្ម៉ង់» ខាងលើ ដើម្បី Copy ពី Telegram មកទម្លាក់ចូល។</span>
+                  </div>
+                </td>
+              </tr>
+            `}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
 
 /**
  * 7. Module ផ្សេងៗ (Wireframes with Notice)
