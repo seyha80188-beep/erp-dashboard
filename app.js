@@ -1181,6 +1181,9 @@ function renderModuleContent(moduleId) {
     case 'profit-loss':
       renderProfitLossModule();
       break;
+    case 'employees':
+      renderEmployeesModule();
+      break;
     default:
       renderGenericModule(moduleId);
       break;
@@ -1416,8 +1419,10 @@ function renderBusinessViewA1Html() {
         </div>
 
         <div style="display:flex; flex-direction:column; gap:10px; margin-top:8px;">
-          ${sellers.map((s, idx) => `
-            <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:rgba(6, 14, 34, 0.6); border:1px solid var(--border-color); border-radius:12px;">
+          ${sellers.map((s, idx) => {
+            const empId = s.avatar === 'Y' ? 'emp-seyha' : s.avatar === 'V' ? 'emp-vathana' : 'emp-sopha';
+            return `
+            <div onclick="openEmployeeDetailModal('${empId}')" style="display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:rgba(6, 14, 34, 0.6); border:1px solid var(--border-color); border-radius:12px; cursor:pointer; transition:all 0.2s ease;" onmouseover="this.style.borderColor='rgba(0,180,216,0.5)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='var(--border-color)'; this.style.transform='none';" title="ចុចដើម្បីមើលរបាយការណ៍លក់របស់ ${s.name}">
               <div style="display:flex; align-items:center; gap:12px;">
                 ${s.avatar === 'Y' ? `
                   <div class="avatar-with-badge" style="width:36px; height:36px;">
@@ -2133,11 +2138,17 @@ function renderTeamSalesSectionHtml() {
               else if (idx === 2) badgeHtml = `<span class="rank-badge rank-badge-3">🥉 3</span>`;
               else badgeHtml = `<span class="rank-badge rank-badge-normal">#${idx + 1}</span>`;
 
+              const matchedEmp = DEFAULT_TEAM_MEMBERS.find(m => m.name.includes(s.name) || s.name.includes(m.name.split(' ')[0]));
+              const empId = matchedEmp ? matchedEmp.id : (s.name.includes('សីហា') ? 'emp-seyha' : s.name.includes('វឌ្ឍនា') ? 'emp-vathana' : s.name.includes('សុផា') ? 'emp-sopha' : 'emp-s-pha');
+
               return `
-                <tr>
+                <tr onclick="openEmployeeDetailModal('${empId}')" style="cursor:pointer;" title="ចុចដើម្បីមើលរបាយការណ៍លក់ផ្ទាល់ខ្លួនរបស់ ${s.name}">
                   <td style="text-align:center;">${badgeHtml}</td>
                   <td>
-                    <div style="font-weight:700; color:#FFFFFF; font-size:13.5px;">${s.name}</div>
+                    <div style="font-weight:700; color:#FFFFFF; font-size:13.5px; display:flex; align-items:center; gap:6px;">
+                      ${s.name}
+                      <span style="font-size:11px; color:var(--primary-accent);"><i data-lucide="external-link" style="width:12px; height:12px;"></i></span>
+                    </div>
                   </td>
                   <td style="text-align:center; color:#93C5FD; font-weight:600;">${s.company} ប្រអប់</td>
                   <td style="text-align:center; color:#FBBF24; font-weight:600;">${s.personal} ប្រអប់</td>
@@ -3205,7 +3216,393 @@ function renderProfitLossModule() {
 }
 
 /**
- * 6. Module ផ្សេងៗ (Wireframes with Notice)
+ * 6. Module បុគ្គលិក & ក្រុមការងារ (Employees & Team Member Performance)
+ */
+const DEFAULT_TEAM_MEMBERS = [
+  {
+    id: 'emp-seyha',
+    name: 'យឹម សីហា (Yem Seyha)',
+    role: 'CEO & Founder / អ្នកគ្រប់គ្រងប្រព័ន្ធ',
+    phone: '088 888 8888',
+    avatar: 'Y',
+    isSeyha: true,
+    status: 'Active',
+    joinDate: '2026-01-01',
+    telegram: '@yemseyha',
+    october: { boxes: 3, revenue: 137.00, commission: 9.00, netProfit: 98.50, deliveryRate: '100%', personalBoxes: 2, companyBoxes: 1 },
+    september: { boxes: 5, revenue: 135.00, commission: 15.00, netProfit: 96.00, deliveryRate: '100%', personalBoxes: 3, companyBoxes: 2 },
+    recentSales: [
+      { date: '2026-10-06', customer: 'ម៉េង ហួរ (ភ្នំពេញ)', product: 'KD-09', qty: 1, amount: 45.00, status: 'បានប្រគល់', payment: 'ABA Bank' },
+      { date: '2026-10-04', customer: 'ចាន់ថា (បាត់ដំបង)', product: 'KD-09', qty: 1, amount: 46.00, status: 'បានប្រគល់', payment: 'Wing' },
+      { date: '2026-10-02', customer: 'សុផល (សៀមរាប)', product: 'KD-09', qty: 1, amount: 46.00, status: 'បានប្រគល់', payment: 'ABA Bank' }
+    ]
+  },
+  {
+    id: 'emp-vathana',
+    name: 'ជា វឌ្ឍនា (Chea Vathana)',
+    role: 'Top Sales Leader / មេក្រុមលក់ឆ្នើម KD-09',
+    phone: '097 777 6666',
+    avatar: 'V',
+    isSeyha: false,
+    status: 'Active',
+    joinDate: '2026-02-15',
+    telegram: '@vathana_kd09',
+    october: { boxes: 7, revenue: 320.00, commission: 81.00, netProfit: 230.00, deliveryRate: '95%', personalBoxes: 0, companyBoxes: 7 },
+    september: { boxes: 27, revenue: 725.00, commission: 81.00, netProfit: 515.00, deliveryRate: '95%', personalBoxes: 0, companyBoxes: 27 },
+    recentSales: [
+      { date: '2026-10-06', customer: 'បូរមី (កំពង់ចាម)', product: 'KD-09', qty: 2, amount: 92.00, status: 'បានប្រគល់', payment: 'ABA Bank' },
+      { date: '2026-10-05', customer: 'សុភាព (ភ្នំពេញ)', product: 'KD-09', qty: 2, amount: 90.00, status: 'បានប្រគល់', payment: 'ABA Bank' },
+      { date: '2026-10-03', customer: 'ដារ៉ា (កណ្តាល)', product: 'KD-09', qty: 2, amount: 92.00, status: 'បានប្រគល់', payment: 'TrueMoney' },
+      { date: '2026-10-01', customer: 'ពិសិដ្ឋ (ព្រៃវែង)', product: 'KD-09', qty: 1, amount: 46.00, status: 'កំពុងដឹក', payment: 'COD' }
+    ]
+  },
+  {
+    id: 'emp-sopha',
+    name: 'ភឿន សុផា (Phoeun Sopha)',
+    role: 'Senior Sales Representative / អ្នកលក់ជាន់ខ្ពស់',
+    phone: '096 555 4444',
+    avatar: 'S',
+    isSeyha: false,
+    status: 'Active',
+    joinDate: '2026-03-01',
+    telegram: '@sopha_sales',
+    october: { boxes: 5, revenue: 228.00, commission: 60.00, netProfit: 164.00, deliveryRate: '92%', personalBoxes: 2, companyBoxes: 3 },
+    september: { boxes: 22, revenue: 590.00, commission: 60.00, netProfit: 420.00, deliveryRate: '92%', personalBoxes: 2, companyBoxes: 20 },
+    recentSales: [
+      { date: '2026-10-06', customer: 'កុសល (កំពត)', product: 'KD-09', qty: 2, amount: 92.00, status: 'បានប្រគល់', payment: 'ABA Bank' },
+      { date: '2026-10-04', customer: 'ស្រីមុំ (ភ្នំពេញ)', product: 'KD-09', qty: 2, amount: 90.00, status: 'បានប្រគល់', payment: 'Wing' },
+      { date: '2026-10-02', customer: 'វិបុល (តាកែវ)', product: 'KD-09', qty: 1, amount: 46.00, status: 'កំពុងដឹក', payment: 'COD' }
+    ]
+  },
+  {
+    id: 'emp-s-pha',
+    name: 'S+PHA (ក្រុមចម្រុះ សុផា & សហការី)',
+    role: 'Sales Partner / ដៃគូលក់រួមគ្នា',
+    phone: '012 333 2222',
+    avatar: 'SP',
+    isSeyha: false,
+    status: 'Active',
+    joinDate: '2026-05-10',
+    telegram: '@spha_partner',
+    october: { boxes: 2, revenue: 92.00, commission: 6.00, netProfit: 66.00, deliveryRate: '90%', personalBoxes: 0, companyBoxes: 2 },
+    september: { boxes: 2, revenue: 90.00, commission: 6.00, netProfit: 64.00, deliveryRate: '90%', personalBoxes: 0, companyBoxes: 2 },
+    recentSales: [
+      { date: '2026-10-05', customer: 'សុធី (ភ្នំពេញ)', product: 'KD-09', qty: 1, amount: 46.00, status: 'បានប្រគល់', payment: 'ABA Bank' },
+      { date: '2026-10-03', customer: 'ផល្លា (កំពង់ស្ពឺ)', product: 'KD-09', qty: 1, amount: 46.00, status: 'បានប្រគល់', payment: 'ABA Bank' }
+    ]
+  },
+  {
+    id: 'emp-v-pha',
+    name: 'V+PHA (ក្រុមចម្រុះ វឌ្ឍនា & សុផា)',
+    role: 'Co-Sales Group / ក្រុមសហការលក់ពិសេស',
+    phone: '070 111 2222',
+    avatar: 'VP',
+    isSeyha: false,
+    status: 'Active',
+    joinDate: '2026-06-01',
+    telegram: '@vpha_team',
+    october: { boxes: 2, revenue: 92.00, commission: 6.00, netProfit: 66.00, deliveryRate: '100%', personalBoxes: 0, companyBoxes: 2 },
+    september: { boxes: 2, revenue: 90.00, commission: 6.00, netProfit: 64.00, deliveryRate: '100%', personalBoxes: 0, companyBoxes: 2 },
+    recentSales: [
+      { date: '2026-10-04', customer: 'រ៉ាដូ (បន្ទាយមានជ័យ)', product: 'KD-09', qty: 2, amount: 92.00, status: 'បានប្រគល់', payment: 'ABA Bank' }
+    ]
+  }
+];
+
+function renderEmployeesModule() {
+  const isOct = state.selectedMonth === '2026-10' || state.selectedMonth === 'all';
+  const members = DEFAULT_TEAM_MEMBERS;
+
+  const totalMembers = members.length;
+  const totalBoxes = members.reduce((sum, m) => sum + (isOct ? m.october.boxes : m.september.boxes), 0);
+  const totalRevenue = members.reduce((sum, m) => sum + (isOct ? m.october.revenue : m.september.revenue), 0);
+  const totalCommission = members.reduce((sum, m) => sum + (isOct ? m.october.commission : m.september.commission), 0);
+
+  moduleContainerEl.innerHTML = `
+    <!-- Employees Module Header -->
+    <div style="display:flex; justify-content:space-between; align-items:center; background:linear-gradient(135deg, rgba(14, 31, 68, 0.9) 0%, rgba(6, 14, 34, 0.95) 100%); border:1px solid rgba(0, 180, 216, 0.35); border-radius:var(--radius-xl); padding:18px 24px; margin-bottom:20px; box-shadow:0 8px 24px rgba(0,0,0,0.35);">
+      <div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:38px; height:38px; border-radius:12px; background:linear-gradient(135deg, #00B4D8, #0077B6); display:flex; align-items:center; justify-content:center; box-shadow:0 0 14px rgba(0,180,216,0.45);">
+            <i data-lucide="user-check" style="width:22px; height:22px; color:#FFFFFF;"></i>
+          </div>
+          <div>
+            <h2 style="font-size:18px; font-weight:700; color:#FFFFFF; margin:0;">
+              បញ្ជីបុគ្គលិក & របាយការណ៍លក់តាមសមាជិកម្នាក់ៗ
+            </h2>
+            <span style="font-size:12px; color:var(--text-muted);">
+              ចុចលើឈ្មោះ ឬកាតបុគ្គលិកខាងក្រោម ដើម្បីមើលរបាយការណ៍លក់ផ្ទាល់ខ្លួន កម្រៃជើងសារ និងប្រវត្តិការងារលម្អិត
+            </span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span class="status-pill-disconnected" style="background:rgba(16, 185, 129, 0.15); color:#10B981; border:1px solid rgba(16, 185, 129, 0.35);">
+          <i data-lucide="shield-check"></i> ${totalMembers} នាក់ (រួមទាំងខ្ញុំ Seyha)
+        </span>
+      </div>
+    </div>
+
+    <!-- 4 KPI Summary Cards for Team Performance -->
+    <div class="metrics-grid">
+      <div class="metric-card border-blue">
+        <div class="metric-header">
+          <span class="metric-label">សមាជិកក្រុមទាំងអស់</span>
+          <span class="metric-icon-badge"><i data-lucide="users"></i></span>
+        </div>
+        <div class="metric-value">${totalMembers} នាក់</div>
+        <div class="metric-footer">ក្រុមការងារលក់ KD-09 សកម្មទាំងអស់</div>
+      </div>
+
+      <div class="metric-card border-green">
+        <div class="metric-header">
+          <span class="metric-label">ការលក់សរុបប្រចាំក្រុម</span>
+          <span class="metric-icon-badge"><i data-lucide="package"></i></span>
+        </div>
+        <div class="metric-value">${totalBoxes} ប្រអប់</div>
+        <div class="metric-footer">${isOct ? 'ខែតុលា ២០២៦' : 'ខែកញ្ញា ២០២៦'} (KD-09)</div>
+      </div>
+
+      <div class="metric-card border-amber">
+        <div class="metric-header">
+          <span class="metric-label">ចំណូលលក់ប្រចាំក្រុម</span>
+          <span class="metric-icon-badge"><i data-lucide="dollar-sign"></i></span>
+        </div>
+        <div class="metric-value">${formatCurrency(totalRevenue)}</div>
+        <div class="metric-footer">${formatCurrency(totalRevenue * 4100, 'KHR')}</div>
+      </div>
+
+      <div class="metric-card border-red">
+        <div class="metric-header">
+          <span class="metric-label">កម្រៃជើងសារសរុប ($3/ប្រអប់)</span>
+          <span class="metric-icon-badge"><i data-lucide="gift"></i></span>
+        </div>
+        <div class="metric-value" style="color:#10B981;">${formatCurrency(totalCommission)}</div>
+        <div class="metric-footer">ចែកជូនតាមចំនួនប្រអប់លក់</div>
+      </div>
+    </div>
+
+    <!-- Interactive Employee Member Grid Cards -->
+    <div class="panel-card" style="margin-bottom:24px;">
+      <div class="card-title-row">
+        <div>
+          <h3 class="card-title"><i data-lucide="id-card"></i> ជ្រើសរើសសមាជិកដើម្បីមើលរបាយការណ៍លក់ផ្ទាល់ខ្លួន (Click to View Report)</h3>
+          <p style="font-size:12px; color:var(--text-muted); margin-top:3px;">ចុចលើកាតរបស់សមាជិកណាម្នាក់ ដើម្បីបើកមើលផ្ទាំងរបាយការណ៍លក់ សមិទ្ធផល និងប្រវត្តិបញ្ជាទិញជាក់ស្តែង</p>
+        </div>
+        <span class="status-pill-disconnected" style="background:rgba(0, 180, 216, 0.15); color:var(--primary-accent); border:1px solid rgba(0, 180, 216, 0.35);">
+          <i data-lucide="mouse-pointer-click"></i> ចុចលើកាតដើម្បីមើល
+        </span>
+      </div>
+
+      <div class="employee-grid">
+        ${members.map((m, idx) => {
+          const stats = isOct ? m.october : m.september;
+          return `
+            <div class="employee-card" onclick="openEmployeeDetailModal('${m.id}')" title="ចុចដើម្បីមើលរបាយការណ៍លក់របស់ ${m.name}">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:12px;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                  ${m.isSeyha ? `
+                    <div class="avatar-with-badge" style="width:48px; height:48px;">
+                      <img src="data:image/jpeg;base64,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" alt="${m.name}" class="avatar-photo-img" style="border:2px solid #00B4D8; box-shadow:0 0 10px rgba(0,180,216,0.5);">
+                      <span class="verified-badge-icon" style="width:14px; height:14px; bottom:-2px; right:-2px;">
+                        <i data-lucide="check" style="width:8px; height:8px;"></i>
+                      </span>
+                    </div>
+                  ` : `
+                    <div class="leaderboard-avatar-circle" style="width:48px; height:48px; font-size:16px;">
+                      ${m.avatar}
+                    </div>
+                  `}
+                  <div>
+                    <h4 style="font-size:15px; font-weight:700; color:#FFFFFF; display:flex; align-items:center; gap:5px; margin:0;">
+                      ${m.name}
+                      ${m.isSeyha ? `<span class="verified-inline-check" style="width:14px; height:14px;"><i data-lucide="check" style="width:8px; height:8px;"></i></span>` : ''}
+                    </h4>
+                    <span style="font-size:11.5px; color:var(--primary-accent);">${m.role}</span>
+                  </div>
+                </div>
+                <span class="employee-stat-badge" style="background:rgba(16, 185, 129, 0.18); color:#10B981; border:1px solid rgba(16, 185, 129, 0.35);">
+                  <i data-lucide="activity"></i> ${m.status}
+                </span>
+              </div>
+
+              <!-- Quick KPI stats for this member -->
+              <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; background:rgba(6, 14, 34, 0.55); padding:10px; border-radius:10px; margin-bottom:12px; border:1px solid rgba(255,255,255,0.06);">
+                <div style="text-align:center;">
+                  <div style="font-size:10px; color:var(--text-muted);">លក់បាន</div>
+                  <div style="font-size:14px; font-weight:700; color:#00B4D8;">${stats.boxes} ប្រអប់</div>
+                </div>
+                <div style="text-align:center; border-left:1px solid rgba(255,255,255,0.08); border-right:1px solid rgba(255,255,255,0.08);">
+                  <div style="font-size:10px; color:var(--text-muted);">ចំណូលលក់</div>
+                  <div style="font-size:14px; font-weight:700; color:#FFFFFF;">${formatCurrency(stats.revenue)}</div>
+                </div>
+                <div style="text-align:center;">
+                  <div style="font-size:10px; color:var(--text-muted);">ជើងសារ ($3)</div>
+                  <div style="font-size:14px; font-weight:700; color:#10B981;">${formatCurrency(stats.commission)}</div>
+                </div>
+              </div>
+
+              <div style="display:flex; justify-content:space-between; align-items:center; font-size:11.5px; color:var(--text-muted);">
+                <span>ជោគជ័យដឹក៖ <strong style="color:#10B981;">${stats.deliveryRate}</strong></span>
+                <span style="color:var(--primary-accent); font-weight:600; display:flex; align-items:center; gap:4px;">
+                  មើលរបាយការណ៍ <i data-lucide="chevron-right" style="width:14px; height:14px;"></i>
+                </span>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+
+    <!-- Modal សម្រាប់បង្ហាញរបាយការណ៍លក់តាមបុគ្គលម្នាក់ៗ (Employee Detail Modal) -->
+    <div id="employee-detail-modal-overlay" class="employee-detail-modal-overlay" style="display:none;" onclick="if(event.target === this) closeEmployeeDetailModal()">
+      <div class="employee-detail-modal" id="employee-detail-modal-content">
+        <!-- Rendered dynamically via openEmployeeDetailModal -->
+      </div>
+    </div>
+  `;
+
+  if (window.lucide) window.lucide.createIcons();
+}
+
+/**
+ * Open Employee Individual Sales Report Modal
+ */
+window.openEmployeeDetailModal = function(empId) {
+  const member = DEFAULT_TEAM_MEMBERS.find(m => m.id === empId);
+  if (!member) return;
+
+  const isOct = state.selectedMonth === '2026-10' || state.selectedMonth === 'all';
+  const stats = isOct ? member.october : member.september;
+  const overlay = document.getElementById('employee-detail-modal-overlay');
+  const content = document.getElementById('employee-detail-modal-content');
+  if (!overlay || !content) return;
+
+  content.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:16px;">
+      <div style="display:flex; align-items:center; gap:14px;">
+        ${member.isSeyha ? `
+          <div class="avatar-with-badge" style="width:54px; height:54px;">
+            <img src="data:image/jpeg;base64,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" alt="${member.name}" class="avatar-photo-img" style="border:2px solid #00B4D8; box-shadow:0 0 14px rgba(0,180,216,0.6);">
+            <span class="verified-badge-icon" style="width:16px; height:16px; bottom:-2px; right:-2px;">
+              <i data-lucide="check" style="width:9px; height:9px;"></i>
+            </span>
+          </div>
+        ` : `
+          <div class="leaderboard-avatar-circle" style="width:54px; height:54px; font-size:18px;">
+            ${member.avatar}
+          </div>
+        `}
+        <div>
+          <h3 style="font-size:18px; font-weight:700; color:#FFFFFF; margin:0; display:flex; align-items:center; gap:6px;">
+            ${member.name}
+            ${member.isSeyha ? `<span class="verified-inline-check" style="width:14px; height:14px;"><i data-lucide="check" style="width:8px; height:8px;"></i></span>` : ''}
+          </h3>
+          <span style="font-size:12.5px; color:var(--primary-accent); font-weight:600;">${member.role}</span>
+          <div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">
+            Telegram: <span style="color:#38BDF8;">${member.telegram}</span> | Tel: <strong>${member.phone}</strong>
+          </div>
+        </div>
+      </div>
+      <button onclick="closeEmployeeDetailModal()" style="background:rgba(255,255,255,0.1); border:none; color:#FFFFFF; width:32px; height:32px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+        <i data-lucide="x" style="width:18px; height:18px;"></i>
+      </button>
+    </div>
+
+    <!-- Performance Cards for this Seller -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-bottom:20px;">
+      <div style="background:rgba(6, 14, 34, 0.65); border:1px solid rgba(0,180,216,0.25); border-radius:12px; padding:12px; text-align:center;">
+        <span style="font-size:11px; color:var(--text-muted);">ប្រអប់លក់សរុប</span>
+        <div style="font-size:18px; font-weight:800; color:#00B4D8; margin-top:3px;">${stats.boxes} ប្រអប់</div>
+        <span style="font-size:10px; color:var(--text-dim);">ក្រុមហ៊ុន៖ ${stats.companyBoxes} | ផ្ទាល់ខ្លួន៖ ${stats.personalBoxes}</span>
+      </div>
+
+      <div style="background:rgba(6, 14, 34, 0.65); border:1px solid rgba(16,185,129,0.25); border-radius:12px; padding:12px; text-align:center;">
+        <span style="font-size:11px; color:var(--text-muted);">ចំណូលលក់បាន</span>
+        <div style="font-size:18px; font-weight:800; color:#FFFFFF; margin-top:3px;">${formatCurrency(stats.revenue)}</div>
+        <span style="font-size:10px; color:#FBBF24;">${formatCurrency(stats.revenue * 4100, 'KHR')}</span>
+      </div>
+
+      <div style="background:rgba(6, 14, 34, 0.65); border:1px solid rgba(245,158,11,0.25); border-radius:12px; padding:12px; text-align:center;">
+        <span style="font-size:11px; color:var(--text-muted);">កម្រៃជើងសារ ($3)</span>
+        <div style="font-size:18px; font-weight:800; color:#10B981; margin-top:3px;">${formatCurrency(stats.commission)}</div>
+        <span style="font-size:10px; color:#10B981;">${formatCurrency(stats.commission * 4100, 'KHR')}</span>
+      </div>
+
+      <div style="background:rgba(6, 14, 34, 0.65); border:1px solid rgba(168,85,247,0.25); border-radius:12px; padding:12px; text-align:center;">
+        <span style="font-size:11px; color:var(--text-muted);">អត្រាជោគជ័យ</span>
+        <div style="font-size:18px; font-weight:800; color:#38BDF8; margin-top:3px;">${stats.deliveryRate}</div>
+        <span style="font-size:10px; color:#10B981;">ដឹកដល់ដៃភ្ញៀវ</span>
+      </div>
+    </div>
+
+    <!-- Recent Individual Sales Orders Table -->
+    <div style="margin-top:14px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <h4 style="font-size:14px; font-weight:700; color:#FFFFFF; margin:0; display:flex; align-items:center; gap:6px;">
+          <i data-lucide="shopping-bag" style="width:16px; height:16px; color:#00B4D8;"></i>
+          ប្រវត្តិលក់ និងអតិថិជនជាក់ស្តែង (Recent Sales Log)
+        </h4>
+        <span style="font-size:11px; color:var(--text-muted);">${stats.boxes} ប្រអប់ក្នុងខែនេះ</span>
+      </div>
+
+      <div class="table-responsive">
+        <table class="data-table" style="font-size:12.5px;">
+          <thead>
+            <tr>
+              <th>កាលបរិច្ឆេទ</th>
+              <th>ឈ្មោះអតិថិជន</th>
+              <th>មុខទំនិញ</th>
+              <th style="text-align:center;">ចំនួន</th>
+              <th style="text-align:right;">ទឹកប្រាក់</th>
+              <th style="text-align:center;">ទូទាត់</th>
+              <th style="text-align:center;">ស្ថានភាព</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${member.recentSales.map(order => `
+              <tr>
+                <td style="color:var(--text-muted); white-space:nowrap;">${order.date}</td>
+                <td style="font-weight:600; color:#FFFFFF;">${order.customer}</td>
+                <td><span style="background:rgba(0,180,216,0.18); color:#00B4D8; padding:2px 6px; border-radius:4px; font-weight:600;">${order.product}</span></td>
+                <td style="text-align:center; font-weight:700;">${order.qty} ប្រអប់</td>
+                <td style="text-align:right; font-weight:700; color:#10B981;">${formatCurrency(order.amount)}</td>
+                <td style="text-align:center;">
+                  <span class="pay-badge ${order.payment.toLowerCase().includes('aba') ? 'aba' : order.payment.toLowerCase().includes('wing') ? 'wing' : 'cash'}" style="font-size:10.5px; padding:2px 6px;">
+                    ${order.payment}
+                  </span>
+                </td>
+                <td style="text-align:center;">
+                  <span class="recon-status-badge ${order.status === 'បានប្រគល់' ? 'paid' : 'pending'}" style="font-size:10px; padding:2px 6px;">
+                    ${order.status}
+                  </span>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:14px;">
+      <button onclick="closeEmployeeDetailModal()" class="btn-cancel" style="padding:8px 16px; border-radius:8px;">បិទផ្ទាំង</button>
+      <button onclick="navigateToModule('sales-teams'); closeEmployeeDetailModal();" class="btn-submit" style="padding:8px 16px; border-radius:8px; display:inline-flex; align-items:center; gap:6px;">
+        <i data-lucide="external-link" style="width:14px; height:14px;"></i> មើលចំណាត់ថ្នាក់ក្រុម
+      </button>
+    </div>
+  `;
+
+  overlay.style.display = 'flex';
+  if (window.lucide) window.lucide.createIcons();
+};
+
+window.closeEmployeeDetailModal = function() {
+  const overlay = document.getElementById('employee-detail-modal-overlay');
+  if (overlay) overlay.style.display = 'none';
+};
+
+/**
+ * 7. Module ផ្សេងៗ (Wireframes with Notice)
  */
 function renderGenericModule(moduleId) {
   const mod = MODULES.find(m => m.id === moduleId);
