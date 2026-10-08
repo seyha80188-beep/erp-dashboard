@@ -114,7 +114,7 @@ const DEFAULT_TEAM_MEMBERS = [
 // Google Sheet Configuration
 const SHEET_CONFIG = {
   spreadsheetId: '1Kg74MK_M1ofUbCzDBKh5B1HxDUqTM8rsTNvbWXJdnoE',
-  webhookUrl: 'https://script.google.com/macros/s/AKfycbwA02pwY7decXviLTk9BKb_eOY0y6ubh8S11Wfi4cc_hkXcK6Ram-p8WtVTNGSTGKwGJg/exec',
+  webhookUrl: 'https://script.google.com/macros/s/AKfycbwV5NCuWLhyTljT5N8jiV-o92DCLWlTWmPDJy7Ig0SlsfYdK7HEXEn5ZGAGch750bwv/exec',
   gids: {
     expenses: '859033776',       // កំណត់ត្រាចំណាយ
     incomes: '1280452951',       // កំណត់ត្រាចំណូល
