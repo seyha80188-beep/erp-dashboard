@@ -334,36 +334,48 @@ const sidebarUserRole = document.getElementById('sidebar-user-role');
  * Initialize Application
  */
 async function initApp() {
-  applyAppTheme();
-  applyAppLanguage();
-  renderSidebarNav();
-  setupSidebarEventListeners();
-  setupSyncButton();
-  setupAuthEventListeners();
+  try {
+    applyAppTheme();
+    applyAppLanguage();
+    renderSidebarNav();
+    setupSidebarEventListeners();
+    setupSyncButton();
+    setupAuthEventListeners();
 
-  // Load and display data directly
-  updateUserDisplay();
-  
-  // Initialize Header Month and Currency Controls
-  const monthSelect = document.getElementById('header-month-select');
-  if (monthSelect) monthSelect.value = state.selectedMonth;
-  
-  const btnUsd = document.getElementById('btn-curr-usd');
-  const btnKhr = document.getElementById('btn-curr-khr');
-  if (state.displayCurrency === 'KHR') {
-    if (btnKhr) btnKhr.classList.add('active');
-    if (btnUsd) btnUsd.classList.remove('active');
-  } else {
-    if (btnUsd) btnUsd.classList.add('active');
-    if (btnKhr) btnKhr.classList.remove('active');
+    // Load and display data directly
+    updateUserDisplay();
+    
+    // Initialize Header Month and Currency Controls
+    const monthSelect = document.getElementById('header-month-select');
+    if (monthSelect) monthSelect.value = state.selectedMonth;
+    
+    const btnUsd = document.getElementById('btn-curr-usd');
+    const btnKhr = document.getElementById('btn-curr-khr');
+    if (state.displayCurrency === 'KHR') {
+      if (btnKhr) btnKhr.classList.add('active');
+      if (btnUsd) btnUsd.classList.remove('active');
+    } else {
+      if (btnUsd) btnUsd.classList.add('active');
+      if (btnKhr) btnKhr.classList.remove('active');
+    }
+
+    // Render initial dashboard immediately so screen never stays blank or unresponsive
+    navigateToModule(state.activeModule);
+
+    await fetchSheetData();
+    // Re-render with fetched Google Sheet data
+    navigateToModule(state.activeModule);
+  } catch (err) {
+    console.error('initApp fatal error:', err);
+    const container = document.getElementById('module-container');
+    if (container && !container.innerHTML) {
+      container.innerHTML = `<div style="padding:40px; text-align:center; color:#F87171;">
+        <h3>មានបញ្ហាក្នុងការដំណើរការទំព័រ (Error loading view)</h3>
+        <p style="margin-top:8px; font-size:13px; color:#FFFFFF;">${err.message || err}</p>
+        <button onclick="location.reload()" style="margin-top:16px; padding:8px 18px; border-radius:8px; background:#00B4D8; color:#060E22; font-weight:700; border:none; cursor:pointer;">ផ្ទុកទំព័រឡើងវិញ (Reload)</button>
+      </div>`;
+    }
   }
-
-  // Render initial dashboard immediately so screen never stays blank or unresponsive
-  navigateToModule(state.activeModule);
-
-  await fetchSheetData();
-  // Re-render with fetched Google Sheet data
-  navigateToModule(state.activeModule);
 }
 
 /**
@@ -1548,7 +1560,8 @@ function renderBusinessViewA1Html() {
                 <div style="font-size:11px; color:#FBBF24;">${lang === 'en' ? 'Net:' : 'ចំណេញ៖'} ${formatCurrency(s.netProfit)}</div>
               </div>
             </div>
-          `).join('')}
+          `;
+        }).join('')}
         </div>
       </div>
 
