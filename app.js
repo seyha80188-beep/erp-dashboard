@@ -2748,15 +2748,63 @@ window.openExpenseModal = function() {
     modal.style.display = 'flex';
     // Default date to today (YYYY-MM-DD)
     const dateInput = document.getElementById('exp-input-date');
-    if (dateInput && !dateInput.value) {
-      const now = new Date();
-      const yr = now.getFullYear();
-      const mo = String(now.getMonth() + 1).padStart(2, '0');
-      const da = String(now.getDate()).padStart(2, '0');
-      dateInput.value = `${yr}-${mo}-${da}`;
+    if (dateInput) {
+      if (!dateInput.value) {
+        const now = new Date();
+        const yr = now.getFullYear();
+        const mo = String(now.getMonth() + 1).padStart(2, '0');
+        const da = String(now.getDate()).padStart(2, '0');
+        dateInput.value = `${yr}-${mo}-${da}`;
+      }
+      window.updateTodayExpenseDisplay(dateInput.value);
     }
     const descInput = document.getElementById('exp-input-desc');
     if (descInput) descInput.focus();
+  }
+};
+
+/**
+ * គណនា និងបង្ហាញការចំណាយសរុបប្រចាំថ្ងៃភ្លាមៗ (Today Expense Live Counter)
+ */
+window.updateTodayExpenseDisplay = function(selectedDate) {
+  const lbl = document.getElementById('exp-today-date-lbl');
+  const khrEl = document.getElementById('exp-today-total-khr');
+  const usdEl = document.getElementById('exp-today-total-usd');
+  const listEl = document.getElementById('exp-today-items-list');
+
+  if (!selectedDate) {
+    const now = new Date();
+    selectedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  }
+
+  if (lbl) lbl.textContent = selectedDate;
+
+  // Filter all expenses for this date from both state.data.expenses & customExpenses
+  const allExp = (state.data && state.data.expenses) ? state.data.expenses : [];
+  const dayExpenses = allExp.filter(e => e.date === selectedDate);
+
+  let totalKhr = 0;
+  let totalUsd = 0;
+
+  dayExpenses.forEach(e => {
+    totalUsd += (e.amountUsd || 0);
+    totalKhr += (e.amountKhr || Math.round((e.amountUsd || 0) * 4100));
+  });
+
+  if (khrEl) khrEl.textContent = `${totalKhr.toLocaleString('en-US')} ៛`;
+  if (usdEl) usdEl.textContent = `($${totalUsd.toFixed(2)} USD)`;
+
+  if (listEl) {
+    if (dayExpenses.length === 0) {
+      listEl.innerHTML = `<span style="font-size:11px; color:rgba(255,255,255,0.5); font-style:italic;">មិនទាន់មានចំណាយក្នុងថ្ងៃនេះនៅឡើយទេ</span>`;
+    } else {
+      listEl.innerHTML = dayExpenses.map(item => `
+        <span class="expense-today-chip" title="${item.category || ''}">
+          <span>${item.description}</span>
+          <strong style="color:#FBBF24;">${(item.amountKhr || 0).toLocaleString()} ៛</strong>
+        </span>
+      `).join('');
+    }
   }
 };
 
@@ -2797,16 +2845,45 @@ window.setExpenseCurrency = function(curr) {
 
 window.onExpenseAmountInput = function(val) {
   const hint = document.getElementById('curr-converted-hint');
-  if (!hint) return;
   const num = parseFloat(val) || 0;
 
-  if (state.expenseCurrency === 'KHR') {
-    const usd = (num / 4100).toFixed(2);
-    hint.textContent = `ស្មើនឹង៖ $${usd} USD (អត្រា 1$ = 4,100 ៛)`;
-  } else {
-    const khr = Math.round(num * 4100).toLocaleString('en-US');
-    hint.textContent = `ស្មើនឹង៖ ${khr} ៛ KHR (អត្រា 1$ = 4,100 ៛)`;
+  if (hint) {
+    if (state.expenseCurrency === 'KHR') {
+      const usd = (num / 4100).toFixed(2);
+      hint.textContent = `ស្មើនឹង៖ $${usd} USD (អត្រា 1$ = 4,100 ៛)`;
+    } else {
+      const khr = Math.round(num * 4100).toLocaleString('en-US');
+      hint.textContent = `ស្មើនឹង៖ ${khr} ៛ KHR (អត្រា 1$ = 4,100 ៛)`;
+    }
   }
+
+  // Update today live total including currently typed amount
+  const dateInput = document.getElementById('exp-input-date');
+  const selectedDate = dateInput ? dateInput.value : '';
+  const allExp = (state.data && state.data.expenses) ? state.data.expenses : [];
+  const dayExpenses = allExp.filter(e => e.date === selectedDate);
+
+  let baseKhr = 0;
+  let baseUsd = 0;
+  dayExpenses.forEach(e => {
+    baseUsd += (e.amountUsd || 0);
+    baseKhr += (e.amountKhr || Math.round((e.amountUsd || 0) * 4100));
+  });
+
+  let currentTypingKhr = 0;
+  let currentTypingUsd = 0;
+  if (state.expenseCurrency === 'KHR') {
+    currentTypingKhr = Math.round(num);
+    currentTypingUsd = parseFloat((num / 4100).toFixed(2));
+  } else {
+    currentTypingUsd = parseFloat(num.toFixed(2));
+    currentTypingKhr = Math.round(num * 4100);
+  }
+
+  const khrEl = document.getElementById('exp-today-total-khr');
+  const usdEl = document.getElementById('exp-today-total-usd');
+  if (khrEl) khrEl.textContent = `${(baseKhr + currentTypingKhr).toLocaleString('en-US')} ៛`;
+  if (usdEl) usdEl.textContent = `($${(baseUsd + currentTypingUsd).toFixed(2)} USD)`;
 };
 
 window.handleSaveExpense = async function(e) {
@@ -2940,6 +3017,7 @@ window.handleSaveExpense = async function(e) {
       ? `បានចូល Google Sheet (${state.data.expenses.length} ចំណាយ)`
       : `បានរក្សាទុកក្នុងទូរស័ព្ទ (${state.data.expenses.length} ចំណាយ)`;
   }
+  window.updateTodayExpenseDisplay(date);
   renderModuleContent(state.activeModule);
 
   if (syncedSuccess) {
@@ -4095,7 +4173,14 @@ function renderOrdersModule() {
           <h3 class="card-title"><i data-lucide="list-ordered"></i> បញ្ជីការកុម្ម៉ង់ទាំងអស់ (Orders Directory)</h3>
           <p style="font-size:12px; color:var(--text-muted); margin-top:2px;">ទិន្នន័យបានកត់ត្រាចូលក្នុងប្រព័ន្ធ និងបញ្ជូនទៅកាន់ Google Sheet ផ្ទាល់</p>
         </div>
-        <span class="order-tag green">${totalOrders} កុម្ម៉ង់</span>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="order-tag green">${totalOrders} កុម្ម៉ង់</span>
+          ${totalOrders > 0 ? `
+            <button type="button" onclick="clearAllCustomOrders()" class="quick-chip" style="color:#EF4444; border-color:rgba(239,68,68,0.3); background:rgba(239,68,68,0.1); cursor:pointer;" title="លុបទិន្នន័យកម្ម៉ង់តេស្តចេញ">
+              <i data-lucide="trash-2" style="width:13px; height:13px;"></i> លុបការកម្ម៉ង់តេស្ត
+            </button>
+          ` : ''}
+        </div>
       </div>
 
       <div class="table-responsive" style="margin-top:14px;">
@@ -4144,6 +4229,19 @@ function renderOrdersModule() {
     </div>
   `;
 }
+
+/**
+ * Clear all custom test orders
+ */
+window.clearAllCustomOrders = function() {
+  if (!confirm('តើបងចង់លុបទិន្នន័យការកម្ម៉ង់ដែលបានតេស្តទាំងអស់ចេញពី Dashboard មែនទេ?')) return;
+  state.customOrders = [];
+  localStorage.removeItem('yem_custom_orders');
+  renderOrdersModule();
+  if (state.activeModule === 'dashboard') {
+    renderBusinessViewA1();
+  }
+};
 
 /**
  * 7. Module ផ្សេងៗ (Wireframes with Notice)

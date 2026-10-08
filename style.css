@@ -161,27 +161,27 @@ body {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 13px;
-  padding: 10px 14px;
+  gap: 14px;
+  padding: 11px 15px;
   background: transparent;
   border: none;
   border-radius: var(--radius-md);
-  color: rgba(255, 255, 255, 0.92);
+  color: rgba(255, 255, 255, 0.95);
   font-family: inherit;
-  font-size: 14.5px;
+  font-size: 15.5px; /* កាន់តែធំច្បាស់ងាយស្រួលមើល */
   font-weight: 600;
-  letter-spacing: 0.15px;
+  letter-spacing: 0.2px;
   cursor: pointer;
   text-align: left;
   transition: all var(--transition-fast);
 }
 
 .module-btn svg {
-  width: 20px;
-  height: 20px;
+  width: 21px;
+  height: 21px;
   flex-shrink: 0;
-  stroke-width: 2.2;
-  color: rgba(255, 255, 255, 0.7);
+  stroke-width: 2.3;
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .module-btn:hover {
@@ -2162,6 +2162,53 @@ body.theme-light .header-curr-pill.active {
   color: #EF4444;
 }
 
+/* Today Expense Real-time Tracker Banner */
+.expense-today-banner {
+  background: linear-gradient(135deg, rgba(0, 180, 216, 0.15) 0%, rgba(14, 31, 68, 0.9) 100%);
+  border: 1px solid rgba(0, 180, 216, 0.35);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.pulse-today-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 10px #10B981;
+  display: inline-block;
+  animation: pulseDot 1.5s infinite;
+}
+
+@keyframes pulseDot {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+.expense-today-mini-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+  max-height: 85px;
+  overflow-y: auto;
+}
+
+.expense-today-chip {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.9);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
 .form-group {
   display: flex;
   flex-direction: column;
@@ -2177,10 +2224,10 @@ body.theme-light .header-curr-pill.active {
 
 .form-input, .form-select {
   width: 100%;
-  padding: 10px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-sm);
-  background: rgba(6, 14, 34, 0.85);
+  padding: 13px 16px; /* រង្វង់បំពេញធំទូលាយ ងាយស្រួលចុចលើទូរស័ព្ទ */
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+  background: rgba(6, 14, 34, 0.9);
   color: #FFFFFF;
   font-family: inherit;
   font-size: 16px; /* 16px prevents iOS Safari auto-zoom while focused */

@@ -22,7 +22,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" href="style.css?v=20261009_0035">
+  <link rel="stylesheet" href="style.css?v=20261009_0110">
 </head>
 <body>
   <!-- Overlay សម្រាប់ Mobile ពេលបើក Sidebar -->
@@ -132,12 +132,6 @@
           <button type="button" id="btn-curr-khr" class="header-curr-pill" onclick="setAppDisplayCurrency('KHR')">៛</button>
         </div>
 
-        <!-- Add Order Button (Quick Paste from Telegram/Chat) -->
-        <button id="open-order-btn" class="header-action-btn-order" onclick="openOrderModal()" title="បញ្ចូលការកម្ម៉ង់ពី Telegram (Paste Orders)">
-          <i data-lucide="clipboard-paste"></i>
-          <span class="btn-text" id="header-btn-order-text">+ បញ្ចូលការកម្ម៉ង់</span>
-        </button>
-
         <!-- Add Expense Button (Desktop/Tablet) -->
         <button id="open-expense-btn" class="header-action-btn-add hide-on-narrow-mobile" onclick="openExpenseModal()" title="កត់ត្រាចំណាយប្រចាំថ្ងៃ (Add Expense)">
           <i data-lucide="plus-circle"></i>
@@ -232,10 +226,25 @@
       </div>
 
       <form id="expense-form" onsubmit="handleSaveExpense(event)">
+        <!-- សង្ខេបចំណាយថ្ងៃនេះ (Today Expense Tracker Banner) -->
+        <div id="expense-today-summary-box" class="expense-today-banner">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="pulse-today-dot"></span>
+              <span style="font-size:13px; font-weight:700; color:#FFFFFF;">ចំណាយថ្ងៃនេះសរុប (<span id="exp-today-date-lbl">ថ្ងៃនេះ</span>)៖</span>
+            </div>
+            <div style="text-align:right;">
+              <div id="exp-today-total-khr" style="font-size:17px; font-weight:800; color:#FBBF24;">0 ៛</div>
+              <div id="exp-today-total-usd" style="font-size:12px; font-weight:600; color:#10B981;">($0.00 USD)</div>
+            </div>
+          </div>
+          <div id="exp-today-items-list" class="expense-today-mini-list"></div>
+        </div>
+
         <!-- 1. កាលបរិច្ឆេទ (Date) -->
         <div class="form-group">
           <label for="exp-input-date" id="lbl-exp-date">កាលបរិច្ឆេទ (Date)</label>
-          <input type="date" id="exp-input-date" class="form-input" required>
+          <input type="date" id="exp-input-date" class="form-input" required onchange="updateTodayExpenseDisplay(this.value)">
         </div>
 
         <!-- 2. មុខទំនិញ / ការពិពណ៌នា (Expense Description) -->
@@ -417,6 +426,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=20261009_0035"></script>
+  <script src="app.js?v=20261009_0110"></script>
 </body>
 </html>
