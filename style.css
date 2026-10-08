@@ -2406,6 +2406,59 @@ input:checked + .slider-round:before {
   color: #FFFFFF;
 }
 
+.recon-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.recon-status-badge.paid, .recon-status-badge.received {
+  background: rgba(16, 185, 129, 0.18);
+  color: #10B981;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.recon-status-badge.pending, .recon-status-badge.cod {
+  background: rgba(245, 158, 11, 0.18);
+  color: #FBBF24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.recon-status-badge.unpaid {
+  background: rgba(239, 68, 68, 0.18);
+  color: #F87171;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.recon-summary-kpi {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+@media (max-width: 768px) {
+  .recon-summary-kpi {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+.recon-kpi-card {
+  background: rgba(6, 14, 34, 0.65);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 /* --------------------------------------------------------------------------
    User Profile Logo & Verified Checkmark Badge
    -------------------------------------------------------------------------- */

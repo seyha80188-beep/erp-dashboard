@@ -1499,6 +1499,141 @@ function renderBusinessViewA1Html() {
         </div>
       </div>
     </div>
+
+    <!-- 3. តារាងផ្ទៀងផ្ទាត់ការទូទាត់ និងដឹកជញ្ជូន (Order Stock, Delivery & Payment Reconciliation Board) -->
+    <div class="panel-card" style="margin-top:16px;">
+      <div class="card-title-row">
+        <div>
+          <h3 class="card-title"><i data-lucide="check-square"></i> ${lang === 'en' ? 'Order, Stock & Payment Reconciliation' : 'ផ្ទៀងផ្ទាត់ស្ថានភាព៖ ថ្លៃដើមស្តុក + ថ្លៃដឹក + ការប្រមូលប្រាក់'}</h3>
+          <span style="font-size:12px; color:var(--text-muted);">${lang === 'en' ? 'Track if stock is paid, delivery is settled, and customer cash/COD is collected' : 'តាមដានច្បាស់ៗ៖ បានទូទាត់ថ្លៃស្តុក? បានទូទាត់ថ្លៃដឹក? និងបានទទួលប្រាក់រួចឬនៅ?'}</span>
+        </div>
+        <span class="status-pill-disconnected" style="background:rgba(16, 185, 129, 0.15); color:#10B981; border:1px solid rgba(16, 185, 129, 0.3);">
+          <i data-lucide="shield-check"></i> ${lang === 'en' ? 'Live Track' : 'តាមដានផ្ទាល់'}
+        </span>
+      </div>
+
+      <!-- 3 Summary Mini-KPI Cards -->
+      <div class="recon-summary-kpi">
+        <!-- 1. Stock Status KPI -->
+        <div class="recon-kpi-card">
+          <div>
+            <div style="font-size:11px; color:var(--text-muted);">${lang === 'en' ? 'Stock Cost Paid' : '១. ថ្លៃដើមស្តុកទំនិញ (COGS)'}</div>
+            <div style="font-size:16px; font-weight:800; color:#10B981; margin-top:3px;">${formatCurrency(cogs)} <span style="font-size:11px; font-weight:500; color:#10B981;">(រួចរាល់ ១០០%)</span></div>
+            <div style="font-size:10.5px; color:var(--text-muted);">${boxesSold} ប្រអប់ x $7.50/ប្រអប់</div>
+          </div>
+          <div style="width:36px; height:36px; border-radius:10px; background:rgba(16, 185, 129, 0.2); display:flex; align-items:center; justify-content:center; color:#10B981;">
+            <i data-lucide="package-check"></i>
+          </div>
+        </div>
+
+        <!-- 2. Delivery Cost Paid KPI -->
+        <div class="recon-kpi-card">
+          <div>
+            <div style="font-size:11px; color:var(--text-muted);">${lang === 'en' ? 'Delivery Settled' : '២. ថ្លៃដឹកជញ្ជូន (Delivery)'}</div>
+            <div style="font-size:16px; font-weight:800; color:#00B4D8; margin-top:3px;">${formatCurrency(delivery)} <span style="font-size:11px; font-weight:500; color:#00B4D8;">(រួចរាល់ ១០០%)</span></div>
+            <div style="font-size:10.5px; color:var(--text-muted);">VET COD $22 + ម៉ូតូ $3</div>
+          </div>
+          <div style="width:36px; height:36px; border-radius:10px; background:rgba(0, 180, 216, 0.2); display:flex; align-items:center; justify-content:center; color:#00B4D8;">
+            <i data-lucide="truck"></i>
+          </div>
+        </div>
+
+        <!-- 3. Customer Cash / COD Collection KPI -->
+        <div class="recon-kpi-card">
+          <div>
+            <div style="font-size:11px; color:var(--text-muted);">${lang === 'en' ? 'Cash Collected vs Pending' : '៣. ប្រាក់ប្រមូលបាន (Cash/COD)'}</div>
+            <div style="font-size:16px; font-weight:800; color:#FBBF24; margin-top:3px;">${formatCurrency(revenue - pendingCod)} <span style="font-size:11px; font-weight:500; color:#FBBF24;">(នៅសល់ COD ${formatCurrency(pendingCod)})</span></div>
+            <div style="font-size:10.5px; color:var(--text-muted);">ប្រមូលបាន $565.00 / រង់ចាំ $120.00</div>
+          </div>
+          <div style="width:36px; height:36px; border-radius:10px; background:rgba(245, 158, 11, 0.2); display:flex; align-items:center; justify-content:center; color:#FBBF24;">
+            <i data-lucide="banknote"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detailed Orders Status Table -->
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ល.រ</th>
+              <th>កាលបរិច្ឆេទ & អតិថិជន</th>
+              <th style="text-align:center;">កញ្ចប់ទំនិញ</th>
+              <th style="text-align:center;">១. ថ្លៃដើមស្តុក (Stock)</th>
+              <th style="text-align:center;">២. ថ្លៃដឹក (Delivery)</th>
+              <th style="text-align:center;">៣. ការទទួលប្រាក់ (Payment)</th>
+              <th style="text-align:right;">ចំណូលលក់</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td><strong>06/10/2026</strong><br><span style="font-size:11px; color:var(--text-muted);">ម៉ូយភ្នំពេញ (012 888 xxx)</span></td>
+              <td style="text-align:center;"><span style="background:rgba(255,255,255,0.06); padding:2px 8px; border-radius:6px; font-weight:700;">2 ប្រអប់</span></td>
+              <td style="text-align:center;"><span class="recon-status-badge paid"><i data-lucide="check-circle-2"></i> បានទូទាត់ ($15.00)</span></td>
+              <td style="text-align:center;"><span class="recon-status-badge paid"><i data-lucide="check-circle-2"></i> បានទូទាត់ ($2.00 ម៉ូតូ)</span></td>
+              <td style="text-align:center;"><span class="recon-status-badge received"><i data-lucide="check-circle-2"></i> បានទទួលប្រាក់ (ABA)</span></td>
+              <td style="text-align:right; font-weight:700; color:#10B981;">$90.00</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td><strong>05/10/2026</strong><br><span style="font-size:11px; color:var(--text-muted);">ម៉ូយសៀមរាប (097 555 xxx)</span></td>
+              <td style="text-align:center;"><span style="background:rgba(255,255,255,0.06); padding:2px 8px; border-radius:6px; font-weight:700;">3 ប្រអប់</span></td>
+              <td style="text-align:center;"><span class="recon-status-badge paid"><i data-lucide="check-circle-2"></i> បានទូទាត់ ($22.50)</span></td>
+              <td style="text-align:center;"><span class="recon-status-badge paid"><i data-lucide="check-circle-2"></i> បានទូទាត់ ($6.00 VET)</span></td>
+              <td style="text-align:center;"><span class="recon-status-badge cod"><i data-lucide="clock"></i> COD រង់ចាំបើក (VET)</span></td>
+              <td style="text-align:right; font-weight:700; color:#FBBF24;">$135.00</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td><strong>04/10/2026</strong><br><span style="font-size:11px; color:var(--text-muted);">ម៉ូយបាត់ដំបង (088 333 xxx)</span></td>
+              <td style="text-align:center;"><span style="background:rgba(255,255,255,0.06); padding:2px 8px; border-radius:6px; font-weight:700;">4 ប្រអប់</span></td>
+              <td style="text-align:center;"><span class="recon-status-badge paid"><i data-lucide="check-circle-2"></i> បានទូទាត់ ($30.00)</span></td>
+              <td style="text-align:center;"><span class="recon-status-badge paid"><i data-lucide="check-circle-2"></i> បានទូទាត់ ($6.00 VET)</span></td>
+              <td style="text-align:center;"><span class="recon-status-badge received"><i data-lucide="check-circle-2"></i> បានទទួលប្រាក់ (Wing)</span></td>
+              <td style="text-align:right; font-weight:700; color:#10B981;">$180.00</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td><strong>03/10/2026</strong><br><span style="font-size:11px; color:var(--text-muted);">ម៉ូយកំពង់ចាម (010 222 xxx)</span></td>
+              <td style="text-align:center;"><span style="background:rgba(255,255,255,0.06); padding:2px 8px; border-radius:6px; font-weight:700;">1 ប្រអប់</span></td>
+              <td style="text-align:center;"><span class="recon-status-badge paid"><i data-lucide="check-circle-2"></i> បានទូទាត់ ($7.50)</span></td>
+              <td style="text-align:center;"><span class="recon-status-badge paid"><i data-lucide="check-circle-2"></i> បានទូទាត់ ($2.00 VET)</span></td>
+              <td style="text-align:center;"><span class="recon-status-badge received"><i data-lucide="check-circle-2"></i> បានទទួលប្រាក់ (ACLEDA)</span></td>
+              <td style="text-align:right; font-weight:700; color:#10B981;">$45.00</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td><strong>02/10/2026</strong><br><span style="font-size:11px; color:var(--text-muted);">ម៉ូយភ្នំពេញ (077 999 xxx)</span></td>
+              <td style="text-align:center;"><span style="background:rgba(255,255,255,0.06); padding:2px 8px; border-radius:6px; font-weight:700;">3 ប្រអប់</span></td>
+              <td style="text-align:center;"><span class="recon-status-badge paid"><i data-lucide="check-circle-2"></i> បានទូទាត់ ($22.50)</span></td>
+              <td style="text-align:center;"><span class="recon-status-badge paid"><i data-lucide="check-circle-2"></i> បានទូទាត់ ($5.00 ម៉ូតូ)</span></td>
+              <td style="text-align:center;"><span class="recon-status-badge received"><i data-lucide="check-circle-2"></i> បានទទួលប្រាក់ (ABA)</span></td>
+              <td style="text-align:right; font-weight:700; color:#10B981;">$135.00</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td><strong>01/10/2026</strong><br><span style="font-size:11px; color:var(--text-muted);">ម៉ូយតាកែវ (096 111 xxx)</span></td>
+              <td style="text-align:center;"><span style="background:rgba(255,255,255,0.06); padding:2px 8px; border-radius:6px; font-weight:700;">2 ប្រអប់</span></td>
+              <td style="text-align:center;"><span class="recon-status-badge paid"><i data-lucide="check-circle-2"></i> បានទូទាត់ ($15.00)</span></td>
+              <td style="text-align:center;"><span class="recon-status-badge paid"><i data-lucide="check-circle-2"></i> បានទូទាត់ ($4.00 VET)</span></td>
+              <td style="text-align:center;"><span class="recon-status-badge received"><i data-lucide="check-circle-2"></i> បានទទួលប្រាក់ (ABA)</span></td>
+              <td style="text-align:right; font-weight:700; color:#10B981;">$100.00</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr style="background:rgba(11, 25, 56, 0.95); font-weight:700;">
+              <td colspan="2">សរុប (15 ប្រអប់ ខែតុលា)</td>
+              <td style="text-align:center; color:#00B4D8;">15 ប្រអប់</td>
+              <td style="text-align:center; color:#10B981;">ទូទាត់រួច $112.50</td>
+              <td style="text-align:center; color:#00B4D8;">ទូទាត់រួច $25.00</td>
+              <td style="text-align:center; color:#FBBF24;">ប្រមូលបាន $565 | COD $120</td>
+              <td style="text-align:right; color:#10B981; font-size:14px;">$685.00</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
   `;
 }
 
