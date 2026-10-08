@@ -161,26 +161,27 @@ body {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 9px 12px;
+  gap: 13px;
+  padding: 10px 14px;
   background: transparent;
   border: none;
   border-radius: var(--radius-md);
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.92);
   font-family: inherit;
-  font-size: 13.5px;
-  font-weight: 500;
+  font-size: 14.5px;
+  font-weight: 600;
+  letter-spacing: 0.15px;
   cursor: pointer;
   text-align: left;
   transition: all var(--transition-fast);
 }
 
 .module-btn svg {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   flex-shrink: 0;
-  stroke-width: 2;
-  color: var(--text-muted);
+  stroke-width: 2.2;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .module-btn:hover {
@@ -2091,15 +2092,16 @@ body.theme-light .header-curr-pill.active {
 }
 
 .expense-modal-card {
-  width: 100%;
-  max-width: 520px;
-  max-height: 90vh;
+  width: 92%;
+  max-width: 440px;
+  max-height: 86vh;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   background: #0B1938;
-  border: 1px solid rgba(0, 180, 216, 0.35);
+  border: 1px solid rgba(0, 180, 216, 0.4);
   border-radius: var(--radius-xl);
-  padding: 24px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 24px rgba(0, 180, 216, 0.25);
+  padding: 20px 18px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 24px rgba(0, 180, 216, 0.25);
   color: #FFFFFF;
 }
 
@@ -2107,8 +2109,8 @@ body.theme-light .header-curr-pill.active {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
-  padding-bottom: 14px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -2164,13 +2166,13 @@ body.theme-light .header-curr-pill.active {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .form-group label {
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .form-input, .form-select {
@@ -2181,7 +2183,7 @@ body.theme-light .header-curr-pill.active {
   background: rgba(6, 14, 34, 0.85);
   color: #FFFFFF;
   font-family: inherit;
-  font-size: 13.5px;
+  font-size: 16px; /* 16px prevents iOS Safari auto-zoom while focused */
   outline: none;
   transition: all var(--transition-fast);
 }
@@ -2834,14 +2836,15 @@ body.theme-glass .employee-detail-modal {
    Smart Order Import Modal & Order Parsing Cards
    ========================================================================== */
 .order-modal-card {
-  width: 100%;
-  max-width: 780px;
-  max-height: 90vh;
+  width: 94%;
+  max-width: 720px;
+  max-height: 88vh;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   background: #0B1938;
   border: 1px solid rgba(0, 180, 216, 0.4);
   border-radius: var(--radius-xl);
-  padding: 24px;
+  padding: 22px 18px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.75), 0 0 25px rgba(0, 180, 216, 0.25);
   color: #FFFFFF;
 }
@@ -2862,7 +2865,7 @@ body.theme-glass .order-modal-card {
   border-radius: 12px;
   color: #FFFFFF;
   font-family: inherit;
-  font-size: 13px;
+  font-size: 16px; /* 16px prevents iOS zoom */
   line-height: 1.5;
   padding: 12px 14px;
   resize: vertical;

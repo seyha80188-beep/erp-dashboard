@@ -10,11 +10,11 @@ const MODULES = [
   { id: 'sales-teams', name: 'របាយការណ៍លក់ប្រចាំក្រុម', icon: 'users' },
   { id: 'comparison', name: 'ការប្រៀបធៀប', icon: 'bar-chart-2' },
   { id: 'inventory', name: 'ស្តុកទំនិញ', icon: 'boxes' },
-  { id: 'orders', name: 'ការបញ្ជាទិញ', icon: 'shopping-cart' },
   { id: 'invoices', name: 'វិក្កយបត្រ', icon: 'file-text' },
   { id: 'profit-loss', name: 'ចំណេញ/ខាត', icon: 'trending-up' },
   { id: 'shipping', name: 'ការដឹកជញ្ជូន', icon: 'truck' },
   { id: 'employees', name: 'បុគ្គលិក', icon: 'user-check' },
+  { id: 'orders', name: 'ការបញ្ជាទិញ (Orders)', icon: 'shopping-cart' },
   { id: 'reports', name: 'របាយការណ៍', icon: 'pie-chart' },
   { id: 'settings', name: 'ការកំណត់', icon: 'settings' }
 ];
