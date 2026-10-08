@@ -2120,8 +2120,24 @@ body.theme-dark .sidebar {
   background: linear-gradient(90deg, #10B981, #00B4D8);
 }
 
+.budget-bar-fill.invest {
+  background: linear-gradient(90deg, #6366F1, #8B5CF6);
+}
+
+.budget-bar-fill.emergency {
+  background: linear-gradient(90deg, #0EA5E9, #3B82F6);
+}
+
+.budget-bar-fill.learn {
+  background: linear-gradient(90deg, #EC4899, #F43F5E);
+}
+
 .budget-bar-fill.wants {
   background: linear-gradient(90deg, #F59E0B, #EF4444);
+}
+
+.budget-bar-fill.give {
+  background: linear-gradient(90deg, #14B8A6, #10B981);
 }
 
 .budget-bar-fill.savings {
@@ -2221,6 +2237,12 @@ input:checked + .slider-round:before {
   background: rgba(16, 185, 129, 0.18);
   color: #10B981;
   border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.pay-badge.wing {
+  background: rgba(132, 204, 22, 0.2);
+  color: #A3E635;
+  border: 1px solid rgba(132, 204, 22, 0.4);
 }
 
 .pay-badge.cash {

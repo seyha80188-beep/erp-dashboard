@@ -236,11 +236,14 @@
         <div class="form-group">
           <label for="exp-input-desc" id="lbl-exp-desc">មុខទំនិញ / ការពិពណ៌នា (Expense Description)</label>
           <input type="text" id="exp-input-desc" class="form-input" placeholder="ឧ. អាហារថ្ងៃត្រង់, កាហ្វេ, សាំង, ទឹកភ្លើង..." required autocomplete="off">
-          <!-- Quick Suggestion Chips -->
+          <!-- Quick Suggestion Chips (អាហារ៣ពេល, ផ្ញើទៅអ្នកផ្ទះ, បញ្ចូលកាត, etc.) -->
           <div class="quick-chips-row">
+            <button type="button" class="quick-chip" onclick="setExpenseDescPreset('អាហារពេលព្រឹក')">🥣 អាហារពេលព្រឹក</button>
             <button type="button" class="quick-chip" onclick="setExpenseDescPreset('អាហារថ្ងៃត្រង់')">🍛 អាហារថ្ងៃត្រង់</button>
+            <button type="button" class="quick-chip" onclick="setExpenseDescPreset('អាហារពេលល្ងាច')">🍲 អាហារពេលល្ងាច</button>
             <button type="button" class="quick-chip" onclick="setExpenseDescPreset('ការហ្វេ & ទឹកសុត')">☕ កាហ្វេ</button>
-            <button type="button" class="quick-chip" onclick="setExpenseDescPreset('សាំងវ៉ិច')">🥪 សាំងវ៉ិច</button>
+            <button type="button" class="quick-chip" onclick="setExpenseDescPreset('ផ្ញើទៅអ្នកផ្ទះ')">👨‍👩‍👧‍👦 ផ្ញើទៅអ្នកផ្ទះ</button>
+            <button type="button" class="quick-chip" onclick="setExpenseDescPreset('បញ្ចូលកាតទូរស័ព្ទ')">📱 បញ្ចូលកាត</button>
             <button type="button" class="quick-chip" onclick="setExpenseDescPreset('សាំងម៉ូតូ/ឡាន')">⛽ សាំង</button>
             <button type="button" class="quick-chip" onclick="setExpenseDescPreset('បង់ថ្លៃបន្ទប់')">🏠 ថ្លៃបន្ទប់</button>
             <button type="button" class="quick-chip" onclick="setExpenseDescPreset('ទឹក, ភ្លើង')">💡 ទឹកភ្លើង</button>
@@ -263,14 +266,16 @@
           <div class="converted-hint" id="curr-converted-hint">ស្មើនឹង៖ $0.00 USD (អត្រា 1$ = 4,100 ៛)</div>
         </div>
 
-        <!-- 4. ប្រភេទចំណាយ (Category) -->
+        <!-- 4. ប្រភេទចំណាយ (Category - 6 Jars System) -->
         <div class="form-group">
           <label for="exp-input-cat" id="lbl-exp-cat">ប្រភេទចំណាយ (Category)</label>
           <select id="exp-input-cat" class="form-select">
-            <option value="ចាំបាច់ (Needs)">១. ចាំបាច់ (Needs - ម្ហូប/កាហ្វេ/សាំង/ផ្ទះ)</option>
-            <option value="កម្សាន្ត (Wants)">២. កម្សាន្ត (Wants - ដើរលេង/ទិញអីវ៉ាន់/ជួបជុំ)</option>
-            <option value="វិនិយោគ/សន្សំ (Savings)">៣. វិនិយោគ/សន្សំ (Savings & Investment)</option>
-            <option value="ផ្សេងៗ (Others)">៤. ផ្សេងៗ (Other Expenses)</option>
+            <option value="តម្រូវការចាំបាច់ (55%)">១. តម្រូវការចាំបាច់ (55%)</option>
+            <option value="វិនិយោគបង្កើនទ្រព្យ (10%)">២. វិនិយោគបង្កើនទ្រព្យ (10%)</option>
+            <option value="សន្សំបន្ទាន់ & រយៈវែង (10%)">៣. សន្សំបន្ទាន់ & រយៈវែង (10%)</option>
+            <option value="អភិវឌ្ឍន៍ខ្លួនឯង (10%)">៤. អភិវឌ្ឍន៍ខ្លួនឯង (10%)</option>
+            <option value="រង្វាន់លើកទឹកចិត្តខ្លួនឯង (10%)">៥. រង្វាន់លើកទឹកចិត្តខ្លួនឯង (10%)</option>
+            <option value="សប្បុរសធម៌ & ជូនម៉ែឪ (5%)">៦. សប្បុរសធម៌ & ជូនម៉ែឪ (5%)</option>
           </select>
         </div>
 
@@ -279,8 +284,9 @@
           <label for="exp-input-payment" id="lbl-exp-payment">វិធីសាស្ត្រទូទាត់ (Payment Method)</label>
           <select id="exp-input-payment" class="form-select">
             <option value="ACLEDA Bank">ACLEDA Bank (អេស៊ីលីដា)</option>
-            <option value="ប្រាសាក់ (KB PRASAC)">ប្រាសាក់ (KB PRASAC)</option>
             <option value="ABA Bank">ABA Bank</option>
+            <option value="វីង (Wing)">វីង (Wing)</option>
+            <option value="ប្រាសាក់ (KB PRASAC)">ប្រាសាក់ (KB PRASAC)</option>
             <option value="សាច់ប្រាក់ (Cash)">សាច់ប្រាក់ (Cash)</option>
           </select>
         </div>
@@ -330,6 +336,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=20261008_1720"></script>
+  <script src="app.js?v=20261008_1855"></script>
 </body>
 </html>

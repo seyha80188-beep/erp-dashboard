@@ -647,39 +647,50 @@ function parseCsvRows(text) {
 }
 
 /**
- * Normalize and Merge Duplicate Expense Categories (e.g. all Needs variations -> ១. ចាំបាច់ (Needs))
+ * Normalize and Merge Duplicate Expense Categories (The 6 Jars Financial System)
+ * 1. តម្រូវការចាំបាច់ (55%)
+ * 2. វិនិយោគបង្កើនទ្រព្យ (10%)
+ * 3. សន្សំបន្ទាន់ & រយៈវែង (10%)
+ * 4. អភិវឌ្ឍន៍ខ្លួនឯង (10%)
+ * 5. រង្វាន់លើកទឹកចិត្តខ្លួនឯង (10%)
+ * 6. សប្បុរសធម៌ & ជូនម៉ែឪ (5%)
  */
 function normalizeExpenseCategory(rawCat) {
-  if (!rawCat) return '១. ចាំបាច់ (Needs)';
+  if (!rawCat) return 'តម្រូវការចាំបាច់ (55%)';
   const cat = String(rawCat).trim();
   const lower = cat.toLowerCase();
 
-  // 1. Needs / ចាំបាច់
-  if (lower.includes('ចាំបាច់') || lower.includes('need') || lower.includes('ម្ហូប') || lower.includes('បាយ') || lower.includes('កាហ្វេ')) {
-    return '១. ចាំបាច់ (Needs)';
+  // 1. តម្រូវការចាំបាច់ (55%) - Needs / ម្ហូប / បាយ / កាហ្វេ / សាំង / ផ្ទះ
+  if (lower.includes('ចាំបាច់') || lower.includes('need') || lower.includes('ម្ហូប') || lower.includes('បាយ') || lower.includes('កាហ្វេ') || lower.includes('សាំង') || lower.includes('បន្ទប់') || lower.includes('ភ្លើង')) {
+    return 'តម្រូវការចាំបាច់ (55%)';
   }
 
-  // 2. Wants / កម្សាន្ត
-  if (lower.includes('កម្សាន្ត') || lower.includes('want') || lower.includes('ដើរលេង') || lower.includes('ទិញអីវ៉ាន់')) {
-    return '២. កម្សាន្ត (Wants)';
+  // 2. វិនិយោគបង្កើនទ្រព្យ (10%) - Investment / Assets
+  if (lower.includes('វិនិយោគ') || lower.includes('invest') || lower.includes('បង្កើនទ្រព្យ') || lower.includes('ភាគហ៊ុន') || lower.includes('ដី')) {
+    return 'វិនិយោគបង្កើនទ្រព្យ (10%)';
   }
 
-  // 3. Savings / វិនិយោគ / សន្សំ
-  if (lower.includes('សន្សំ') || lower.includes('saving') || lower.includes('វិនិយោគ') || lower.includes('invest')) {
-    return '៣. សន្សំ & វិនិយោគ (Savings)';
+  // 3. សន្សំបន្ទាន់ & រយៈវែង (10%) - Emergency & Long Term Savings
+  if (lower.includes('សន្សំ') || lower.includes('saving') || lower.includes('បន្ទាន់') || lower.includes('emergency')) {
+    return 'សន្សំបន្ទាន់ & រយៈវែង (10%)';
   }
 
-  // 4. Business / Work / ការងារ
-  if (lower.includes('ជំនួញ') || lower.includes('business') || lower.includes('ការងារ') || lower.includes('work')) {
-    return '៤. ជំនួញ & ការងារ (Business/Work)';
+  // 4. អភិវឌ្ឍន៍ខ្លួនឯង (10%) - Personal Growth / Education / វគ្គសិក្សា / សៀវភៅ
+  if (lower.includes('អភិវឌ្ឍន៍') || lower.includes('រៀន') || lower.includes('សៀវភៅ') || lower.includes('education') || lower.includes('skill')) {
+    return 'អភិវឌ្ឍន៍ខ្លួនឯង (10%)';
   }
 
-  // 5. Family / Donation
-  if (lower.includes('គ្រួសារ') || lower.includes('family') || lower.includes('សប្បុរសធម៌') || lower.includes('donation')) {
-    return '៥. គ្រួសារ & សប្បុរសធម៌ (Family)';
+  // 5. រង្វាន់លើកទឹកចិត្តខ្លួនឯង (10%) - Play / Reward / Wants / កម្សាន្ត / ដើរលេង
+  if (lower.includes('រង្វាន់') || lower.includes('កម្សាន្ត') || lower.includes('want') || lower.includes('ដើរលេង') || lower.includes('ទិញអីវ៉ាន់') || lower.includes('ជួបជុំ')) {
+    return 'រង្វាន់លើកទឹកចិត្តខ្លួនឯង (10%)';
   }
 
-  return '៦. ផ្សេងៗ (Other Expenses)';
+  // 6. សប្បុរសធម៌ & ជូនម៉ែឪ (5%) - Give / Charity / Parents / Family
+  if (lower.includes('សប្បុរសធម៌') || lower.includes('ម៉ែ') || lower.includes('ឪ') || lower.includes('អ្នកផ្ទះ') || lower.includes('គ្រួសារ') || lower.includes('charity') || lower.includes('give') || lower.includes('បុណ្យ')) {
+    return 'សប្បុរសធម៌ & ជូនម៉ែឪ (5%)';
+  }
+
+  return cat;
 }
 
 /**
@@ -1505,36 +1516,48 @@ function renderPersonalViewB2Html() {
   const netProfitUsd = totalIncomeUsd - totalExpenseUsd;
   const totalItemsCount = filteredExpenses.length;
 
-  // Group normalized categories for ABA-style budgets
-  let needsUsd = 0;
-  let wantsUsd = 0;
-  let savingsUsd = 0;
-  let othersUsd = 0;
+  // Group normalized categories for the 6 Financial Jars System
+  let jarNeedsUsd = 0;     // 1. តម្រូវការចាំបាច់ (55%)
+  let jarInvestUsd = 0;    // 2. វិនិយោគបង្កើនទ្រព្យ (10%)
+  let jarEmergencyUsd = 0; // 3. សន្សំបន្ទាន់ & រយៈវែង (10%)
+  let jarLearnUsd = 0;     // 4. អភិវឌ្ឍន៍ខ្លួនឯង (10%)
+  let jarPlayUsd = 0;      // 5. រង្វាន់លើកទឹកចិត្តខ្លួនឯង (10%)
+  let jarGiveUsd = 0;      // 6. សប្បុរសធម៌ & ជូនម៉ែឪ (5%)
 
   filteredExpenses.forEach(e => {
     const cat = e.category || '';
-    if (cat.includes('ចាំបាច់') || cat.includes('Needs')) {
-      needsUsd += e.amountUsd;
-    } else if (cat.includes('កម្សាន្ត') || cat.includes('Wants')) {
-      wantsUsd += e.amountUsd;
-    } else if (cat.includes('សន្សំ') || cat.includes('Savings')) {
-      savingsUsd += e.amountUsd;
+    if (cat.includes('ចាំបាច់') || cat.includes('55%')) {
+      jarNeedsUsd += e.amountUsd;
+    } else if (cat.includes('វិនិយោគ') || cat.includes('បង្កើនទ្រព្យ')) {
+      jarInvestUsd += e.amountUsd;
+    } else if (cat.includes('សន្សំ') || cat.includes('បន្ទាន់')) {
+      jarEmergencyUsd += e.amountUsd;
+    } else if (cat.includes('អភិវឌ្ឍន៍') || cat.includes('រៀន')) {
+      jarLearnUsd += e.amountUsd;
+    } else if (cat.includes('រង្វាន់') || cat.includes('កម្សាន្ត') || cat.includes('លើកទឹកចិត្ត')) {
+      jarPlayUsd += e.amountUsd;
+    } else if (cat.includes('សប្បុរសធម៌') || cat.includes('ម៉ែ') || cat.includes('ឪ') || cat.includes('5%')) {
+      jarGiveUsd += e.amountUsd;
     } else {
-      othersUsd += e.amountUsd;
+      jarNeedsUsd += e.amountUsd;
     }
   });
 
-  const needsPct = totalExpenseUsd > 0 ? ((needsUsd / totalExpenseUsd) * 100).toFixed(1) : 0;
-  const wantsPct = totalExpenseUsd > 0 ? ((wantsUsd / totalExpenseUsd) * 100).toFixed(1) : 0;
-  const savingsPct = totalExpenseUsd > 0 ? ((savingsUsd / totalExpenseUsd) * 100).toFixed(1) : 0;
+  const jarNeedsPct = totalExpenseUsd > 0 ? ((jarNeedsUsd / totalExpenseUsd) * 100).toFixed(1) : 0;
+  const jarInvestPct = totalExpenseUsd > 0 ? ((jarInvestUsd / totalExpenseUsd) * 100).toFixed(1) : 0;
+  const jarEmergencyPct = totalExpenseUsd > 0 ? ((jarEmergencyUsd / totalExpenseUsd) * 100).toFixed(1) : 0;
+  const jarLearnPct = totalExpenseUsd > 0 ? ((jarLearnUsd / totalExpenseUsd) * 100).toFixed(1) : 0;
+  const jarPlayPct = totalExpenseUsd > 0 ? ((jarPlayUsd / totalExpenseUsd) * 100).toFixed(1) : 0;
+  const jarGivePct = totalExpenseUsd > 0 ? ((jarGiveUsd / totalExpenseUsd) * 100).toFixed(1) : 0;
 
-  // Monthly Budget Thresholds
-  const budgetNeeds = 250.00;
-  const budgetWants = 80.00;
-  const budgetSavings = 100.00;
-
-  const needsBudgetPct = Math.min(100, Math.round((needsUsd / budgetNeeds) * 100));
-  const wantsBudgetPct = Math.min(100, Math.round((wantsUsd / budgetWants) * 100));
+  // Theoretical targets based on total income or $450 budget baseline
+  const budgetBase = totalIncomeUsd > 0 ? totalIncomeUsd : 450.00;
+  const budgetNeeds = budgetBase * 0.55;
+  const budgetInvest = budgetBase * 0.10;
+  const budgetEmergency = budgetBase * 0.10;
+  const budgetLearn = budgetBase * 0.10;
+  const budgetPlay = budgetBase * 0.10;
+  const budgetGive = budgetBase * 0.05;
 
   const isBalanceHidden = state.hideBalance || false;
   const activeTxTab = state.activeTxTab || 'expenses';
@@ -1657,17 +1680,17 @@ function renderPersonalViewB2Html() {
           <span class="metric-label">${lang === 'en' ? 'Needs Ratio' : 'ភាគរយចំណាយចាំបាច់'}</span>
           <span class="metric-icon-badge"><i data-lucide="pie-chart"></i></span>
         </div>
-        <div class="metric-value" style="color:#00B4D8;">${needsPct}%</div>
-        <div class="metric-footer">${lang === 'en' ? 'Healthy Target: < 60%' : 'គោលដៅសុខភាព៖ < 60%'}</div>
+        <div class="metric-value" style="color:#00B4D8;">${jarNeedsPct}%</div>
+        <div class="metric-footer">${lang === 'en' ? 'Target: 55%' : 'គោលដៅ៖ 55%'}</div>
       </div>
     </div>
 
-    <!-- Category Budgets with ABA-Style Progress Bars -->
+    <!-- Category Budgets with ABA-Style Progress Bars (The 6 Jars System) -->
     <div class="panel-card">
       <div class="card-title-row">
         <div>
-          <h3 class="card-title"><i data-lucide="sliders"></i> ${lang === 'en' ? 'Personal Category Budgets (50/30/20 Rule)' : 'ការបែងចែកកញ្ចប់ចំណាយតាមប្រភេទ (រូបមន្ត 50/30/20)'}</h3>
-          <span style="font-size:12px; color:var(--text-muted);">${lang === 'en' ? 'Normalized & merged categories with ABA progress indicators' : 'សម្អាត និងច្របាច់បញ្ចូលប្រភេទចំណាយស្ទួនរួចរាល់'}</span>
+          <h3 class="card-title"><i data-lucide="sliders"></i> ${lang === 'en' ? 'The 6 Jars Financial System' : 'ការបែងចែកកញ្ចប់ហិរញ្ញវត្ថុ ៦ ប្រភេទ (6 Jars Formula)'}</h3>
+          <span style="font-size:12px; color:var(--text-muted);">${lang === 'en' ? '55% Needs | 10% Invest | 10% Savings | 10% Growth | 10% Play | 5% Give' : '៥៥% ចាំបាច់ | ១០% វិនិយោគ | ១០% សន្សំ | ១០% រៀនសូត្រ | ១០% រង្វាន់ | ៥% ម៉ែឪ&ធម៌'}</span>
         </div>
         <span class="status-pill-disconnected" style="background:#DCFCE7; color:#15803D;">
           ${lang === 'en' ? 'Total Spent' : 'ចំណាយសរុប'} ${formatCurrency(totalExpenseUsd)}
@@ -1675,54 +1698,99 @@ function renderPersonalViewB2Html() {
       </div>
 
       <div style="display:flex; flex-direction:column; gap:14px; margin-top:12px;">
-        <!-- 1. Needs (Merged) -->
+        <!-- 1. តម្រូវការចាំបាច់ (55%) -->
         <div class="budget-progress-card">
           <div class="budget-progress-header">
-            <span class="budget-cat-name">១. ចាំបាច់ (Needs - ម្ហូប/កាហ្វេ/សាំង/ផ្ទះ)</span>
-            <span class="budget-cat-amounts" style="color:#00B4D8;">${formatCurrency(needsUsd)} / ${formatCurrency(budgetNeeds)}</span>
+            <span class="budget-cat-name">១. តម្រូវការចាំបាច់ (55% - ម្ហូប/បាយ/កាហ្វេ/សាំង/បន្ទប់)</span>
+            <span class="budget-cat-amounts" style="color:#00B4D8;">${formatCurrency(jarNeedsUsd)} / ${formatCurrency(budgetNeeds)}</span>
           </div>
           <div class="budget-bar-track">
-            <div class="budget-bar-fill needs" style="width:${needsBudgetPct}%;"></div>
+            <div class="budget-bar-fill needs" style="width:${Math.min(100, Math.round((jarNeedsUsd / budgetNeeds) * 100))}%;"></div>
           </div>
           <div class="budget-progress-footer">
-            <span>${needsPct}% ${lang === 'en' ? 'of total expenses' : 'នៃចំណាយសរុប'}</span>
-            <span style="color:${needsBudgetPct >= 80 ? '#EF4444' : '#10B981'}; font-weight:600;">${needsBudgetPct}% ${lang === 'en' ? 'of budget used' : 'នៃកញ្ចប់ថវិកា'}</span>
+            <span>${jarNeedsPct}% ${lang === 'en' ? 'of total expenses' : 'នៃចំណាយសរុប'}</span>
+            <span style="color:${(jarNeedsUsd / budgetNeeds) >= 0.8 ? '#EF4444' : '#10B981'}; font-weight:600;">${Math.min(100, Math.round((jarNeedsUsd / budgetNeeds) * 100))}% ${lang === 'en' ? 'of budget' : 'នៃកញ្ចប់ 55%'}</span>
           </div>
         </div>
 
-        <!-- 2. Wants -->
+        <!-- 2. វិនិយោគបង្កើនទ្រព្យ (10%) -->
         <div class="budget-progress-card">
           <div class="budget-progress-header">
-            <span class="budget-cat-name">២. កម្សាន្ត (Wants - ដើរលេង/ញ៉ាំក្រៅ/ទិញអីវ៉ាន់)</span>
-            <span class="budget-cat-amounts" style="color:#F59E0B;">${formatCurrency(wantsUsd)} / ${formatCurrency(budgetWants)}</span>
+            <span class="budget-cat-name">២. វិនិយោគបង្កើនទ្រព្យ (10% - Investment & Assets)</span>
+            <span class="budget-cat-amounts" style="color:#8B5CF6;">${formatCurrency(jarInvestUsd)} / ${formatCurrency(budgetInvest)}</span>
           </div>
           <div class="budget-bar-track">
-            <div class="budget-bar-fill wants" style="width:${wantsBudgetPct}%;"></div>
+            <div class="budget-bar-fill invest" style="width:${Math.min(100, Math.round((jarInvestUsd / budgetInvest) * 100))}%;"></div>
           </div>
           <div class="budget-progress-footer">
-            <span>${wantsPct}% ${lang === 'en' ? 'of total expenses' : 'នៃចំណាយសរុប'}</span>
-            <span style="color:${wantsBudgetPct >= 80 ? '#EF4444' : '#10B981'}; font-weight:600;">${wantsBudgetPct}% ${lang === 'en' ? 'of budget used' : 'នៃកញ្ចប់ថវិកា'}</span>
+            <span>${jarInvestPct}% ${lang === 'en' ? 'of total expenses' : 'នៃចំណាយសរុប'}</span>
+            <span style="color:#8B5CF6; font-weight:600;">${Math.min(100, Math.round((jarInvestUsd / budgetInvest) * 100))}% ${lang === 'en' ? 'of target' : 'នៃគោលដៅ 10%'}</span>
           </div>
         </div>
 
-        <!-- 3. Savings -->
+        <!-- 3. សន្សំបន្ទាន់ & រយៈវែង (10%) -->
         <div class="budget-progress-card">
           <div class="budget-progress-header">
-            <span class="budget-cat-name">៣. សន្សំ & វិនិយោគ (Savings & Investments)</span>
-            <span class="budget-cat-amounts" style="color:#3B82F6;">${formatCurrency(savingsUsd)} / ${formatCurrency(budgetSavings)}</span>
+            <span class="budget-cat-name">៣. សន្សំបន្ទាន់ & រយៈវែង (10% - Emergency & LTSS)</span>
+            <span class="budget-cat-amounts" style="color:#3B82F6;">${formatCurrency(jarEmergencyUsd)} / ${formatCurrency(budgetEmergency)}</span>
           </div>
           <div class="budget-bar-track">
-            <div class="budget-bar-fill savings" style="width:${Math.min(100, Math.round((savingsUsd / budgetSavings) * 100))}%;"></div>
+            <div class="budget-bar-fill emergency" style="width:${Math.min(100, Math.round((jarEmergencyUsd / budgetEmergency) * 100))}%;"></div>
           </div>
           <div class="budget-progress-footer">
-            <span>${savingsPct}% ${lang === 'en' ? 'of total expenses' : 'នៃចំណាយសរុប'}</span>
-            <span style="color:#3B82F6; font-weight:600;">${Math.min(100, Math.round((savingsUsd / budgetSavings) * 100))}% ${lang === 'en' ? 'of savings goal' : 'នៃគោលដៅសន្សំ'}</span>
+            <span>${jarEmergencyPct}% ${lang === 'en' ? 'of total expenses' : 'នៃចំណាយសរុប'}</span>
+            <span style="color:#3B82F6; font-weight:600;">${Math.min(100, Math.round((jarEmergencyUsd / budgetEmergency) * 100))}% ${lang === 'en' ? 'of target' : 'នៃគោលដៅ 10%'}</span>
+          </div>
+        </div>
+
+        <!-- 4. អភិវឌ្ឍន៍ខ្លួនឯង (10%) -->
+        <div class="budget-progress-card">
+          <div class="budget-progress-header">
+            <span class="budget-cat-name">៤. អភិវឌ្ឍន៍ខ្លួនឯង (10% - Education & Books)</span>
+            <span class="budget-cat-amounts" style="color:#EC4899;">${formatCurrency(jarLearnUsd)} / ${formatCurrency(budgetLearn)}</span>
+          </div>
+          <div class="budget-bar-track">
+            <div class="budget-bar-fill learn" style="width:${Math.min(100, Math.round((jarLearnUsd / budgetLearn) * 100))}%;"></div>
+          </div>
+          <div class="budget-progress-footer">
+            <span>${jarLearnPct}% ${lang === 'en' ? 'of total expenses' : 'នៃចំណាយសរុប'}</span>
+            <span style="color:#EC4899; font-weight:600;">${Math.min(100, Math.round((jarLearnUsd / budgetLearn) * 100))}% ${lang === 'en' ? 'of target' : 'នៃគោលដៅ 10%'}</span>
+          </div>
+        </div>
+
+        <!-- 5. រង្វាន់លើកទឹកចិត្តខ្លួនឯង (10%) -->
+        <div class="budget-progress-card">
+          <div class="budget-progress-header">
+            <span class="budget-cat-name">៥. រង្វាន់លើកទឹកចិត្តខ្លួនឯង (10% - Play & Joy)</span>
+            <span class="budget-cat-amounts" style="color:#F59E0B;">${formatCurrency(jarPlayUsd)} / ${formatCurrency(budgetPlay)}</span>
+          </div>
+          <div class="budget-bar-track">
+            <div class="budget-bar-fill wants" style="width:${Math.min(100, Math.round((jarPlayUsd / budgetPlay) * 100))}%;"></div>
+          </div>
+          <div class="budget-progress-footer">
+            <span>${jarPlayPct}% ${lang === 'en' ? 'of total expenses' : 'នៃចំណាយសរុប'}</span>
+            <span style="color:${(jarPlayUsd / budgetPlay) >= 0.8 ? '#EF4444' : '#10B981'}; font-weight:600;">${Math.min(100, Math.round((jarPlayUsd / budgetPlay) * 100))}% ${lang === 'en' ? 'of budget' : 'នៃកញ្ចប់ 10%'}</span>
+          </div>
+        </div>
+
+        <!-- 6. សប្បុរសធម៌ & ជូនម៉ែឪ (5%) -->
+        <div class="budget-progress-card">
+          <div class="budget-progress-header">
+            <span class="budget-cat-name">៦. សប្បុរសធម៌ & ជូនម៉ែឪ (5% - Give & Family)</span>
+            <span class="budget-cat-amounts" style="color:#14B8A6;">${formatCurrency(jarGiveUsd)} / ${formatCurrency(budgetGive)}</span>
+          </div>
+          <div class="budget-bar-track">
+            <div class="budget-bar-fill give" style="width:${Math.min(100, Math.round((jarGiveUsd / budgetGive) * 100))}%;"></div>
+          </div>
+          <div class="budget-progress-footer">
+            <span>${jarGivePct}% ${lang === 'en' ? 'of total expenses' : 'នៃចំណាយសរុប'}</span>
+            <span style="color:#14B8A6; font-weight:600;">${Math.min(100, Math.round((jarGiveUsd / budgetGive) * 100))}% ${lang === 'en' ? 'of target' : 'នៃគោលដៅ 5%'}</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Recent Transactions with Payment Method Badges (ABA, ACLEDA, PRASAC, Cash) -->
+    <!-- Recent Transactions with Payment Method Badges (ABA, ACLEDA, WING, PRASAC, Cash) -->
     <div class="panel-card">
       <div class="card-title-row">
         <div style="display:flex; gap:6px;">
@@ -1745,10 +1813,13 @@ function renderPersonalViewB2Html() {
             if (method.includes('aba')) {
               badgeClass = 'aba';
               badgeLabel = 'ABA Bank';
-            } else if (method.includes('acleda')) {
+            } else if (method.includes('acleda') || method.includes('អេស៊ី')) {
               badgeClass = 'acleda';
               badgeLabel = 'ACLEDA';
-            } else if (method.includes('prasac')) {
+            } else if (method.includes('wing') || method.includes('វីង')) {
+              badgeClass = 'wing';
+              badgeLabel = 'Wing';
+            } else if (method.includes('prasac') || method.includes('ប្រាសាក់')) {
               badgeClass = 'prasac';
               badgeLabel = 'PRASAC';
             } else {
