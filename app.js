@@ -271,22 +271,32 @@ async function initApp() {
 }
 
 /**
- * Apply App Theme: 💎 ថ្លា (Glassmorphism) vs 🌙 ងងឹត (Solid Dark)
+ * Apply App Theme: 💎 ថ្លា (Glass) vs 🌙 ងងឹត (Dark) vs ☀️ សរថ្លា (Light Glass)
  */
 function applyAppTheme() {
   const theme = state.theme || 'glass';
-  document.body.classList.remove('theme-glass', 'theme-dark');
-  document.body.classList.add(theme === 'dark' ? 'theme-dark' : 'theme-glass');
+  document.body.classList.remove('theme-glass', 'theme-dark', 'theme-light');
+  if (theme === 'light') {
+    document.body.classList.add('theme-light');
+  } else if (theme === 'dark') {
+    document.body.classList.add('theme-dark');
+  } else {
+    document.body.classList.add('theme-glass');
+  }
 
   const themeBtnLabel = document.getElementById('theme-btn-label');
   const themeIcon = document.getElementById('theme-icon');
   if (themeBtnLabel) {
-    themeBtnLabel.textContent = theme === 'dark' 
-      ? (state.lang === 'en' ? 'Dark' : 'ងងឹត') 
-      : (state.lang === 'en' ? 'Glass' : 'ថ្លា');
+    if (theme === 'light') {
+      themeBtnLabel.textContent = state.lang === 'en' ? 'Light' : 'សរថ្លា';
+    } else if (theme === 'dark') {
+      themeBtnLabel.textContent = state.lang === 'en' ? 'Dark' : 'ងងឹត';
+    } else {
+      themeBtnLabel.textContent = state.lang === 'en' ? 'Glass' : 'ថ្លា';
+    }
   }
   if (themeIcon) {
-    themeIcon.setAttribute('data-lucide', theme === 'dark' ? 'moon' : 'sparkles');
+    themeIcon.setAttribute('data-lucide', theme === 'light' ? 'sun' : (theme === 'dark' ? 'moon' : 'sparkles'));
     if (window.lucide) window.lucide.createIcons();
   }
 }
@@ -1720,8 +1730,8 @@ function renderPersonalViewB2Html() {
             <span>${t.accountInfo}</span>
           </div>
         </div>
-        <div class="acleda-holiday-badge">
-          <span>🌸 ${lang === 'en' ? 'Oct 2026' : 'តុលា ២០២៦'}</span>
+        <div class="acleda-holiday-badge" title="កាលបរិច្ឆេទថ្ងៃនេះ">
+          <span>🌸 ${lang === 'en' ? `Day ${new Date().getDate()} Oct 2026` : `ថ្ងៃទី ${new Date().getDate() < 10 ? '០' + new Date().getDate() : new Date().getDate()} តុលា ២០២៦`}</span>
         </div>
       </div>
 
@@ -2751,10 +2761,16 @@ window.handleSaveExpense = async function(e) {
 };
 
 /**
- * Toggle App Theme: 💎 ថ្លា (Glassmorphism) vs 🌙 ងងឹត (Solid Dark)
+ * Toggle App Theme: 💎 ថ្លា (Glassmorphism) ➔ ☀️ សរថ្លា (Light Glass) ➔ 🌙 ងងឹត (Solid Dark)
  */
 window.toggleAppTheme = function() {
-  state.theme = state.theme === 'glass' ? 'dark' : 'glass';
+  if (state.theme === 'glass') {
+    state.theme = 'light';
+  } else if (state.theme === 'light') {
+    state.theme = 'dark';
+  } else {
+    state.theme = 'glass';
+  }
   localStorage.setItem('yem_theme', state.theme);
   applyAppTheme();
 };
