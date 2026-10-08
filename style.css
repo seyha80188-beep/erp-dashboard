@@ -1792,25 +1792,93 @@ body {
 }
 
 /* ==========================================================================
-   Themes: 💎 ថ្លា (Glassmorphism), 🌙 ងងឹត (Midnight Dark), ☀️ សរថ្លា (White Glass)
+   Themes: 💎 ថ្លាពិតប្រាកដ (iOS 18 Frosted Glassmorphism) vs 🌙 ងងឹត (Midnight Dark)
    ========================================================================== */
 body.theme-glass {
-  background-color: #060E22;
+  background-color: #0B0F19 !important;
   background-image: 
-    radial-gradient(circle at 15% 15%, rgba(0, 180, 216, 0.16) 0%, transparent 45%),
-    radial-gradient(circle at 85% 35%, rgba(245, 158, 11, 0.10) 0%, transparent 50%),
-    radial-gradient(circle at 50% 85%, rgba(0, 119, 182, 0.12) 0%, transparent 55%);
+    radial-gradient(circle at 20% 15%, rgba(249, 115, 22, 0.28) 0%, transparent 40%),
+    radial-gradient(circle at 80% 20%, rgba(168, 85, 247, 0.28) 0%, transparent 45%),
+    radial-gradient(circle at 15% 55%, rgba(14, 165, 233, 0.3) 0%, transparent 45%),
+    radial-gradient(circle at 85% 65%, rgba(34, 197, 94, 0.25) 0%, transparent 45%),
+    radial-gradient(circle at 50% 85%, rgba(236, 72, 153, 0.22) 0%, transparent 50%) !important;
+  background-attachment: fixed !important;
 }
 
+/* iOS 18 Control Center Ultra-Frosted Glass Cards */
 body.theme-glass .panel-card,
-body.theme-glass .acleda-balance-card,
 body.theme-glass .metric-card,
-body.theme-glass .dashboard-section-nav {
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  background: rgba(14, 31, 68, 0.65);
-  border: 1px solid rgba(0, 180, 216, 0.22);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+body.theme-glass .dashboard-section-nav,
+body.theme-glass .recon-kpi-card {
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(28px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border-radius: 20px !important;
+  box-shadow: 
+    0 8px 32px 0 rgba(0, 0, 0, 0.37),
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.45) !important;
+}
+
+body.theme-glass .acleda-balance-card {
+  background: rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(32px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 24px !important;
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.5) !important;
+}
+
+body.theme-glass .top-header {
+  background: rgba(11, 15, 25, 0.55) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+body.theme-glass .sidebar {
+  background: rgba(11, 15, 25, 0.65) !important;
+  backdrop-filter: blur(30px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(30px) saturate(190%) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+body.theme-glass .header-select-dropdown,
+body.theme-glass .header-currency-toggle,
+body.theme-glass .header-pill-btn {
+  background: rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.3) !important;
+}
+
+body.theme-glass .data-table th {
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(12px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+body.theme-glass .data-table td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+body.theme-glass .data-table tr:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+body.theme-glass .section-tab-btn {
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+body.theme-glass .section-tab-btn.active {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3), inset 0 1px 1.5px rgba(255, 255, 255, 0.5) !important;
 }
 
 body.theme-dark {
