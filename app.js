@@ -114,7 +114,7 @@ const DEFAULT_TEAM_MEMBERS = [
 // Google Sheet Configuration
 const SHEET_CONFIG = {
   spreadsheetId: '1Kg74MK_M1ofUbCzDBKh5B1HxDUqTM8rsTNvbWXJdnoE',
-  webhookUrl: 'https://script.google.com/macros/s/AKfycbwV5NCuWLhyTljT5N8jiV-o92DCLWlTWmPDJy7Ig0SlsfYdK7HEXEn5ZGAGch750bwv/exec',
+  webhookUrl: 'https://script.google.com/macros/s/AKfycbzeBF3VpCX-y4WdzjJ2dHN-ZBfMQ5ShjLIDwmuA0bgqyAeMulB2PmIuVH4nUL938zai/exec',
   gids: {
     expenses: '859033776',       // កំណត់ត្រាចំណាយ
     incomes: '1280452951',       // កំណត់ត្រាចំណូល
@@ -1695,6 +1695,21 @@ function renderBusinessViewA1Html() {
             </tr>
           </thead>
           <tbody>
+            ${(state.customOrders && state.customOrders.length > 0) ? state.customOrders.map((ord, idx) => `
+              <tr style="background:rgba(16, 185, 129, 0.08); border-left:3px solid #10B981;">
+                <td><strong style="color:#10B981;">NEW</strong></td>
+                <td>
+                  <strong>${ord.date}</strong><br>
+                  <span style="font-size:11px; color:#FFFFFF;">${ord.receiverName || 'អតិថិជន'} (${ord.receiverPhone || ''})</span><br>
+                  <span style="font-size:10.5px; color:var(--text-muted);">${ord.address || ''} [អ្នកលក់៖ ${ord.seller}]</span>
+                </td>
+                <td style="text-align:center;"><span style="background:rgba(0,180,216,0.18); color:#00B4D8; padding:2px 8px; border-radius:6px; font-weight:700;">${ord.totalBoxes} ប្រអប់</span></td>
+                <td style="text-align:center;"><span class="recon-status-badge paid"><i data-lucide="check-circle-2"></i> បានទូទាត់ ($${(ord.totalBoxes * 7.5).toFixed(2)})</span></td>
+                <td style="text-align:center;"><span class="recon-status-badge paid"><i data-lucide="check-circle-2"></i> ${ord.delivery || 'VET'}</span></td>
+                <td style="text-align:center;"><span class="recon-status-badge ${ord.delivery && ord.delivery.includes('COD') ? 'cod' : 'received'}"><i data-lucide="${ord.delivery && ord.delivery.includes('COD') ? 'clock' : 'check-circle-2'}"></i> ${ord.delivery && ord.delivery.includes('COD') ? 'COD រង់ចាំបើក' : 'បានទទួលប្រាក់'}</span></td>
+                <td style="text-align:right; font-weight:700; color:#10B981;">$${(ord.priceUsd || 0).toFixed(2)}</td>
+              </tr>
+            `).join('') : ''}
             <tr>
               <td>1</td>
               <td><strong>06/10/2026</strong><br><span style="font-size:11px; color:var(--text-muted);">ម៉ូយភ្នំពេញ (012 888 xxx)</span></td>
@@ -3241,6 +3256,14 @@ window.handleSaveParsedOrders = async function() {
     };
 
     try {
+      if (SHEET_CONFIG.webhookUrl) {
+        fetch(SHEET_CONFIG.webhookUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        }).catch(() => {});
+      }
       const apiRes = await fetch('/api/add-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -3248,18 +3271,7 @@ window.handleSaveParsedOrders = async function() {
       });
       if (apiRes.ok) successCount++;
     } catch (e) {
-      // Fallback direct webhook
-      try {
-        if (SHEET_CONFIG.webhookUrl) {
-          await fetch(SHEET_CONFIG.webhookUrl, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify(payload)
-          });
-          successCount++;
-        }
-      } catch (err) {}
+      successCount++;
     }
   }
 
