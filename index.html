@@ -22,7 +22,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" href="style.css?v=20261018_v6">
+  <link rel="stylesheet" href="style.css?v=20261018_v7">
 </head>
 <body>
   <!-- Mobile Pull-to-Refresh Indicator Container -->
@@ -125,10 +125,10 @@
       </div>
 
       <div class="header-right">
-        <!-- Add Expense Button -->
-        <button id="open-expense-btn" class="header-action-btn-add" onclick="openExpenseModal()" title="កត់ត្រាចំណាយប្រចាំថ្ងៃ (Add Expense)">
+        <!-- Add Expense Button (Desktop/Tablet Only) -->
+        <button id="open-expense-btn" class="header-action-btn-add hide-on-narrow-mobile" onclick="openExpenseModal()" title="កត់ត្រាចំណាយប្រចាំថ្ងៃ (Add Expense)">
           <i data-lucide="plus-circle"></i>
-          <span class="btn-text hide-on-narrow-mobile" id="header-btn-add-text">កត់ត្រាចំណាយ</span>
+          <span class="btn-text" id="header-btn-add-text">កត់ត្រាចំណាយ</span>
         </button>
 
         <!-- Theme Switcher: 🧡 ទឹកក្រូច VET / 💎 ថ្លា / 🌙 ងងឹត -->
@@ -186,12 +186,10 @@
         <span id="nav-orders-text">ការបញ្ជាទិញ</span>
       </button>
 
-      <!-- [4] កត់ត្រាចំណាយ (Add Expense) -->
-      <button class="acleda-bottom-btn quick-add-nav-btn expense-nav-btn" id="tab-nav-expenses" onclick="openExpenseModal()" title="កត់ត្រាចំណាយ (Add Expense)">
-        <div class="quick-add-plus-circle expense-circle">
-          <i data-lucide="plus"></i>
-        </div>
-        <span id="nav-expenses-text">កត់ត្រាចំណាយ</span>
+      <!-- [4] ចំណាយ B2 (Expenses) -->
+      <button class="acleda-bottom-btn" id="tab-nav-expenses" onclick="handleBottomTabClick('cash-flow')">
+        <i data-lucide="wallet"></i>
+        <span id="nav-expenses-text">ចំណាយ B2</span>
       </button>
 
       <!-- [5] របាយការណ៍ (Reports) -->
@@ -421,6 +419,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=20261018_v6"></script>
+  <script src="app.js?v=20261018_v7"></script>
 </body>
 </html>
