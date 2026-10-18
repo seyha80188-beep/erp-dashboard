@@ -480,32 +480,70 @@ body {
 .acleda-date-strip {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  margin-bottom: 8px;
-  padding: 0 2px;
+  justify-content: center;
+  width: 100%;
+  margin-top: 2px;
+  margin-bottom: 14px;
+  padding: 0;
 }
 
 .acleda-holiday-badge {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--primary-gold);
-  background: rgba(245, 158, 11, 0.12);
-  padding: 5px 12px;
-  border-radius: 20px;
-  border: 1px solid rgba(245, 158, 11, 0.35);
+  font-family: 'Kantumruy Pro', var(--font-khmer), -apple-system, sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  color: #FBBF24;
+  background: linear-gradient(135deg, rgba(20, 32, 60, 0.9) 0%, rgba(10, 18, 38, 0.95) 100%);
+  padding: 8px 24px;
+  border-radius: 30px;
+  border: 1.5px solid rgba(251, 191, 36, 0.55);
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+  justify-content: center;
+  gap: 8px;
+  /* 3D Embossed Effect (អក្សរផុស + កាតផុស) */
+  box-shadow: 
+    0 6px 20px rgba(0, 0, 0, 0.45),
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.25),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.5),
+    0 0 18px rgba(251, 191, 36, 0.3);
+  text-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.7),
+    0 0 10px rgba(251, 191, 36, 0.55);
+  letter-spacing: 0.4px;
   transition: all var(--transition-fast);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  user-select: none;
 }
 
 .acleda-holiday-badge:hover {
-  background: rgba(245, 158, 11, 0.2);
-  border-color: var(--primary-gold);
+  background: linear-gradient(135deg, rgba(30, 48, 88, 0.95) 0%, rgba(14, 26, 54, 0.98) 100%);
+  border-color: #FBBF24;
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.55),
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.35),
+    0 0 24px rgba(251, 191, 36, 0.45);
   transform: translateY(-1px);
+}
+
+.flower-icon-glow {
+  font-size: 19px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 8px rgba(244, 114, 182, 0.7));
+  animation: gentleFlowerPulse 3s ease-in-out infinite;
+}
+
+@keyframes gentleFlowerPulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 6px rgba(244, 114, 182, 0.6)); }
+  50% { transform: scale(1.15); filter: drop-shadow(0 0 12px rgba(244, 114, 182, 0.9)); }
+}
+
+.embossed-date-text {
+  font-weight: 800;
+  letter-spacing: 0.5px;
 }
 
 /* Main Hero Balance Card (Bank Card Style) */
@@ -2432,12 +2470,19 @@ body.theme-vet .filter-select {
   color: #1E293B !important;
 }
 
-/* Holiday / Flower Badge in VET */
+/* Holiday / Flower Badge in VET (3D Embossed Effect) */
 body.theme-vet .acleda-holiday-badge {
-  background: #FFF7ED !important;
-  border: 1px solid rgba(255, 102, 0, 0.35) !important;
-  color: #EA580C !important;
-  box-shadow: 0 2px 8px rgba(255, 102, 0, 0.12) !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  color: #C2410C !important;
+  background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%) !important;
+  border: 1.5px solid #FB923C !important;
+  box-shadow: 
+    0 6px 18px rgba(234, 88, 12, 0.18),
+    inset 0 2px 2px #FFFFFF,
+    inset 0 -2px 3px rgba(194, 65, 12, 0.12),
+    0 0 16px rgba(255, 102, 0, 0.2) !important;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9), 0 0 8px rgba(251, 146, 60, 0.4) !important;
 }
 
 /* Bottom Navigation in VET */

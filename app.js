@@ -1633,7 +1633,8 @@ function renderDashboardModule() {
     <div class="acleda-hero-container">
       <div class="acleda-date-strip">
         <div class="acleda-holiday-badge" title="កាលបរិច្ឆេទថ្ងៃនេះ">
-          <span>${dateBadgeText}</span>
+          <span class="flower-icon-glow">🌸</span>
+          <span class="embossed-date-text">${lang === 'en' ? `${dayNum} ${now.toLocaleString('en-US', { month: 'short' })} ${now.getFullYear()}` : `ថ្ងៃទី ${dayKhmer} ${monthKhmer} ${yearKhmer}`}</span>
         </div>
       </div>
       <div class="acleda-balance-card">
@@ -1679,18 +1680,8 @@ function renderDashboardModule() {
           </button>
         </div>
 
-        <!-- Quick Action Twin Pills: កត់ត្រាចំណាយ & បញ្ចូលការកម្ម៉ង់ (Side by side) -->
+        <!-- Quick Action Twin Pills: បញ្ចូលការកម្ម៉ង់ (ឆ្វេង) & កត់ត្រាចំណាយ (ស្តាំ) -->
         <div class="dashboard-quick-actions-bar">
-          <button type="button" class="dash-quick-btn dash-quick-expense" onclick="openExpenseModal()">
-            <div class="dash-quick-icon-circle expense-circle">
-              <i data-lucide="file-plus"></i>
-            </div>
-            <div class="dash-quick-text">
-              <span class="dash-quick-label"><span class="dash-title-sparkle expense">✦</span> ${lang === 'en' ? 'Log Expense' : 'កត់ត្រាចំណាយ'}</span>
-              <span class="dash-quick-sub">${lang === 'en' ? 'Daily Personal' : 'ចំណាយប្រចាំថ្ងៃ (Sheet B2)'}</span>
-            </div>
-          </button>
-
           <button type="button" class="dash-quick-btn dash-quick-orders" onclick="openOrderModal()">
             <div class="dash-quick-icon-circle orders-circle">
               <i data-lucide="clipboard-paste"></i>
@@ -1698,6 +1689,16 @@ function renderDashboardModule() {
             <div class="dash-quick-text">
               <span class="dash-quick-label"><span class="dash-title-sparkle orders">✦</span> ${lang === 'en' ? 'Enter Orders' : 'បញ្ចូលការកម្ម៉ង់'}</span>
               <span class="dash-quick-sub">${lang === 'en' ? 'Paste Telegram' : 'Paste ពី Telegram'}</span>
+            </div>
+          </button>
+
+          <button type="button" class="dash-quick-btn dash-quick-expense" onclick="openExpenseModal()">
+            <div class="dash-quick-icon-circle expense-circle">
+              <i data-lucide="file-plus"></i>
+            </div>
+            <div class="dash-quick-text">
+              <span class="dash-quick-label"><span class="dash-title-sparkle expense">✦</span> ${lang === 'en' ? 'Log Expense' : 'កត់ត្រាចំណាយ'}</span>
+              <span class="dash-quick-sub">${lang === 'en' ? 'Daily Personal' : 'ចំណាយប្រចាំថ្ងៃ (Sheet B2)'}</span>
             </div>
           </button>
         </div>
