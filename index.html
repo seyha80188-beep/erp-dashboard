@@ -22,9 +22,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" href="style.css?v=20261018_acledatabs">
+  <link rel="stylesheet" href="style.css?v=20261018_v3">
 </head>
 <body>
+  <!-- Mobile Pull-to-Refresh Indicator Container -->
+  <div id="pull-to-refresh" class="pull-to-refresh-container">
+    <div class="pull-refresh-icon-circle">
+      <i data-lucide="refresh-cw" id="pull-refresh-icon"></i>
+    </div>
+    <span id="pull-refresh-text" class="pull-refresh-label">អូសចុះក្រោមដើម្បីផ្ទុកទិន្នន័យ</span>
+  </div>
+
   <!-- Overlay សម្រាប់ Mobile ពេលបើក Sidebar -->
   <div id="sidebar-overlay" class="sidebar-overlay"></div>
 
@@ -185,12 +193,12 @@
         <span id="nav-sales-text">ការលក់ A1</span>
       </button>
 
-      <!-- [3] (+) កត់ត្រារហ័ស (Quick Add) -->
-      <button class="acleda-bottom-btn quick-add-nav-btn" id="tab-nav-add" onclick="openExpenseModal()">
+      <!-- [3] ការបញ្ជាទិញ (Orders) -->
+      <button class="acleda-bottom-btn quick-add-nav-btn" id="tab-nav-orders" onclick="handleBottomTabClick('orders')" title="ការបញ្ជាទិញ (Orders)">
         <div class="quick-add-plus-circle">
-          <i data-lucide="plus"></i>
+          <i data-lucide="shopping-bag"></i>
         </div>
-        <span id="nav-add-text">កត់ត្រារហ័ស</span>
+        <span id="nav-orders-text">ការបញ្ជាទិញ</span>
       </button>
 
       <!-- [4] ចំណាយ B2 (Expenses) -->
@@ -426,6 +434,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=20261018_acledatabs"></script>
+  <script src="app.js?v=20261018_v3"></script>
 </body>
 </html>
