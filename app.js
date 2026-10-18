@@ -1251,52 +1251,157 @@ function setupSidebarEventListeners() {
     }
   });
 
-  // Mobile Touch Gestures: Swipe from left edge to open drawer, swipe left to close
+  // Mobile Touch Gestures: Smooth real-time swipe drawer (works from edge to screen center)
   let touchStartX = 0;
   let touchStartY = 0;
-  let isEdgeSwipe = false;
+  let touchStartTime = 0;
+  let isSwipingSidebar = false;
+  let isSwipeIntentDecided = false;
+  let startingStateOpen = false;
 
   document.addEventListener('touchstart', (e) => {
     if (e.touches.length !== 1 || window.innerWidth > 768) return;
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
+    const touch = e.touches[0];
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+    touchStartTime = Date.now();
+    isSwipingSidebar = false;
+    isSwipeIntentDecided = false;
+    startingStateOpen = sidebarEl ? sidebarEl.classList.contains('open') : false;
 
-    // Detect if finger touch started near left edge of screen (<= 45px) and drawer is closed
-    if (touchStartX <= 45 && sidebarEl && !sidebarEl.classList.contains('open')) {
-      isEdgeSwipe = true;
-    } else {
-      isEdgeSwipe = false;
+    // When closed, allow swiping from up to 70% of screen width (left to center)
+    // When open, touch can start anywhere to drag closed
+    if (!startingStateOpen && touchStartX > window.innerWidth * 0.70) {
+      return;
     }
   }, { passive: true });
 
+  document.addEventListener('touchmove', (e) => {
+    if (e.touches.length !== 1 || window.innerWidth > 768) return;
+    if (!startingStateOpen && touchStartX > window.innerWidth * 0.70) return;
+
+    const currentX = e.touches[0].clientX;
+    const currentY = e.touches[0].clientY;
+    const deltaX = currentX - touchStartX;
+    const deltaY = currentY - touchStartY;
+
+    if (!isSwipeIntentDecided) {
+      const absX = Math.abs(deltaX);
+      const absY = Math.abs(deltaY);
+      if (absX > 8 || absY > 8) {
+        isSwipeIntentDecided = true;
+        if (absX > absY * 1.1) {
+          if (!startingStateOpen && deltaX > 5) {
+            isSwipingSidebar = true;
+          } else if (startingStateOpen && deltaX < -5) {
+            isSwipingSidebar = true;
+          }
+        }
+      }
+    }
+
+    if (!isSwipingSidebar || !sidebarEl) return;
+
+    if (e.cancelable) {
+      e.preventDefault();
+    }
+
+    const drawerWidth = sidebarEl.offsetWidth || Math.min(270, window.innerWidth * 0.8);
+
+    if (!startingStateOpen) {
+      const clampedDelta = Math.max(0, Math.min(drawerWidth, deltaX));
+      const translateX = -drawerWidth + clampedDelta;
+      const progress = clampedDelta / drawerWidth;
+
+      sidebarEl.style.transition = 'none';
+      sidebarEl.style.transform = `translateX(${translateX}px)`;
+
+      if (sidebarOverlayEl) {
+        sidebarOverlayEl.style.display = 'block';
+        sidebarOverlayEl.style.transition = 'none';
+        sidebarOverlayEl.style.opacity = (progress * 0.95).toFixed(3);
+      }
+    } else {
+      const clampedDelta = Math.min(0, Math.max(-drawerWidth, deltaX));
+      const progress = 1 + (clampedDelta / drawerWidth);
+
+      sidebarEl.style.transition = 'none';
+      sidebarEl.style.transform = `translateX(${clampedDelta}px)`;
+
+      if (sidebarOverlayEl) {
+        sidebarOverlayEl.style.transition = 'none';
+        sidebarOverlayEl.style.opacity = Math.max(0, progress * 0.95).toFixed(3);
+      }
+    }
+  }, { passive: false });
+
   document.addEventListener('touchend', (e) => {
-    if (e.changedTouches.length !== 1 || window.innerWidth > 768) return;
-    const touchEndX = e.changedTouches[0].clientX;
-    const touchEndY = e.changedTouches[0].clientY;
+    if (window.innerWidth > 768) return;
+    if (!isSwipingSidebar) {
+      return;
+    }
+
+    const touchEndX = e.changedTouches[0] ? e.changedTouches[0].clientX : touchStartX;
     const deltaX = touchEndX - touchStartX;
-    const deltaY = touchEndY - touchStartY;
+    const elapsed = Math.max(1, Date.now() - touchStartTime);
+    const velocityX = deltaX / elapsed; // px/ms
 
-    // Swipe right from left edge to open drawer
-    if (isEdgeSwipe && deltaX > 45 && Math.abs(deltaY) < deltaX * 1.5) {
-      openSidebar();
-    }
+    isSwipingSidebar = false;
+    isSwipeIntentDecided = false;
 
-    // Swipe left anywhere when drawer is open to close drawer
-    if (sidebarEl && sidebarEl.classList.contains('open') && deltaX < -45 && Math.abs(deltaY) < Math.abs(deltaX) * 1.5) {
-      closeSidebar();
+    if (!startingStateOpen) {
+      // Swiping to open: open if dragged > 45px or swiped fast
+      if (deltaX > 45 || velocityX > 0.3) {
+        openSidebar();
+      } else {
+        closeSidebar();
+      }
+    } else {
+      // Swiping to close: close if dragged left > 45px or swiped fast left
+      if (deltaX < -45 || velocityX < -0.3) {
+        closeSidebar();
+      } else {
+        openSidebar();
+      }
     }
-    isEdgeSwipe = false;
+  }, { passive: true });
+
+  document.addEventListener('touchcancel', () => {
+    if (isSwipingSidebar) {
+      isSwipingSidebar = false;
+      isSwipeIntentDecided = false;
+      if (startingStateOpen) openSidebar();
+      else closeSidebar();
+    }
   }, { passive: true });
 }
 
 function openSidebar() {
-  if (sidebarEl) sidebarEl.classList.add('open');
-  if (sidebarOverlayEl) sidebarOverlayEl.classList.add('active');
+  if (sidebarEl) {
+    sidebarEl.style.transform = '';
+    sidebarEl.style.transition = '';
+    sidebarEl.classList.add('open');
+  }
+  if (sidebarOverlayEl) {
+    sidebarOverlayEl.style.display = '';
+    sidebarOverlayEl.style.opacity = '';
+    sidebarOverlayEl.style.transition = '';
+    sidebarOverlayEl.classList.add('active');
+  }
 }
 
 function closeSidebar() {
-  if (sidebarEl) sidebarEl.classList.remove('open');
-  if (sidebarOverlayEl) sidebarOverlayEl.classList.remove('active');
+  if (sidebarEl) {
+    sidebarEl.style.transform = '';
+    sidebarEl.style.transition = '';
+    sidebarEl.classList.remove('open');
+  }
+  if (sidebarOverlayEl) {
+    sidebarOverlayEl.style.display = '';
+    sidebarOverlayEl.style.opacity = '';
+    sidebarOverlayEl.style.transition = '';
+    sidebarOverlayEl.classList.remove('active');
+  }
 }
 
 /**
@@ -2408,8 +2513,8 @@ function renderTeamSalesSectionHtml() {
           <p style="font-size:12px; color:var(--text-muted); margin-top:3px;">${lang === 'en' ? 'Boxes sold from company and personal with commissions ($3/box)' : 'ចំនួនប្រអប់លក់ចេញពីក្រុមហ៊ុន និងប្រាក់កម្រៃជើងសារទទួលបាន ($3/ប្រអប់)'}</p>
         </div>
         <div style="display:flex; align-items:center; gap:8px;">
-          <button type="button" class="header-action-btn-order" onclick="openOrderModal()" style="padding:4px 12px; font-size:11.5px;">
-            <i data-lucide="clipboard-paste" style="width:14px; height:14px;"></i>
+          <button type="button" class="btn-large-paste-orders" onclick="openOrderModal()" style="padding:6px 14px; font-size:12.5px; border-radius:20px;">
+            <i data-lucide="clipboard-paste" style="width:15px; height:15px;"></i>
             <span>+ បញ្ចូលការកម្ម៉ង់</span>
           </button>
           <span class="status-pill-disconnected" style="background:#DCFCE7; color:#15803D;">${lang === 'en' ? 'Total' : 'សរុប'} ${totalBoxes} ${lang === 'en' ? 'Boxes' : 'ប្រអប់'}</span>
@@ -4310,8 +4415,8 @@ function renderOrdersModule() {
           <span style="font-size:12px; color:var(--text-muted);">គ្រប់គ្រង និងតាមដានរាល់ការកម្ម៉ង់ដែលបាន Paste ពី Telegram ចូលទៅ Sheet A1</span>
         </div>
       </div>
-      <div>
-        <button type="button" class="header-action-btn-order" onclick="openOrderModal()" style="padding:8px 18px; font-size:13px;">
+      <div class="orders-banner-action-wrap">
+        <button type="button" class="btn-large-paste-orders" onclick="openOrderModal()">
           <i data-lucide="clipboard-paste"></i>
           <span>+ Paste បញ្ចូលការកម្ម៉ង់ពី Telegram</span>
         </button>
