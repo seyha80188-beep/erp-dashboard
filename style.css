@@ -1294,6 +1294,147 @@ body {
   height: 18px;
 }
 
+/* Hero Day Picker Row (Merged single-day view) */
+.hero-day-picker-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 6px 12px;
+  background: rgba(6, 14, 34, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.hero-native-date {
+  background: rgba(10, 25, 47, 0.95);
+  border: 1px solid rgba(0, 180, 216, 0.35);
+  color: #FFFFFF;
+  font-size: 11.5px;
+  font-weight: 600;
+  font-family: inherit;
+  padding: 3px 8px;
+  border-radius: 6px;
+  outline: none;
+  cursor: pointer;
+  color-scheme: dark;
+}
+
+.hero-mini-tag {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #FFFFFF;
+  font-size: 10.5px;
+  font-weight: 600;
+  font-family: inherit;
+  padding: 2px 7px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.hero-mini-tag:hover, .hero-mini-tag.active {
+  background: rgba(0, 180, 216, 0.25);
+  border-color: rgba(0, 180, 216, 0.6);
+  color: #00B4D8;
+}
+
+/* Tracker Scope Panel (តាមថ្ងៃ / ចន្លោះ ២-៣ថ្ងៃ / តាមខែ / តាមឆ្នាំ) */
+.tracker-scope-panel {
+  background: linear-gradient(145deg, rgba(10, 25, 47, 0.9) 0%, rgba(6, 14, 34, 0.95) 100%);
+  border: 1px solid rgba(0, 180, 216, 0.3);
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
+}
+
+.tracker-scope-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tracker-active-badge {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #10B981;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.tracker-mode-capsule {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(6, 14, 34, 0.7);
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 10px;
+  overflow-x: auto;
+}
+
+.tracker-mode-btn {
+  flex: 1;
+  min-width: 80px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 7px 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.tracker-mode-btn svg {
+  width: 13px;
+  height: 13px;
+}
+
+.tracker-mode-btn.active {
+  background: linear-gradient(135deg, rgba(0, 180, 216, 0.25) 0%, rgba(14, 31, 68, 0.8) 100%);
+  color: #FFFFFF;
+  border: 1px solid rgba(0, 180, 216, 0.45);
+  font-weight: 700;
+  box-shadow: 0 0 12px rgba(0, 180, 216, 0.3);
+}
+
+.tracker-controls-row {
+  padding-top: 4px;
+}
+
+.tracker-filter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tracker-ctl-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
 /* Daily Interactive Expense & Sales Date Trackers */
 .daily-tracker-grid {
   display: grid;

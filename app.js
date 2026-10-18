@@ -309,7 +309,13 @@ const state = {
     end: '2026-10-06'
   },
   selectedExpenseDate: null,
-  selectedSalesDate: null
+  selectedSalesDate: null,
+  selectedDashboardDate: null,
+  trackerPeriodMode: 'day', // 'day' | 'range' | 'month' | 'year'
+  trackerStartDate: '2026-10-01',
+  trackerEndDate: '2026-10-06',
+  trackerMonth: '2026-10',
+  trackerYear: '2026'
 };
 
 // DOM Elements
@@ -1679,21 +1685,51 @@ function getActualAdsSpendForRange(startDate, endDate, monthStr) {
 }
 
 /**
- * គណនាទិន្នន័យចំណាយតាមថ្ងៃនីមួយៗជាក់លាក់ (Daily Specific Expense Query)
+ * គណនាទិន្នន័យចំណាយតាមថ្ងៃ / ចន្លោះកាលបរិច្ឆេទ (២-៣ថ្ងៃ) / ខែ / ឆ្នាំ (Flexible Expense Query)
  */
-function getExpenseDataForDate(targetDate) {
+function getFlexibleExpenseData() {
   const expenses = state.data.expenses || [];
   const now = new Date();
   const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-  const queryDate = targetDate || state.selectedExpenseDate || todayStr;
+  
+  const mode = state.trackerPeriodMode || 'day';
+  const targetDate = state.selectedExpenseDate || state.selectedDashboardDate || todayStr;
+  const startDate = state.trackerStartDate || '2026-10-01';
+  const endDate = state.trackerEndDate || todayStr;
+  const targetMonth = state.trackerMonth || '2026-10';
+  const targetYear = state.trackerYear || '2026';
 
-  let matched = expenses.filter(e => e.date === queryDate);
-  // Demo fallback: if query is today and no logged expenses yet, show demo records from 2026-10-06
-  if (matched.length === 0 && (queryDate === todayStr || queryDate === '2026-10-19')) {
-    const demoMatched = expenses.filter(e => e.date === '2026-10-06');
-    if (demoMatched.length > 0 && !(state.customExpenses && state.customExpenses.some(e => e.date === queryDate))) {
-      matched = demoMatched;
+  let matched = [];
+  let periodLabelKm = '';
+  let periodLabelEn = '';
+
+  if (mode === 'day') {
+    periodLabelKm = `ថ្ងៃ ${targetDate}`;
+    periodLabelEn = `Date: ${targetDate}`;
+    matched = expenses.filter(e => e.date === targetDate);
+    // Demo fallback: if query is today and no logged expenses yet, show demo records from 2026-10-06
+    if (matched.length === 0 && (targetDate === todayStr || targetDate === '2026-10-19')) {
+      const demoMatched = expenses.filter(e => e.date === '2026-10-06');
+      if (demoMatched.length > 0 && !(state.customExpenses && state.customExpenses.some(e => e.date === targetDate))) {
+        matched = demoMatched;
+      }
     }
+  } else if (mode === 'range') {
+    const d1 = new Date(startDate);
+    const d2 = new Date(endDate);
+    const diffTime = Math.abs(d2 - d1);
+    const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1);
+    periodLabelKm = `${diffDays} ថ្ងៃ (${startDate} ដល់ ${endDate})`;
+    periodLabelEn = `${diffDays} Days (${startDate} to ${endDate})`;
+    matched = expenses.filter(e => e.date >= startDate && e.date <= endDate);
+  } else if (mode === 'month') {
+    periodLabelKm = `ខែ ${targetMonth}`;
+    periodLabelEn = `Month: ${targetMonth}`;
+    matched = expenses.filter(e => (e.month === targetMonth) || (e.date && e.date.startsWith(targetMonth)));
+  } else if (mode === 'year') {
+    periodLabelKm = `ពេញមួយឆ្នាំ ${targetYear}`;
+    periodLabelEn = `Full Year ${targetYear}`;
+    matched = expenses.filter(e => e.date && e.date.startsWith(targetYear));
   }
 
   let totalUsd = 0;
@@ -1704,7 +1740,9 @@ function getExpenseDataForDate(targetDate) {
   });
 
   return {
-    date: queryDate,
+    mode,
+    periodLabelKm,
+    periodLabelEn,
     count: matched.length,
     totalUsd: parseFloat(totalUsd.toFixed(2)),
     totalKhr: Math.round(totalKhr),
@@ -1712,73 +1750,172 @@ function getExpenseDataForDate(targetDate) {
   };
 }
 
+function getExpenseDataForDate(targetDate) {
+  if (targetDate) state.selectedExpenseDate = targetDate;
+  return getFlexibleExpenseData();
+}
+
 /**
- * គណនាចំណូល និងចំណេញពីការលក់តាមថ្ងៃនីមួយៗជាក់លាក់ (Daily Sales & Profit Query)
+ * គណនាចំណូល និងចំណេញពីការលក់តាមថ្ងៃ / ចន្លោះកាលបរិច្ឆេទ (២-៣ថ្ងៃ) / ខែ / ឆ្នាំ (Flexible Sales Query)
  */
-function getSalesDataForDate(targetDate) {
+function getFlexibleSalesData() {
   const now = new Date();
   const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-  const queryDate = targetDate || state.selectedSalesDate || todayStr;
+  
+  const mode = state.trackerPeriodMode || 'day';
+  const targetDate = state.selectedSalesDate || state.selectedDashboardDate || todayStr;
+  const startDate = state.trackerStartDate || '2026-10-01';
+  const endDate = state.trackerEndDate || todayStr;
+  const targetMonth = state.trackerMonth || '2026-10';
+  const targetYear = state.trackerYear || '2026';
 
-  const adsInfo = getActualAdsSpendForDate(queryDate);
-  const adsSpend = adsInfo.count > 0 ? adsInfo.sum : (queryDate === todayStr ? 7.00 : 0.00);
-
+  let periodLabelKm = '';
+  let periodLabelEn = '';
   let boxesSold = 0;
   let revenue = 0.00;
   let cogs = 0.00;
   let delivery = 0.00;
+  let ads = 0.00;
   let ordersList = [];
 
-  // 1. Check custom orders entered in app
-  if (state.customOrders && state.customOrders.length > 0) {
-    const matchingCustom = state.customOrders.filter(ord => ord.date === queryDate || (ord.date && ord.date.includes(queryDate)));
+  const allCustomOrders = state.customOrders || [];
+
+  if (mode === 'day') {
+    periodLabelKm = `ថ្ងៃ ${targetDate}`;
+    periodLabelEn = `Date: ${targetDate}`;
+    const adsInfo = getActualAdsSpendForDate(targetDate);
+    ads = adsInfo.count > 0 ? adsInfo.sum : (targetDate === todayStr ? 7.00 : 0.00);
+
+    const matchingCustom = allCustomOrders.filter(ord => ord.date === targetDate || (ord.date && ord.date.includes(targetDate)));
     matchingCustom.forEach(ord => {
       const boxes = ord.totalBoxes || 1;
       const rev = ord.priceUsd || (boxes * 45);
       const isCompany = !ord.goodsSource || ord.goodsSource.includes('ក្រុមហ៊ុន') || !ord.goodsSource.includes('ផ្ទាល់ខ្លួន');
-      const stockCost = getOrderCogsAmount(boxes, isCompany);
-      const delivCost = getDeliveryFeeByMethod(ord.delivery);
-
       boxesSold += boxes;
       revenue += rev;
-      cogs += stockCost;
-      delivery += delivCost;
+      cogs += getOrderCogsAmount(boxes, isCompany);
+      delivery += getDeliveryFeeByMethod(ord.delivery);
+      ordersList.push(ord);
+    });
+
+    if (boxesSold === 0) {
+      if (targetDate === todayStr || targetDate === '2026-10-19' || targetDate === '2026-10-06') {
+        boxesSold = 2; revenue = 90.00; cogs = 2 * 24.00; delivery = 5.50;
+      } else if (targetDate === '2026-10-05') {
+        boxesSold = 3; revenue = 135.00; cogs = 72.00; delivery = 6.00;
+      } else if (targetDate === '2026-10-04') {
+        boxesSold = 4; revenue = 180.00; cogs = 96.00; delivery = 6.00;
+      } else if (targetDate === '2026-10-03') {
+        boxesSold = 3; revenue = 135.00; cogs = 72.00; delivery = 6.00;
+      } else if (targetDate === '2026-10-02') {
+        boxesSold = 2; revenue = 90.00; cogs = 48.00; delivery = 5.00;
+      } else if (targetDate === '2026-10-01') {
+        boxesSold = 1; revenue = 45.00; cogs = 24.00; delivery = 2.50;
+      }
+    }
+  } else if (mode === 'range') {
+    const d1 = new Date(startDate);
+    const d2 = new Date(endDate);
+    const diffTime = Math.abs(d2 - d1);
+    const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1);
+    periodLabelKm = `${diffDays} ថ្ងៃ (${startDate} ដល់ ${endDate})`;
+    periodLabelEn = `${diffDays} Days (${startDate} to ${endDate})`;
+
+    const adsInfo = getActualAdsSpendForRange(startDate, endDate, null);
+    ads = adsInfo.count > 0 ? adsInfo.sum : (diffDays * 7.00);
+
+    const baseDays = {
+      '2026-10-01': { boxes: 1, rev: 45, cogs: 24, deliv: 2.50 },
+      '2026-10-02': { boxes: 2, rev: 90, cogs: 48, deliv: 5.00 },
+      '2026-10-03': { boxes: 3, rev: 135, cogs: 72, deliv: 6.00 },
+      '2026-10-04': { boxes: 4, rev: 180, cogs: 96, deliv: 6.00 },
+      '2026-10-05': { boxes: 3, rev: 135, cogs: 72, deliv: 6.00 },
+      '2026-10-06': { boxes: 2, rev: 90, cogs: 48, deliv: 5.50 }
+    };
+    Object.keys(baseDays).forEach(d => {
+      if (d >= startDate && d <= endDate) {
+        boxesSold += baseDays[d].boxes;
+        revenue += baseDays[d].rev;
+        cogs += baseDays[d].cogs;
+        delivery += baseDays[d].deliv;
+      }
+    });
+
+    const matchingCustom = allCustomOrders.filter(ord => ord.date >= startDate && ord.date <= endDate);
+    matchingCustom.forEach(ord => {
+      const boxes = ord.totalBoxes || 1;
+      const rev = ord.priceUsd || (boxes * 45);
+      const isCompany = !ord.goodsSource || ord.goodsSource.includes('ក្រុមហ៊ុន') || !ord.goodsSource.includes('ផ្ទាល់ខ្លួន');
+      boxesSold += boxes;
+      revenue += rev;
+      cogs += getOrderCogsAmount(boxes, isCompany);
+      delivery += getDeliveryFeeByMethod(ord.delivery);
+      ordersList.push(ord);
+    });
+  } else if (mode === 'month') {
+    periodLabelKm = `ខែ ${targetMonth}`;
+    periodLabelEn = `Month: ${targetMonth}`;
+    const isOct = targetMonth === '2026-10';
+    const adsInfo = getActualAdsSpendForRange(null, null, targetMonth);
+    ads = adsInfo.count > 0 ? adsInfo.sum : (isOct ? 55.00 : 120.00);
+    boxesSold = isOct ? 15 : 54;
+    cogs = boxesSold * 24.00;
+    delivery = isOct ? 42.50 : 125.00;
+    revenue = isOct ? 685.00 : 1450.00;
+
+    const matchingCustom = allCustomOrders.filter(ord => ord.date && ord.date.startsWith(targetMonth));
+    matchingCustom.forEach(ord => {
+      const boxes = ord.totalBoxes || 1;
+      const rev = ord.priceUsd || (boxes * 45);
+      const isCompany = !ord.goodsSource || ord.goodsSource.includes('ក្រុមហ៊ុន') || !ord.goodsSource.includes('ផ្ទាល់ខ្លួន');
+      boxesSold += boxes;
+      revenue += rev;
+      cogs += getOrderCogsAmount(boxes, isCompany);
+      delivery += getDeliveryFeeByMethod(ord.delivery);
+      ordersList.push(ord);
+    });
+  } else if (mode === 'year') {
+    periodLabelKm = `ឆ្នាំ ${targetYear}`;
+    periodLabelEn = `Year: ${targetYear}`;
+    const adsInfo = getActualAdsSpendForRange(null, null, null);
+    ads = adsInfo.count > 0 ? adsInfo.sum : 175.00;
+    boxesSold = 69;
+    cogs = 69 * 24.00;
+    delivery = 180.00;
+    revenue = 2135.00;
+
+    const matchingCustom = allCustomOrders.filter(ord => ord.date && ord.date.startsWith(targetYear));
+    matchingCustom.forEach(ord => {
+      const boxes = ord.totalBoxes || 1;
+      const rev = ord.priceUsd || (boxes * 45);
+      const isCompany = !ord.goodsSource || ord.goodsSource.includes('ក្រុមហ៊ុន') || !ord.goodsSource.includes('ផ្ទាល់ខ្លួន');
+      boxesSold += boxes;
+      revenue += rev;
+      cogs += getOrderCogsAmount(boxes, isCompany);
+      delivery += getDeliveryFeeByMethod(ord.delivery);
       ordersList.push(ord);
     });
   }
 
-  // 2. Base distribution if no custom orders
-  if (boxesSold === 0) {
-    if (queryDate === todayStr || queryDate === '2026-10-19' || queryDate === '2026-10-06') {
-      boxesSold = 2;
-      revenue = 90.00;
-      cogs = 2 * 24.00; // $48.00 (ក្រុមហ៊ុន $24/ប្រអប់)
-      delivery = 5.50;  // 1 Motor ($2.50) + 1 VET ($3.00)
-    } else if (queryDate === '2026-10-05') {
-      boxesSold = 3; revenue = 135.00; cogs = 72.00; delivery = 6.00;
-    } else if (queryDate === '2026-10-04') {
-      boxesSold = 4; revenue = 180.00; cogs = 96.00; delivery = 6.00;
-    } else if (queryDate === '2026-10-03') {
-      boxesSold = 3; revenue = 135.00; cogs = 72.00; delivery = 6.00;
-    } else if (queryDate === '2026-10-02') {
-      boxesSold = 2; revenue = 90.00; cogs = 48.00; delivery = 5.00;
-    } else if (queryDate === '2026-10-01') {
-      boxesSold = 1; revenue = 45.00; cogs = 24.00; delivery = 2.50;
-    }
-  }
-
-  const netProfit = revenue - (cogs + delivery + adsSpend);
+  const netProfit = revenue - (cogs + delivery + ads);
 
   return {
-    date: queryDate,
+    mode,
+    periodLabelKm,
+    periodLabelEn,
     boxesSold,
     revenue: parseFloat(revenue.toFixed(2)),
     cogs: parseFloat(cogs.toFixed(2)),
     delivery: parseFloat(delivery.toFixed(2)),
-    ads: parseFloat(adsSpend.toFixed(2)),
+    ads: parseFloat(ads.toFixed(2)),
     netProfit: parseFloat(netProfit.toFixed(2)),
     orders: ordersList
   };
+}
+
+function getSalesDataForDate(targetDate) {
+  if (targetDate) state.selectedSalesDate = targetDate;
+  return getFlexibleSalesData();
 }
 
 /**
@@ -1989,13 +2126,21 @@ function renderDashboardModule() {
   const displayUsd = isBusiness ? bizNetProfit : personalNetUsd;
   const displayKhr = displayUsd * 4100;
 
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const yd = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const yesterdayStr = `${yd.getFullYear()}-${String(yd.getMonth() + 1).padStart(2, '0')}-${String(yd.getDate()).padStart(2, '0')}`;
+  const tm = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  const tomorrowStr = `${tm.getFullYear()}-${String(tm.getMonth() + 1).padStart(2, '0')}-${String(tm.getDate()).padStart(2, '0')}`;
+  const curDashDate = state.selectedDashboardDate || todayStr;
+
   // Dynamic Card Label reflecting active period
   let cardLabel = '';
   if (isBusiness) {
     cardLabel = `${bizKpi.periodLabel} (Sheet A1)`;
   } else {
-    const periodLabelKm = state.dashboardPeriod === 'day' ? 'ថ្ងៃនេះ' : (state.dashboardPeriod === 'tomorrow' ? 'ថ្ងៃស្អែក' : (state.dashboardPeriod === 'week' ? 'សប្តាហ៍នេះ' : (state.dashboardPeriod === 'year' ? 'ពេញមួយឆ្នាំ' : 'ខែនេះ')));
-    const periodLabelEn = state.dashboardPeriod === 'day' ? 'Today' : (state.dashboardPeriod === 'tomorrow' ? 'Tomorrow' : (state.dashboardPeriod === 'week' ? 'This Week' : (state.dashboardPeriod === 'year' ? 'All Year' : 'This Month')));
+    const periodLabelKm = state.dashboardPeriod === 'day' ? (curDashDate === todayStr ? 'ថ្ងៃនេះ' : `ថ្ងៃ ${curDashDate}`) : (state.dashboardPeriod === 'week' ? 'សប្តាហ៍នេះ' : (state.dashboardPeriod === 'year' ? 'ពេញមួយឆ្នាំ' : 'ខែនេះ'));
+    const periodLabelEn = state.dashboardPeriod === 'day' ? (curDashDate === todayStr ? 'Today' : `Day (${curDashDate})`) : (state.dashboardPeriod === 'week' ? 'This Week' : (state.dashboardPeriod === 'year' ? 'All Year' : 'This Month'));
     cardLabel = lang === 'en' ? `Net Balance - ${periodLabelEn} (Sheet B2)` : `សមតុល្យនៅសល់${periodLabelKm} (Sheet B2)`;
   }
 
@@ -2005,7 +2150,6 @@ function renderDashboardModule() {
   const circleIcon = isBusiness ? 'trending-up' : 'wallet';
 
   // Dynamic Current Date with Flower Badge
-  const now = new Date();
   const dayNum = now.getDate();
   const khmerNums = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
   const dayKhmer = String(dayNum).split('').map(d => khmerNums[parseInt(d)] || d).join('');
@@ -2057,13 +2201,10 @@ function renderDashboardModule() {
       <span class="hero-balance-usd">(${isBalanceHidden ? '•••••• $' : formatUsd(displayUsd)})</span>
     </div>
 
-    <!-- Time Filter Capsule: ថ្ងៃនេះ | ថ្ងៃស្អែក | សប្តាហ៍នេះ | ខែនេះ -->
+    <!-- Time Filter Capsule: ថ្ងៃនេះ | សប្តាហ៍នេះ | ខែនេះ -->
     <div class="hero-filter-capsule">
       <button class="hero-filter-btn ${state.dashboardPeriod === 'day' ? 'active' : ''}" onclick="setDashboardPeriod('day')">
         ${lang === 'en' ? 'Today' : 'ថ្ងៃនេះ'}
-      </button>
-      <button class="hero-filter-btn ${state.dashboardPeriod === 'tomorrow' ? 'active' : ''}" onclick="setDashboardPeriod('tomorrow')">
-        ${lang === 'en' ? 'Tomorrow' : 'ថ្ងៃស្អែក'}
       </button>
       <button class="hero-filter-btn ${state.dashboardPeriod === 'week' ? 'active' : ''}" onclick="setDashboardPeriod('week')">
         ${lang === 'en' ? 'This Week' : 'សប្តាហ៍នេះ'}
@@ -2072,6 +2213,17 @@ function renderDashboardModule() {
         ${lang === 'en' ? 'This Month' : 'ខែនេះ'}
       </button>
     </div>
+
+    ${state.dashboardPeriod === 'day' ? `
+      <!-- Single Day Picker (Merged Day View) -->
+      <div class="hero-day-picker-bar">
+        <span><i data-lucide="calendar"></i> ${lang === 'en' ? 'Pick Date:' : 'រើសថ្ងៃ៖'}</span>
+        <input type="date" class="hero-native-date" value="${curDashDate}" onchange="setDashboardDayDate(this.value)">
+        <button type="button" class="hero-mini-tag ${curDashDate === todayStr ? 'active' : ''}" onclick="setDashboardDayDate('${todayStr}')">ថ្ងៃនេះ</button>
+        <button type="button" class="hero-mini-tag ${curDashDate === yesterdayStr ? 'active' : ''}" onclick="setDashboardDayDate('${yesterdayStr}')">ម្សិលមិញ</button>
+        <button type="button" class="hero-mini-tag ${curDashDate === tomorrowStr ? 'active' : ''}" onclick="setDashboardDayDate('${tomorrowStr}')">ថ្ងៃស្អែក</button>
+      </div>
+    ` : ''}
 
       <!-- Dual Action Pills: ✈️ ការកុម្ម៉ង់តាមតេឡេក្រាម & 👛 ចំណាយប្រចាំថ្ងៃ -->
       <div class="hero-action-row">
@@ -2143,7 +2295,6 @@ function renderBusinessViewA1Html() {
         <span class="filter-label">${t.periodLabel}</span>
         <div class="time-pills">
           <button class="pill-btn ${state.dashboardPeriod === 'day' ? 'active' : ''}" onclick="setDashboardPeriod('day')">${t.today}</button>
-          <button class="pill-btn ${state.dashboardPeriod === 'tomorrow' ? 'active' : ''}" onclick="setDashboardPeriod('tomorrow')">${lang === 'en' ? 'Tomorrow' : 'ថ្ងៃស្អែក'}</button>
           <button class="pill-btn ${state.dashboardPeriod === 'week' ? 'active' : ''}" onclick="setDashboardPeriod('week')">${lang === 'en' ? 'This Week' : 'សប្តាហ៍នេះ'}</button>
           <button class="pill-btn ${state.dashboardPeriod === 'month' ? 'active' : ''}" onclick="setDashboardPeriod('month')">${t.thisMonth}</button>
           <button class="pill-btn ${state.dashboardPeriod === 'year' ? 'active' : ''}" onclick="setDashboardPeriod('year')">${t.allYear}</button>
@@ -2612,16 +2763,98 @@ function renderPersonalViewB2Html() {
   const tm = new Date(now.getTime() + 24 * 60 * 60 * 1000);
   const tomorrowStr = `${tm.getFullYear()}-${String(tm.getMonth() + 1).padStart(2, '0')}-${String(tm.getDate()).padStart(2, '0')}`;
 
-  const curExpDate = state.selectedExpenseDate || todayStr;
-  const curSalesDate = state.selectedSalesDate || todayStr;
+  const trackerMode = state.trackerPeriodMode || 'day';
+  const curExpDate = state.selectedExpenseDate || state.selectedDashboardDate || todayStr;
+  const curSalesDate = state.selectedSalesDate || state.selectedDashboardDate || todayStr;
+  const curRangeStart = state.trackerStartDate || '2026-10-01';
+  const curRangeEnd = state.trackerEndDate || todayStr;
+  const curTrackerMonth = state.trackerMonth || '2026-10';
+  const curTrackerYear = state.trackerYear || '2026';
 
-  const dayExpData = getExpenseDataForDate(curExpDate);
-  const daySalesData = getSalesDataForDate(curSalesDate);
+  const dayExpData = getFlexibleExpenseData();
+  const daySalesData = getFlexibleSalesData();
 
   return `
-    <!-- Interactive Daily Expense & Sales Trackers with Date Pickers (តាមថ្ងៃនីមួយៗ) -->
+    <!-- 1. របារជ្រើសរើសចន្លោះពេលមើលចំណាយ និងចំណូល (Flexible Period Switcher) -->
+    <div class="tracker-scope-panel">
+      <div class="tracker-scope-header">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <i data-lucide="filter" style="width:16px; height:16px; color:var(--primary-accent);"></i>
+          <span style="font-size:13px; font-weight:700; color:#FFFFFF;">${lang === 'en' ? 'Expense & Sales Scope:' : 'ជ្រើសរើសចន្លោះពេលមើលចំណាយ & ចំណូល៖'}</span>
+        </div>
+        <span class="tracker-active-badge">${dayExpData.periodLabelKm}</span>
+      </div>
+
+      <!-- Mode Tabs: តាមថ្ងៃ | ចន្លោះថ្ងៃ (២-៣ថ្ងៃ) | តាមខែ | តាមឆ្នាំ -->
+      <div class="tracker-mode-capsule">
+        <button type="button" class="tracker-mode-btn ${trackerMode === 'day' ? 'active' : ''}" onclick="setTrackerMode('day')">
+          <i data-lucide="calendar"></i> តាមថ្ងៃ
+        </button>
+        <button type="button" class="tracker-mode-btn ${trackerMode === 'range' ? 'active' : ''}" onclick="setTrackerMode('range')">
+          <i data-lucide="calendar-range"></i> ចន្លោះថ្ងៃ (២-៣ ថ្ងៃ...)
+        </button>
+        <button type="button" class="tracker-mode-btn ${trackerMode === 'month' ? 'active' : ''}" onclick="setTrackerMode('month')">
+          <i data-lucide="calendar-days"></i> តាមខែ
+        </button>
+        <button type="button" class="tracker-mode-btn ${trackerMode === 'year' ? 'active' : ''}" onclick="setTrackerMode('year')">
+          <i data-lucide="bar-chart"></i> តាមឆ្នាំ
+        </button>
+      </div>
+
+      <!-- Contextual Controls depending on Mode -->
+      <div class="tracker-controls-row">
+        ${trackerMode === 'day' ? `
+          <!-- 1. Day Mode Controls -->
+          <div class="tracker-filter-row">
+            <span class="tracker-ctl-label">រើសកាលបរិច្ឆេទ៖</span>
+            <input type="date" class="tracker-native-date" value="${curExpDate}" onchange="setTrackerDate(this.value)">
+            <div class="tracker-preset-pills" style="margin:0;">
+              <button type="button" class="tracker-mini-pill ${curExpDate === todayStr ? 'active' : ''}" onclick="setTrackerDate('${todayStr}')">ថ្ងៃនេះ</button>
+              <button type="button" class="tracker-mini-pill ${curExpDate === yesterdayStr ? 'active' : ''}" onclick="setTrackerDate('${yesterdayStr}')">ម្សិលមិញ</button>
+              <button type="button" class="tracker-mini-pill ${curExpDate === tomorrowStr ? 'active' : ''}" onclick="setTrackerDate('${tomorrowStr}')">ថ្ងៃស្អែក</button>
+            </div>
+          </div>
+        ` : trackerMode === 'range' ? `
+          <!-- 2. Range Mode Controls (២ថ្ងៃ, ៣ថ្ងៃ...) -->
+          <div class="tracker-filter-row range-controls">
+            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+              <span class="tracker-ctl-label">ពីថ្ងៃ៖</span>
+              <input type="date" class="tracker-native-date" value="${curRangeStart}" onchange="setTrackerRangeStart(this.value)">
+              <span class="tracker-ctl-label">ដល់៖</span>
+              <input type="date" class="tracker-native-date" value="${curRangeEnd}" onchange="setTrackerRangeEnd(this.value)">
+            </div>
+            <div class="tracker-preset-pills" style="margin:0;">
+              <button type="button" class="tracker-mini-pill" onclick="setTrackerQuickRange(2)">២ ថ្ងៃចុងក្រោយ</button>
+              <button type="button" class="tracker-mini-pill" onclick="setTrackerQuickRange(3)">៣ ថ្ងៃចុងក្រោយ</button>
+              <button type="button" class="tracker-mini-pill" onclick="setTrackerQuickRange(7)">៧ ថ្ងៃចុងក្រោយ</button>
+            </div>
+          </div>
+        ` : trackerMode === 'month' ? `
+          <!-- 3. Month Mode Controls -->
+          <div class="tracker-filter-row">
+            <span class="tracker-ctl-label">រើសខែ៖</span>
+            <select class="tracker-native-date" onchange="setTrackerMonth(this.value)" style="padding:4px 10px;">
+              <option value="2026-10" ${curTrackerMonth === '2026-10' ? 'selected' : ''}>ខែតុលា 2026 (Oct 2026)</option>
+              <option value="2026-09" ${curTrackerMonth === '2026-09' ? 'selected' : ''}>ខែកញ្ញា 2026 (Sep 2026)</option>
+              <option value="2026-08" ${curTrackerMonth === '2026-08' ? 'selected' : ''}>ខែសីហា 2026 (Aug 2026)</option>
+            </select>
+          </div>
+        ` : `
+          <!-- 4. Year Mode Controls -->
+          <div class="tracker-filter-row">
+            <span class="tracker-ctl-label">រើសឆ្នាំ៖</span>
+            <select class="tracker-native-date" onchange="setTrackerYear(this.value)" style="padding:4px 10px;">
+              <option value="2026" ${curTrackerYear === '2026' ? 'selected' : ''}>ពេញមួយឆ្នាំ 2026</option>
+              <option value="2025" ${curTrackerYear === '2025' ? 'selected' : ''}>ឆ្នាំ 2025</option>
+            </select>
+          </div>
+        `}
+      </div>
+    </div>
+
+    <!-- 2. Dual Interactive Cards: ចំណាយ និង ចំណូលពីការលក់ -->
     <div class="daily-tracker-grid">
-      <!-- 1. កាតកត់ត្រា និងតាមដានចំណាយតាមថ្ងៃ (Daily Expense Date Tracker) -->
+      <!-- 1. កាតកត់ត្រា និងតាមដានចំណាយ (Expense Tracker Card) -->
       <div class="daily-tracker-card expense-card">
         <div class="tracker-card-header">
           <div class="tracker-head-left">
@@ -2629,29 +2862,14 @@ function renderPersonalViewB2Html() {
               <i data-lucide="credit-card"></i>
             </div>
             <div>
-              <div class="tracker-head-title">${lang === 'en' ? 'Daily Expense' : 'កត់ត្រាចំណាយ'}</div>
-              <div class="tracker-head-sub">${lang === 'en' ? 'Sheet B2 Expense Tracker' : 'តាមដានការចំណាយតាមថ្ងៃ'}</div>
+              <div class="tracker-head-title">${lang === 'en' ? 'Expenses' : 'កត់ត្រាចំណាយ'}</div>
+              <div class="tracker-head-sub">${dayExpData.periodLabelKm}</div>
             </div>
           </div>
-          <button type="button" class="tracker-action-btn btn-log-exp" onclick="openExpenseModal('${curExpDate}')" title="${lang === 'en' ? 'Add Expense' : 'កត់ត្រាចំណាយថ្មី'}">
+          <button type="button" class="tracker-action-btn btn-log-exp" onclick="openExpenseModal(state.selectedExpenseDate || '${todayStr}')" title="${lang === 'en' ? 'Add Expense' : 'កត់ត្រាចំណាយថ្មី'}">
             <i data-lucide="plus"></i>
             <span>${lang === 'en' ? 'Add' : 'កត់ត្រា'}</span>
           </button>
-        </div>
-
-        <!-- Select Date Control -->
-        <div class="tracker-picker-row">
-          <span class="tracker-picker-label"><i data-lucide="calendar"></i> ${lang === 'en' ? 'Select Date:' : 'ជ្រើសរើសថ្ងៃ៖'}</span>
-          <div class="tracker-input-wrapper">
-            <input type="date" id="tracker-exp-date-input" class="tracker-native-date" value="${curExpDate}" onchange="setTrackerExpenseDate(this.value)">
-          </div>
-        </div>
-
-        <!-- Quick Preset Pills (ថ្ងៃនេះ, ម្សិលមិញ, ថ្ងៃស្អែក) -->
-        <div class="tracker-preset-pills">
-          <button type="button" class="tracker-mini-pill ${curExpDate === todayStr ? 'active' : ''}" onclick="setTrackerExpenseDate('${todayStr}')">${lang === 'en' ? 'Today' : 'ថ្ងៃនេះ'}</button>
-          <button type="button" class="tracker-mini-pill ${curExpDate === yesterdayStr ? 'active' : ''}" onclick="setTrackerExpenseDate('${yesterdayStr}')">${lang === 'en' ? 'Yesterday' : 'ម្សិលមិញ'}</button>
-          <button type="button" class="tracker-mini-pill ${curExpDate === tomorrowStr ? 'active' : ''}" onclick="setTrackerExpenseDate('${tomorrowStr}')">${lang === 'en' ? 'Tomorrow' : 'ថ្ងៃស្អែក'}</button>
         </div>
 
         <!-- Figures Display Below (បង្ហាញតួរលេខចំណាយនៅខាងក្រោម) -->
@@ -2669,26 +2887,26 @@ function renderPersonalViewB2Html() {
               ${dayExpData.count > 0 ? `${dayExpData.count} លើកកត់ត្រា` : (lang === 'en' ? 'No expenses' : 'គ្មានចំណាយទេ')}
             </span>
             <button type="button" class="tracker-fast-add" onclick="openExpenseModal('${curExpDate}')">
-              + កត់ត្រាចំណាយថ្ងៃនេះ
+              + កត់ត្រាចំណាយ
             </button>
           </div>
 
-          <!-- Mini list of items for selected date if exists -->
+          <!-- Mini list of items if exists -->
           ${dayExpData.count > 0 ? `
             <div class="tracker-items-chips">
-              ${dayExpData.items.slice(0, 3).map(it => `
+              ${dayExpData.items.slice(0, 4).map(it => `
                 <div class="tracker-item-chip" title="${it.description || ''}">
                   <span class="chip-desc">${it.description || ''}</span>
                   <span class="chip-amt">${(it.amountKhr || Math.round((it.amountUsd || 0) * 4100)).toLocaleString()} ៛</span>
                 </div>
               `).join('')}
-              ${dayExpData.count > 3 ? `<span class="chip-more">+${dayExpData.count - 3} ទៀត...</span>` : ''}
+              ${dayExpData.count > 4 ? `<span class="chip-more">+${dayExpData.count - 4} មុខទៀត...</span>` : ''}
             </div>
           ` : ''}
         </div>
       </div>
 
-      <!-- 2. កាតចំណូល និងចំណេញពីការលក់តាមថ្ងៃ (Daily Sales & Profit Date Tracker) -->
+      <!-- 2. កាតចំណូល និងចំណេញពីការលក់ (Sales & Profit Card) -->
       <div class="daily-tracker-card sales-card">
         <div class="tracker-card-header">
           <div class="tracker-head-left">
@@ -2697,28 +2915,13 @@ function renderPersonalViewB2Html() {
             </div>
             <div>
               <div class="tracker-head-title">${lang === 'en' ? 'Sales & Profit' : 'ចំណូលពីការលក់'}</div>
-              <div class="tracker-head-sub">${lang === 'en' ? 'Revenue & Net Margin' : 'ចំណូល និងចំណេញពីការលក់'}</div>
+              <div class="tracker-head-sub">${daySalesData.periodLabelKm}</div>
             </div>
           </div>
           <button type="button" class="tracker-action-btn btn-log-order" onclick="openOrderModal()" title="${lang === 'en' ? 'Paste Telegram Order' : 'បញ្ចូលការកម្ម៉ង់ពី Telegram'}">
             <i data-lucide="plus"></i>
             <span>${lang === 'en' ? 'Order' : 'កម្ម៉ង់'}</span>
           </button>
-        </div>
-
-        <!-- Select Date Control -->
-        <div class="tracker-picker-row">
-          <span class="tracker-picker-label"><i data-lucide="calendar"></i> ${lang === 'en' ? 'Select Date:' : 'ជ្រើសរើសថ្ងៃ៖'}</span>
-          <div class="tracker-input-wrapper">
-            <input type="date" id="tracker-sales-date-input" class="tracker-native-date" value="${curSalesDate}" onchange="setTrackerSalesDate(this.value)">
-          </div>
-        </div>
-
-        <!-- Quick Preset Pills (ថ្ងៃនេះ, ម្សិលមិញ, ថ្ងៃស្អែក) -->
-        <div class="tracker-preset-pills">
-          <button type="button" class="tracker-mini-pill ${curSalesDate === todayStr ? 'active' : ''}" onclick="setTrackerSalesDate('${todayStr}')">${lang === 'en' ? 'Today' : 'ថ្ងៃនេះ'}</button>
-          <button type="button" class="tracker-mini-pill ${curSalesDate === yesterdayStr ? 'active' : ''}" onclick="setTrackerSalesDate('${yesterdayStr}')">${lang === 'en' ? 'Yesterday' : 'ម្សិលមិញ'}</button>
-          <button type="button" class="tracker-mini-pill ${curSalesDate === tomorrowStr ? 'active' : ''}" onclick="setTrackerSalesDate('${tomorrowStr}')">${lang === 'en' ? 'Tomorrow' : 'ថ្ងៃស្អែក'}</button>
         </div>
 
         <!-- Figures Display Below (ចំណូលពីការលក់ និងចំណេញពីការលក់) -->
@@ -3596,14 +3799,72 @@ window.updateCustomDate = function(type, val) {
   if (window.lucide) window.lucide.createIcons();
 };
 
-window.setTrackerExpenseDate = function(dateStr) {
-  state.selectedExpenseDate = dateStr;
+window.setTrackerMode = function(mode) {
+  state.trackerPeriodMode = mode;
   renderDashboardModule();
   if (window.lucide) window.lucide.createIcons();
 };
 
-window.setTrackerSalesDate = function(dateStr) {
+window.setTrackerDate = function(dateStr) {
+  state.trackerPeriodMode = 'day';
+  state.selectedExpenseDate = dateStr;
   state.selectedSalesDate = dateStr;
+  state.selectedDashboardDate = dateStr;
+  renderDashboardModule();
+  if (window.lucide) window.lucide.createIcons();
+};
+
+window.setTrackerExpenseDate = function(dateStr) {
+  window.setTrackerDate(dateStr);
+};
+
+window.setTrackerSalesDate = function(dateStr) {
+  window.setTrackerDate(dateStr);
+};
+
+window.setTrackerRangeStart = function(dateStr) {
+  state.trackerPeriodMode = 'range';
+  state.trackerStartDate = dateStr;
+  renderDashboardModule();
+  if (window.lucide) window.lucide.createIcons();
+};
+
+window.setTrackerRangeEnd = function(dateStr) {
+  state.trackerPeriodMode = 'range';
+  state.trackerEndDate = dateStr;
+  renderDashboardModule();
+  if (window.lucide) window.lucide.createIcons();
+};
+
+window.setTrackerQuickRange = function(days) {
+  state.trackerPeriodMode = 'range';
+  const now = new Date();
+  const end = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const startD = new Date(now.getTime() - (days - 1) * 24 * 60 * 60 * 1000);
+  const start = `${startD.getFullYear()}-${String(startD.getMonth() + 1).padStart(2, '0')}-${String(startD.getDate()).padStart(2, '0')}`;
+  state.trackerStartDate = start;
+  state.trackerEndDate = end;
+  renderDashboardModule();
+  if (window.lucide) window.lucide.createIcons();
+};
+
+window.setTrackerMonth = function(monthStr) {
+  state.trackerPeriodMode = 'month';
+  state.trackerMonth = monthStr;
+  renderDashboardModule();
+  if (window.lucide) window.lucide.createIcons();
+};
+
+window.setTrackerYear = function(yearStr) {
+  state.trackerPeriodMode = 'year';
+  state.trackerYear = yearStr;
+  renderDashboardModule();
+  if (window.lucide) window.lucide.createIcons();
+};
+
+window.setDashboardDayDate = function(dateStr) {
+  state.selectedDashboardDate = dateStr;
+  state.dashboardPeriod = 'day';
   renderDashboardModule();
   if (window.lucide) window.lucide.createIcons();
 };
