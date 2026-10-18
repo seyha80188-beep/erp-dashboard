@@ -22,7 +22,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" href="style.css?v=20261018_v12">
+  <link rel="stylesheet" href="style.css?v=20261018_v13">
 </head>
 <body>
   <!-- Mobile Pull-to-Refresh Indicator Container -->
@@ -109,12 +109,12 @@
           </div>
           <div class="header-user-meta">
             <span class="header-username-khmer" id="header-user-khmer">
-              យឹម សីហា
+              សួស្តី, យឹម សីហា
               <span class="verified-inline-check" style="width: 12px; height: 12px;">
                 <i data-lucide="check" style="width: 8px; height: 8px;"></i>
               </span>
             </span>
-            <span class="header-username-en" id="header-user-en">YEM SEYHA (Admin)</span>
+            <span class="header-username-en" id="header-user-en">(Yem Seyha)</span>
           </div>
         </div>
 
@@ -125,16 +125,22 @@
       </div>
 
       <div class="header-right">
+        <!-- Date Badge (Like Screenshot) -->
+        <div class="header-date-badge hide-on-narrow-mobile" id="header-date-badge" onclick="openThemeModal()" title="កាលបរិច្ឆេទ & ចុចប្តូរពណ៌ Theme">
+          <span class="header-date-khmer" id="header-date-khmer">១៨ តុលា ២០២៦</span>
+          <span class="header-date-en" id="header-date-en">(Oct 18, 2026)</span>
+        </div>
+
         <!-- Add Expense Button (Desktop/Tablet Only) -->
         <button id="open-expense-btn" class="header-action-btn-add hide-on-narrow-mobile" onclick="openExpenseModal()" title="កត់ត្រាចំណាយប្រចាំថ្ងៃ (Add Expense)">
           <i data-lucide="plus-circle"></i>
           <span class="btn-text" id="header-btn-add-text">កត់ត្រាចំណាយ</span>
         </button>
 
-        <!-- Theme Switcher: 🧡 ទឹកក្រូច VET / 💎 ថ្លា / 🌙 ងងឹត -->
-        <button id="theme-toggle-btn" class="header-pill-btn" onclick="toggleAppTheme()" title="ប្តូររចនាបថ ទឹកក្រូច VET / ថ្លា / ងងឹត">
-          <i id="theme-icon" data-lucide="sun"></i>
-          <span id="theme-btn-label">ទឹកក្រូច VET</span>
+        <!-- Theme Switcher Palette: 🌊 Teal ថ្មី / 🧡 ទឹកក្រូច VET / 🌙 ងងឹត / 💎 ថ្លា -->
+        <button id="theme-toggle-btn" class="header-pill-btn theme-palette-pill" onclick="openThemeModal()" title="ជ្រើសរើសពណ៌ និងរចនាបថ (Select Theme)">
+          <i id="theme-icon" data-lucide="palette"></i>
+          <span id="theme-btn-label">🌊 Teal ថ្មី</span>
         </button>
 
         <!-- Language Switcher: 🇰🇭 ខ្មែរ / 🇬🇧 ENG (Cambodian / English Flag Badge like VET Express) -->
@@ -390,6 +396,74 @@
         </button>
       </div>
     </div>
+  <!-- Theme Selector Modal Overlay (ជ្រើសរើសពណ៌ / Theme) -->
+  <div id="theme-modal-overlay" class="modal-overlay" style="display: none;">
+    <div class="theme-modal-card">
+      <div class="modal-header-row">
+        <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:0;">
+          <div class="theme-palette-icon">
+            <i data-lucide="palette"></i>
+          </div>
+          <div>
+            <h3 class="modal-title">ជ្រើសរើសពណ៌ និងរចនាបថ</h3>
+            <span class="modal-subtitle">Select Dashboard Theme</span>
+          </div>
+        </div>
+        <button type="button" class="modal-close-icon-btn" onclick="closeThemeModal()" aria-label="បិទ">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <div class="theme-options-grid">
+        <!-- 1. Teal Mint (ទម្រង់ថ្មី ដូចរូបភាព) -->
+        <div class="theme-option-card" id="theme-opt-teal" onclick="selectTheme('teal')">
+          <div class="theme-swatch teal-swatch">
+            <i data-lucide="sparkles" style="color:#FFF; width:22px; height:22px;"></i>
+          </div>
+          <div class="theme-info">
+            <span class="theme-name">🌊 Teal Mint (ទម្រង់ថ្មី)</span>
+            <span class="theme-desc">ផ្ទៃសរលោង Minimalist + កាតពណ៌ផ្ទៃមេឃស្រទន់ iOS</span>
+          </div>
+          <div class="theme-check-mark"><i data-lucide="check"></i></div>
+        </div>
+
+        <!-- 2. VET Orange (ដើម) -->
+        <div class="theme-option-card" id="theme-opt-vet" onclick="selectTheme('vet')">
+          <div class="theme-swatch vet-swatch">
+            <i data-lucide="sun" style="color:#FFF; width:22px; height:22px;"></i>
+          </div>
+          <div class="theme-info">
+            <span class="theme-name">🧡 ទឹកក្រូច VET (ដើម)</span>
+            <span class="theme-desc">រចនាបថ VET Express ផ្ទៃសរលាយទឹកក្រូចប្រណិត</span>
+          </div>
+          <div class="theme-check-mark"><i data-lucide="check"></i></div>
+        </div>
+
+        <!-- 3. Solid Dark (Navy) -->
+        <div class="theme-option-card" id="theme-opt-dark" onclick="selectTheme('dark')">
+          <div class="theme-swatch dark-swatch">
+            <i data-lucide="moon" style="color:#38BDF8; width:22px; height:22px;"></i>
+          </div>
+          <div class="theme-info">
+            <span class="theme-name">🌙 ងងឹត (Solid Dark)</span>
+            <span class="theme-desc">ពណ៌ទឹកប៊ិចក្រម៉ៅ ACLEDA / ABA កម្រិតខ្ពស់</span>
+          </div>
+          <div class="theme-check-mark"><i data-lucide="check"></i></div>
+        </div>
+
+        <!-- 4. Glassmorphism -->
+        <div class="theme-option-card" id="theme-opt-glass" onclick="selectTheme('glass')">
+          <div class="theme-swatch glass-swatch">
+            <i data-lucide="gem" style="color:#E0F2FE; width:22px; height:22px;"></i>
+          </div>
+          <div class="theme-info">
+            <span class="theme-name">💎 ថ្លា (Glassmorphism)</span>
+            <span class="theme-desc">កញ្ចក់ថ្លាពន្លឺភ្លឺផ្លេក Modern Frosted Glass</span>
+          </div>
+          <div class="theme-check-mark"><i data-lucide="check"></i></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Login Modal Overlay -->
@@ -419,6 +493,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=20261018_v12"></script>
+  <script src="app.js?v=20261018_v13"></script>
 </body>
 </html>

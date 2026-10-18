@@ -272,7 +272,7 @@ const state = {
   hideBalance: false,
   displayCurrency: localStorage.getItem('yem_display_currency') || 'USD', // 'USD' | 'KHR'
   overspendingAlert: JSON.parse(localStorage.getItem('yem_overspend_alert') || 'true'),
-  theme: localStorage.getItem('yem_theme') || 'vet', // 'vet' | 'glass' | 'dark' | 'light'
+  theme: localStorage.getItem('yem_theme') || 'teal', // 'teal' | 'vet' | 'dark' | 'glass'
   lang: localStorage.getItem('yem_lang') || 'km',       // 'km' | 'en'
   expenseCurrency: 'KHR',      // 'KHR' | 'USD'
   isLoading: false,
@@ -385,9 +385,11 @@ async function initApp() {
  * Apply App Theme: 💎 ថ្លា (Glass) vs 🌙 ងងឹត (Dark) vs ☀️ សរថ្លា (Light Glass)
  */
 function applyAppTheme() {
-  const theme = state.theme || 'vet';
-  document.body.classList.remove('theme-glass', 'theme-dark', 'theme-light', 'theme-vet');
-  if (theme === 'vet') {
+  const theme = state.theme || 'teal';
+  document.body.classList.remove('theme-glass', 'theme-dark', 'theme-light', 'theme-vet', 'theme-teal');
+  if (theme === 'teal') {
+    document.body.classList.add('theme-teal');
+  } else if (theme === 'vet') {
     document.body.classList.add('theme-vet');
   } else if (theme === 'light') {
     document.body.classList.add('theme-light');
@@ -400,19 +402,34 @@ function applyAppTheme() {
   const themeBtnLabel = document.getElementById('theme-btn-label');
   const themeIcon = document.getElementById('theme-icon');
   if (themeBtnLabel) {
-    if (theme === 'vet') {
-      themeBtnLabel.textContent = state.lang === 'en' ? 'VET Orange' : 'ទឹកក្រូច VET';
-    } else if (theme === 'light') {
-      themeBtnLabel.textContent = state.lang === 'en' ? 'Soft Frost' : 'សរស្រទន់';
+    if (theme === 'teal') {
+      themeBtnLabel.textContent = state.lang === 'en' ? '🌊 Teal Mint' : '🌊 Teal ថ្មី';
+    } else if (theme === 'vet') {
+      themeBtnLabel.textContent = state.lang === 'en' ? '🧡 VET Orange' : '🧡 ទឹកក្រូច VET';
     } else if (theme === 'dark') {
-      themeBtnLabel.textContent = state.lang === 'en' ? 'Dark' : 'ងងឹត';
+      themeBtnLabel.textContent = state.lang === 'en' ? '🌙 Dark Navy' : '🌙 ងងឹត';
     } else {
-      themeBtnLabel.textContent = state.lang === 'en' ? 'Glass' : 'ថ្លា';
+      themeBtnLabel.textContent = state.lang === 'en' ? '💎 Glass' : '💎 ថ្លា';
     }
   }
   if (themeIcon) {
-    themeIcon.setAttribute('data-lucide', theme === 'vet' ? 'sun' : (theme === 'light' ? 'sun' : (theme === 'dark' ? 'moon' : 'sparkles')));
+    themeIcon.setAttribute('data-lucide', 'palette');
     if (window.lucide) window.lucide.createIcons();
+  }
+
+  // Update date badge in header if present
+  const dateKhmerEl = document.getElementById('header-date-khmer');
+  const dateEnEl = document.getElementById('header-date-en');
+  if (dateKhmerEl && dateEnEl) {
+    const now = new Date();
+    const dayNum = now.getDate();
+    const khmerNums = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
+    const dayKhmer = String(dayNum).split('').map(d => khmerNums[parseInt(d)] || d).join('');
+    const khmerMonths = ['មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា', 'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'];
+    const monthKhmer = khmerMonths[now.getMonth()] || 'តុលា';
+    const yearKhmer = String(now.getFullYear()).split('').map(d => khmerNums[parseInt(d)] || d).join('');
+    dateKhmerEl.textContent = `${dayKhmer} ${monthKhmer} ${yearKhmer}`;
+    dateEnEl.textContent = `(${now.toLocaleString('en-US', { month: 'short' })} ${dayNum}, ${now.getFullYear()})`;
   }
 }
 
@@ -1629,79 +1646,76 @@ function renderDashboardModule() {
     : `🌸 ថ្ងៃទី ${dayKhmer} ${monthKhmer} ${yearKhmer}`;
 
   moduleContainerEl.innerHTML = `
-    <!-- FINTECH HERO CONTAINER -->
-    <div class="fintech-hero-container">
-      <!-- 1. Refined Sub-Header Greeting Strip -->
-      <div class="fintech-greeting-strip">
-        <div class="greeting-date-pill">
-          <span class="flower-icon-glow">🌸</span>
-          <span class="greeting-date-text">${lang === 'en' ? `${dayNum} ${now.toLocaleString('en-US', { month: 'short' })} ${now.getFullYear()}` : `ថ្ងៃទី ${dayKhmer} ${monthKhmer} ${yearKhmer}`}</span>
+    <!-- 1. Top Greeting & Date Header (Matching Screenshot) -->
+    <div class="minimal-greeting-bar">
+      <div class="user-greeting-meta">
+        <div class="user-greeting-avatar">
+          <img src="data:image/jpeg;base64,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" alt="YEM SEYHA">
+          <span class="user-greeting-check"><i data-lucide="check"></i></span>
         </div>
-        <div class="live-sync-pill">
-          <span class="pulse-live-indicator"></span>
-          <span>${lang === 'en' ? 'Live Master Sync' : 'ទិន្នន័យផ្ទាល់ A1 & B2'}</span>
-        </div>
-      </div>
-
-      <!-- 2. Master Bank Card -->
-      <div class="fintech-balance-card">
-        <div class="fintech-card-glow-bg"></div>
-        <div class="fintech-card-header">
-          <div class="fintech-chip-badge">
-            <div class="fintech-chip-icon"><i data-lucide="${circleIcon}"></i></div>
-            <span class="fintech-account-title">${circleLabel}</span>
-          </div>
-          <button class="fintech-eye-btn" onclick="toggleBalanceVisibility()" title="${lang === 'en' ? 'Toggle Balance Visibility' : 'បិទ/បង្ហាញ លេខប្រាក់'}">
-            <i data-lucide="${isBalanceHidden ? 'eye-off' : 'eye'}"></i>
-          </button>
-        </div>
-
-        <div class="fintech-balance-body">
-          <span class="fintech-balance-subtitle">${cardLabel}</span>
-          <div class="fintech-primary-amount">${isBalanceHidden ? '•••••••• ៛' : formatKhr(displayKhr)}</div>
-          <div class="fintech-secondary-amount">
-            <span class="fintech-sub-val">${isBalanceHidden ? '•••••• $' : formatUsd(displayUsd)}</span>
-            <span class="fintech-rate-badge">${lang === 'en' ? 'Rate $1 = 4,100៛' : 'អត្រា $1 = 4,100៛'}</span>
-          </div>
-        </div>
-
-        <!-- 3. iOS/Revolut Segmented Pill Control -->
-        <div class="fintech-segmented-wrapper">
-          <div class="fintech-segmented-control">
-            <button class="segmented-tab-btn ${isBusiness ? 'active' : ''}" onclick="switchDashboardSection('business')">
-              <i data-lucide="building-2"></i>
-              <span>${lang === 'en' ? 'Business Sales' : 'អាជីវកម្ម'}</span>
-            </button>
-            <button class="segmented-tab-btn ${!isBusiness ? 'active' : ''}" onclick="switchDashboardSection('personal')">
-              <i data-lucide="wallet"></i>
-              <span>${lang === 'en' ? 'Personal Finance' : 'ចំណូល-ចំណាយ'}</span>
-            </button>
-          </div>
+        <div class="user-greeting-text">
+          <div class="user-khmer-title">${lang === 'en' ? 'Hello, Yem Seyha' : 'សួស្តី, យឹម សីហា'}</div>
+          <div class="user-en-sub">(Yem Seyha)</div>
         </div>
       </div>
 
-      <!-- 4. Quick Action Twin Hub (Outside the Card) -->
-      <div class="fintech-action-hub">
-        <button type="button" class="fintech-action-pill orders-action-pill" onclick="openOrderModal()">
-          <div class="action-pill-icon orders-glow">
-            <i data-lucide="clipboard-paste"></i>
-          </div>
-          <div class="action-pill-meta">
-            <span class="action-pill-title"><span class="action-star green">✦</span> ${lang === 'en' ? 'Enter Orders' : 'បញ្ចូលការកម្ម៉ង់'}</span>
-            <span class="action-pill-desc">${lang === 'en' ? 'Paste from Telegram' : 'Paste ពី Telegram'}</span>
-          </div>
-          <div class="action-pill-arrow"><i data-lucide="arrow-right"></i></div>
+      <div class="top-date-card" onclick="openThemeModal()" title="កាលបរិច្ឆេទ & ចុចប្តូរពណ៌ Theme">
+        <div class="date-khmer-badge">${dayKhmer} ${monthKhmer} ${yearKhmer}</div>
+        <div class="date-en-badge">(${now.toLocaleString('en-US', { month: 'short' })} ${dayNum}, ${now.getFullYear()})</div>
+      </div>
+    </div>
+
+    <!-- 2. Master Hero Card (Teal Mint Gradient from Screenshot) -->
+    <div class="minimal-hero-card">
+      <div class="hero-top-row">
+        <span class="hero-card-title">${cardLabel}</span>
+        <button class="hero-eye-btn" onclick="toggleBalanceVisibility()" title="${lang === 'en' ? 'Toggle Balance' : 'បិទ/បង្ហាញ លេខប្រាក់'}">
+          <i data-lucide="${isBalanceHidden ? 'eye-off' : 'eye'}"></i>
+        </button>
+      </div>
+
+      <div class="hero-balance-row">
+        <span class="hero-balance-khr">${isBalanceHidden ? '•••••••• ៛' : formatKhr(displayKhr)}</span>
+        <span class="hero-balance-usd">(${isBalanceHidden ? '•••••• $' : formatUsd(displayUsd)})</span>
+      </div>
+
+      <!-- Time Filter Capsule: ថ្ងៃនេះ | សប្តាហ៍នេះ | ខែនេះ -->
+      <div class="hero-filter-capsule">
+        <button class="hero-filter-btn ${state.dashboardPeriod === 'day' ? 'active' : ''}" onclick="setDashboardPeriod('day')">
+          ${lang === 'en' ? 'Today' : 'ថ្ងៃនេះ'}
+        </button>
+        <button class="hero-filter-btn ${state.dashboardPeriod === 'week' ? 'active' : ''}" onclick="setDashboardPeriod('week')">
+          ${lang === 'en' ? 'This Week' : 'សប្តាហ៍នេះ'}
+        </button>
+        <button class="hero-filter-btn ${state.dashboardPeriod === 'month' ? 'active' : ''}" onclick="setDashboardPeriod('month')">
+          ${lang === 'en' ? 'This Month' : 'ខែនេះ'}
+        </button>
+      </div>
+
+      <!-- Dual Action Pills: ✈️ ការកុម្ម៉ង់តាមតេឡេក្រាម & 👛 ចំណាយប្រចាំថ្ងៃ -->
+      <div class="hero-action-row">
+        <button type="button" class="hero-action-pill telegram-pill" onclick="openOrderModal()">
+          <div class="hero-action-icon telegram-icon"><i data-lucide="send"></i></div>
+          <span>${lang === 'en' ? 'Telegram Orders' : 'ការកុម្ម៉ង់តាមតេឡេក្រាម'}</span>
         </button>
 
-        <button type="button" class="fintech-action-pill expense-action-pill" onclick="openExpenseModal()">
-          <div class="action-pill-icon expense-glow">
-            <i data-lucide="file-plus"></i>
-          </div>
-          <div class="action-pill-meta">
-            <span class="action-pill-title"><span class="action-star orange">✦</span> ${lang === 'en' ? 'Log Expense' : 'កត់ត្រាចំណាយ'}</span>
-            <span class="action-pill-desc">${lang === 'en' ? 'Daily Personal (B2)' : 'ចំណាយប្រចាំថ្ងៃ (Sheet B2)'}</span>
-          </div>
-          <div class="action-pill-arrow"><i data-lucide="arrow-right"></i></div>
+        <button type="button" class="hero-action-pill expense-pill" onclick="openExpenseModal()">
+          <div class="hero-action-icon expense-icon"><i data-lucide="wallet"></i></div>
+          <span>${lang === 'en' ? 'Daily Expense' : 'ចំណាយប្រចាំថ្ងៃ'}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 3. Business vs Personal Switch Capsule -->
+    <div class="fintech-segmented-wrapper" style="margin-bottom: 16px;">
+      <div class="fintech-segmented-control">
+        <button class="segmented-tab-btn ${isBusiness ? 'active' : ''}" onclick="switchDashboardSection('business')">
+          <i data-lucide="building-2"></i>
+          <span>${lang === 'en' ? 'Business Sales (A1)' : 'អាជីវកម្ម (A1)'}</span>
+        </button>
+        <button class="segmented-tab-btn ${!isBusiness ? 'active' : ''}" onclick="switchDashboardSection('personal')">
+          <i data-lucide="wallet"></i>
+          <span>${lang === 'en' ? 'Personal Finance (B2)' : 'ចំណូល-ចំណាយ (B2)'}</span>
         </button>
       </div>
     </div>
@@ -1778,48 +1792,71 @@ function renderBusinessViewA1Html() {
       </div>
     </div>
 
-    <!-- 1. 6 Business KPI Cards (Revenue, COGS, Delivery, Ads, Net Profit, Pending COD) -->
-    <div class="metrics-grid">
+    <!-- 1. 2x2 Clean Minimalist KPI Grid (from Screenshot) -->
+    <div class="minimal-kpi-grid">
       <!-- 1. Revenue -->
-      <div class="metric-card border-green">
-        <div class="metric-header">
-          <span class="metric-label">${lang === 'en' ? 'Gross Revenue' : 'ចំណូលសរុប (Revenue)'}</span>
-          <span class="metric-icon-badge"><i data-lucide="dollar-sign"></i></span>
+      <div class="minimal-kpi-card revenue-kpi">
+        <div class="kpi-icon-badge badge-green">
+          <i data-lucide="trending-up"></i>
         </div>
-        <div class="metric-value" style="color:#10B981;">${formatCurrency(revenue)}</div>
-        <div class="metric-footer">${formatSubCurrency(revenue)} (${boxesSold} ${lang === 'en' ? 'Boxes' : 'ប្រអប់'})</div>
+        <div class="kpi-title-wrap">
+          <span class="kpi-title-khmer">${lang === 'en' ? 'Revenue' : 'ប្រាក់ចំណូល'}</span>
+          <span class="kpi-title-en">(Revenue)</span>
+        </div>
+        <div class="kpi-value-text">$${revenue.toFixed(2)}</div>
+        <div class="kpi-trend-pill trend-up">
+          <i data-lucide="arrow-up-right"></i> +4.5%
+        </div>
       </div>
 
       <!-- 2. Cost of Goods (COGS) -->
-      <div class="metric-card border-amber">
-        <div class="metric-header">
-          <span class="metric-label">${lang === 'en' ? 'Cost of Goods (COGS)' : 'ថ្លៃដើមទំនិញ (COGS)'}</span>
-          <span class="metric-icon-badge"><i data-lucide="package"></i></span>
+      <div class="minimal-kpi-card cogs-kpi">
+        <div class="kpi-icon-badge badge-orange">
+          <i data-lucide="settings"></i>
         </div>
-        <div class="metric-value" style="color:#F59E0B;">${formatCurrency(cogs)}</div>
-        <div class="metric-footer">${formatSubCurrency(cogs)} ($7.50/${lang === 'en' ? 'box' : 'ប្រអប់'})</div>
+        <div class="kpi-title-wrap">
+          <span class="kpi-title-khmer">${lang === 'en' ? 'COGS' : 'ថ្លៃដើម'}</span>
+          <span class="kpi-title-en">(COGS)</span>
+        </div>
+        <div class="kpi-value-text">$${cogs.toFixed(2)}</div>
+        <div class="kpi-trend-pill trend-down">
+          <i data-lucide="arrow-down-right"></i> -1.2%
+        </div>
       </div>
 
       <!-- 3. Delivery Cost -->
-      <div class="metric-card border-blue">
-        <div class="metric-header">
-          <span class="metric-label">${lang === 'en' ? 'Delivery Cost' : 'ថ្លៃដឹកជញ្ជូន (Delivery)'}</span>
-          <span class="metric-icon-badge"><i data-lucide="truck"></i></span>
+      <div class="minimal-kpi-card delivery-kpi">
+        <div class="kpi-icon-badge badge-purple">
+          <i data-lucide="truck"></i>
         </div>
-        <div class="metric-value">${formatCurrency(delivery)}</div>
-        <div class="metric-footer">${formatSubCurrency(delivery)} (VET COD & ម៉ូតូ)</div>
+        <div class="kpi-title-wrap">
+          <span class="kpi-title-khmer">${lang === 'en' ? 'Delivery' : 'ដឹកជញ្ជូន'}</span>
+          <span class="kpi-title-en">(Delivery)</span>
+        </div>
+        <div class="kpi-value-text">$${delivery.toFixed(2)}</div>
+        <div class="kpi-trend-pill trend-up">
+          <i data-lucide="arrow-up-right"></i> +3.3%
+        </div>
       </div>
 
       <!-- 4. Ads Spend -->
-      <div class="metric-card border-red">
-        <div class="metric-header">
-          <span class="metric-label">${lang === 'en' ? 'Ads Spend' : 'ថ្លៃប៊ូសផេក (Ads Spend)'}</span>
-          <span class="metric-icon-badge"><i data-lucide="target"></i></span>
+      <div class="minimal-kpi-card ads-kpi">
+        <div class="kpi-icon-badge badge-yellow">
+          <i data-lucide="megaphone"></i>
         </div>
-        <div class="metric-value" style="color:#EF4444;">${formatCurrency(ads)}</div>
-        <div class="metric-footer">${formatSubCurrency(ads)} (Facebook Page Ads)</div>
+        <div class="kpi-title-wrap">
+          <span class="kpi-title-khmer">${lang === 'en' ? 'Ads Spend' : 'ការចំណាយលើការផ្សព្វផ្សាយ'}</span>
+          <span class="kpi-title-en">(Ads Spend)</span>
+        </div>
+        <div class="kpi-value-text">$${ads.toFixed(2)}</div>
+        <div class="kpi-trend-pill trend-up">
+          <i data-lucide="arrow-up-right"></i> +4.5%
+        </div>
       </div>
+    </div>
 
+    <!-- Supplementary Net Profit & Pending COD Row -->
+    <div class="metrics-grid" style="margin-bottom: 20px;">
       <!-- 5. Net Business Profit -->
       <div class="metric-card border-green" style="background:linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(6, 14, 34, 0.8) 100%);">
         <div class="metric-header">
@@ -3677,20 +3714,52 @@ window.handleSaveParsedOrders = async function() {
 };
 
 /**
- * Toggle App Theme: 💎 ថ្លា (Glassmorphism) ➔ ☀️ សរថ្លា (Light Glass) ➔ 🌙 ងងឹត (Solid Dark)
+ * Theme Modal Handlers & Selection
+ */
+window.openThemeModal = function() {
+  const overlay = document.getElementById('theme-modal-overlay');
+  if (overlay) {
+    overlay.style.display = 'flex';
+    ['teal', 'vet', 'dark', 'glass'].forEach(t => {
+      const card = document.getElementById(`theme-opt-${t}`);
+      if (card) {
+        if (state.theme === t) card.classList.add('selected');
+        else card.classList.remove('selected');
+      }
+    });
+    if (window.lucide) window.lucide.createIcons();
+  }
+};
+
+window.closeThemeModal = function() {
+  const overlay = document.getElementById('theme-modal-overlay');
+  if (overlay) overlay.style.display = 'none';
+};
+
+window.selectTheme = function(themeName) {
+  state.theme = themeName;
+  localStorage.setItem('yem_theme', themeName);
+  applyAppTheme();
+  renderDashboardModule();
+  closeThemeModal();
+};
+
+/**
+ * Toggle App Theme: 🌊 Teal ថ្មី ➔ 🧡 ទឹកក្រូច VET ➔ 🌙 ងងឹត ➔ 💎 ថ្លា
  */
 window.toggleAppTheme = function() {
-  if (state.theme === 'vet') {
-    state.theme = 'glass';
-  } else if (state.theme === 'glass') {
+  if (state.theme === 'teal') {
+    state.theme = 'vet';
+  } else if (state.theme === 'vet') {
     state.theme = 'dark';
   } else if (state.theme === 'dark') {
-    state.theme = 'light';
+    state.theme = 'glass';
   } else {
-    state.theme = 'vet';
+    state.theme = 'teal';
   }
   localStorage.setItem('yem_theme', state.theme);
   applyAppTheme();
+  renderDashboardModule();
 };
 
 /**
