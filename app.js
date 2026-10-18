@@ -2133,6 +2133,9 @@ function renderDashboardModule() {
   const tm = new Date(now.getTime() + 24 * 60 * 60 * 1000);
   const tomorrowStr = `${tm.getFullYear()}-${String(tm.getMonth() + 1).padStart(2, '0')}-${String(tm.getDate()).padStart(2, '0')}`;
   const curDashDate = state.selectedDashboardDate || todayStr;
+  const heroExpData = getExpenseDataForDate(curDashDate);
+  const heroExpenseUsd = heroExpData.totalUsd;
+  const heroExpenseKhr = heroExpData.totalKhr;
 
   // Dynamic Card Label reflecting active period
   let cardLabel = '';
@@ -2199,6 +2202,13 @@ function renderDashboardModule() {
     <div class="hero-balance-row">
       <span class="hero-balance-khr">${isBalanceHidden ? '•••••••• ៛' : formatKhr(displayKhr)}</span>
       <span class="hero-balance-usd">(${isBalanceHidden ? '•••••• $' : formatUsd(displayUsd)})</span>
+    </div>
+
+    <!-- Daily Expense in Red (ចំនួនចំណាយប្រចាំថ្ងៃ) -->
+    <div class="hero-expense-row">
+      <span class="hero-expense-label"><i data-lucide="trending-down"></i> ${lang === 'en' ? 'Daily Expense:' : 'ចំណាយប្រចាំថ្ងៃ៖'}</span>
+      <span class="hero-expense-val-khr">${isBalanceHidden ? '•••••• ៛' : `-${heroExpenseKhr.toLocaleString('en-US')} ៛`}</span>
+      <span class="hero-expense-val-usd">(${isBalanceHidden ? '•••• $' : `-$${heroExpenseUsd.toFixed(2)}`})</span>
     </div>
 
     <!-- Time Filter Capsule: ថ្ងៃនេះ | សប្តាហ៍នេះ | ខែនេះ -->
