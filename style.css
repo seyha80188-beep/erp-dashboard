@@ -5266,3 +5266,88 @@ body.theme-glass .minimal-hero-card {
   -webkit-backdrop-filter: blur(20px) !important;
 }
 
+/* Dashboard Theme Chip & Palette Button */
+.dashboard-theme-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #FFFFFF;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #0F172A;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dashboard-theme-chip:hover {
+  border-color: #38A3A5;
+  transform: translateY(-1px);
+}
+
+.dashboard-theme-chip:active {
+  transform: scale(0.96);
+}
+
+.dashboard-theme-chip svg {
+  width: 16px;
+  height: 16px;
+  color: #0284C7;
+}
+
+body.theme-teal .dashboard-theme-chip {
+  background: #FFFFFF;
+  border-color: #A7F3D0;
+  color: #0F172A;
+}
+
+body.theme-vet .dashboard-theme-chip {
+  background: #FFF7ED;
+  border-color: #FED7AA;
+  color: #C2410C;
+}
+
+body.theme-vet .dashboard-theme-chip svg {
+  color: #EA580C;
+}
+
+body.theme-dark .dashboard-theme-chip {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+}
+
+body.theme-dark .dashboard-theme-chip svg {
+  color: #38BDF8;
+}
+
+body.theme-glass .dashboard-theme-chip {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #FFFFFF;
+}
+
+/* Ensure Theme Modal Card is above everything and styled */
+#theme-modal-overlay {
+  z-index: 99999 !important;
+}
+
+#theme-modal-overlay.active {
+  display: flex !important;
+}
+
+.theme-palette-pill {
+  border: 1.5px solid #38A3A5 !important;
+}
+
+.theme-palette-pill svg {
+  color: #38A3A5 !important;
+}
+
+

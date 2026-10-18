@@ -22,7 +22,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" href="style.css?v=20261018_v13">
+  <link rel="stylesheet" href="style.css?v=20261018_v14">
 </head>
 <body>
   <!-- Mobile Pull-to-Refresh Indicator Container -->
@@ -198,10 +198,10 @@
         <span id="nav-expenses-text">ចំណាយ B2</span>
       </button>
 
-      <!-- [5] របាយការណ៍ (Reports) -->
-      <button class="acleda-bottom-btn" id="tab-nav-reports" onclick="handleBottomTabClick('reports')">
-        <i data-lucide="pie-chart"></i>
-        <span id="nav-reports-text">របាយការណ៍</span>
+      <!-- [5] ពណ៌ & ការកំណត់ (Theme Settings) -->
+      <button class="acleda-bottom-btn" id="tab-nav-theme" onclick="openThemeModal()" title="ជ្រើសរើសពណ៌ / Themes">
+        <i data-lucide="palette"></i>
+        <span id="nav-theme-text">ពណ៌</span>
       </button>
     </nav>
   </div>
@@ -396,8 +396,10 @@
         </button>
       </div>
     </div>
+  </div>
+
   <!-- Theme Selector Modal Overlay (ជ្រើសរើសពណ៌ / Theme) -->
-  <div id="theme-modal-overlay" class="modal-overlay" style="display: none;">
+  <div id="theme-modal-overlay" class="modal-overlay" style="display: none; z-index: 99999;" onclick="if(event.target === this) closeThemeModal()">
     <div class="theme-modal-card">
       <div class="modal-header-row">
         <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:0;">
@@ -493,6 +495,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=20261018_v13"></script>
+  <script src="app.js?v=20261018_v14"></script>
 </body>
 </html>

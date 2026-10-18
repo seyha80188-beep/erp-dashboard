@@ -1659,9 +1659,16 @@ function renderDashboardModule() {
         </div>
       </div>
 
-      <div class="top-date-card" onclick="openThemeModal()" title="កាលបរិច្ឆេទ & ចុចប្តូរពណ៌ Theme">
-        <div class="date-khmer-badge">${dayKhmer} ${monthKhmer} ${yearKhmer}</div>
-        <div class="date-en-badge">(${now.toLocaleString('en-US', { month: 'short' })} ${dayNum}, ${now.getFullYear()})</div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <button type="button" class="dashboard-theme-chip" onclick="openThemeModal()" title="ជ្រើសរើសពណ៌ / Theme">
+          <i data-lucide="palette"></i>
+          <span>${state.theme === 'teal' ? '🌊 Teal' : (state.theme === 'vet' ? '🧡 VET' : (state.theme === 'dark' ? '🌙 Dark' : '💎 Glass'))}</span>
+        </button>
+
+        <div class="top-date-card" onclick="openThemeModal()" title="កាលបរិច្ឆេទ & ចុចប្តូរពណ៌ Theme">
+          <div class="date-khmer-badge">${dayKhmer} ${monthKhmer} ${yearKhmer}</div>
+          <div class="date-en-badge">(${now.toLocaleString('en-US', { month: 'short' })} ${dayNum}, ${now.getFullYear()})</div>
+        </div>
       </div>
     </div>
 
@@ -3720,6 +3727,7 @@ window.openThemeModal = function() {
   const overlay = document.getElementById('theme-modal-overlay');
   if (overlay) {
     overlay.style.display = 'flex';
+    overlay.classList.add('active');
     ['teal', 'vet', 'dark', 'glass'].forEach(t => {
       const card = document.getElementById(`theme-opt-${t}`);
       if (card) {
@@ -3733,7 +3741,10 @@ window.openThemeModal = function() {
 
 window.closeThemeModal = function() {
   const overlay = document.getElementById('theme-modal-overlay');
-  if (overlay) overlay.style.display = 'none';
+  if (overlay) {
+    overlay.style.display = 'none';
+    overlay.classList.remove('active');
+  }
 };
 
 window.selectTheme = function(themeName) {
