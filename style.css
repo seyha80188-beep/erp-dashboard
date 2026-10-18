@@ -477,6 +477,14 @@ body {
   color: var(--text-muted);
 }
 
+.acleda-date-strip {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+  padding: 0 2px;
+}
+
 .acleda-holiday-badge {
   font-size: 12px;
   font-weight: 700;
@@ -490,11 +498,14 @@ body {
   gap: 6px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
   transition: all var(--transition-fast);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .acleda-holiday-badge:hover {
   background: rgba(245, 158, 11, 0.2);
   border-color: var(--primary-gold);
+  transform: translateY(-1px);
 }
 
 /* Main Hero Balance Card (Bank Card Style) */
@@ -1443,6 +1454,28 @@ body {
     font-size: 11px;
   }
 
+  /* Language Flag Switcher (Cambodia 🇰🇭 / UK 🇬🇧) */
+  .header-flag-icon {
+    font-size: 17px !important;
+    line-height: 1 !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .header-lang-flag-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    padding: 5px 9px !important;
+  }
+
+  .header-lang-flag-btn #lang-btn-label {
+    display: inline-block !important;
+    font-weight: 700 !important;
+    font-size: 12px !important;
+  }
+
   .content-area {
     padding: 10px 8px 75px;
   }
@@ -1537,6 +1570,10 @@ body {
 
   .header-pill-btn span {
     display: none; /* Icon-only on ultra compact mobile */
+  }
+
+  .header-lang-flag-btn span.header-flag-icon {
+    display: inline-flex !important;
   }
 
   .header-pill-btn {
@@ -2127,6 +2164,255 @@ body.theme-dark .acleda-balance-card {
 body.theme-dark .sidebar {
   background-color: #050C1D !important;
   border-right-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* ==========================================================================
+   🧡 VET Express Theme: White Blended with VET Vibrant Orange (សរលាយទឹកក្រូច)
+   ========================================================================== */
+body.theme-vet {
+  background-color: #F8FAFC !important;
+  background-image: radial-gradient(at 0% 0%, rgba(255, 102, 0, 0.08) 0px, transparent 50%),
+                    radial-gradient(at 100% 100%, rgba(255, 133, 51, 0.06) 0px, transparent 50%) !important;
+  color: #1E293B !important;
+}
+
+body.theme-vet .main-wrapper {
+  background: transparent !important;
+}
+
+/* Top Header in Signature VET Express Orange */
+body.theme-vet .top-header {
+  background: linear-gradient(135deg, #FF6600 0%, #EA580C 100%) !important;
+  border-bottom: 2px solid #C2410C !important;
+  box-shadow: 0 4px 20px rgba(234, 88, 12, 0.3) !important;
+  color: #FFFFFF !important;
+}
+
+body.theme-vet .header-user-pill {
+  background: rgba(255, 255, 255, 0.22) !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  color: #FFFFFF !important;
+}
+
+body.theme-vet .header-username-text,
+body.theme-vet .header-module-title,
+body.theme-vet .header-breadcrumb {
+  color: #FFFFFF !important;
+}
+
+body.theme-vet .menu-toggle-btn,
+body.theme-vet .header-pill-btn,
+body.theme-vet .header-action-btn-add {
+  background: rgba(255, 255, 255, 0.22) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  color: #FFFFFF !important;
+}
+
+body.theme-vet .menu-toggle-btn:hover,
+body.theme-vet .header-pill-btn:hover {
+  background: rgba(255, 255, 255, 0.35) !important;
+}
+
+/* Sidebar in Clean White */
+body.theme-vet .sidebar {
+  background: #FFFFFF !important;
+  border-right: 1px solid #E2E8F0 !important;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.06) !important;
+}
+
+body.theme-vet .sidebar-brand-name {
+  color: #0F172A !important;
+}
+
+body.theme-vet .module-item {
+  color: #64748B !important;
+}
+
+body.theme-vet .module-item:hover {
+  background: #FFF7ED !important;
+  color: #EA580C !important;
+}
+
+body.theme-vet .module-item.active {
+  background: linear-gradient(135deg, rgba(255, 102, 0, 0.12) 0%, rgba(234, 88, 12, 0.08) 100%) !important;
+  color: #EA580C !important;
+  border-left: 3px solid #FF6600 !important;
+  font-weight: 700 !important;
+}
+
+body.theme-vet .module-item.active svg {
+  color: #FF6600 !important;
+}
+
+/* Hero Balance Card in Clean White with Orange Borders & Accents */
+body.theme-vet .acleda-balance-card {
+  background: #FFFFFF !important;
+  border: 1.5px solid rgba(255, 102, 0, 0.3) !important;
+  box-shadow: 0 10px 30px rgba(255, 102, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+}
+
+body.theme-vet .acleda-balance-label {
+  color: #64748B !important;
+}
+
+body.theme-vet .acleda-balance-khr {
+  color: #EA580C !important;
+  text-shadow: none !important;
+}
+
+body.theme-vet .acleda-balance-usd {
+  color: #0F172A !important;
+}
+
+body.theme-vet .acleda-circle-meter {
+  background: #FFF7ED !important;
+  border-color: rgba(255, 102, 0, 0.4) !important;
+  color: #EA580C !important;
+}
+
+/* Switcher Buttons in Hero Card */
+body.theme-vet .acleda-tab-btn {
+  background: #FFF7ED !important;
+  border: 1.5px solid rgba(255, 102, 0, 0.28) !important;
+  color: #0F172A !important;
+  box-shadow: 0 2px 8px rgba(255, 102, 0, 0.08) !important;
+}
+
+body.theme-vet .acleda-tab-btn .acleda-tab-title {
+  color: #0F172A !important;
+}
+
+body.theme-vet .acleda-tab-icon-wrap {
+  background: rgba(255, 102, 0, 0.12) !important;
+  border-color: rgba(255, 102, 0, 0.3) !important;
+  color: #EA580C !important;
+}
+
+body.theme-vet .acleda-tab-btn.active {
+  background: linear-gradient(135deg, #FF6600 0%, #EA580C 100%) !important;
+  border-color: #FF6600 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 18px rgba(255, 102, 0, 0.4) !important;
+}
+
+body.theme-vet .acleda-tab-btn.active .acleda-tab-title {
+  color: #FFFFFF !important;
+}
+
+body.theme-vet .acleda-tab-btn.active .acleda-tab-icon-wrap {
+  background: rgba(255, 255, 255, 0.25) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  color: #FFFFFF !important;
+}
+
+body.theme-vet .acleda-tab-btn.active .acleda-active-dot {
+  background: #FFFFFF !important;
+  box-shadow: 0 0 8px #FFFFFF !important;
+}
+
+/* White Cards with Crisp Shadows */
+body.theme-vet .panel-card,
+body.theme-vet .metric-card,
+body.theme-vet .recon-kpi-card,
+body.theme-vet .dashboard-section-nav {
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+  color: #1E293B !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+body.theme-vet .card-title,
+body.theme-vet h2,
+body.theme-vet h3 {
+  color: #0F172A !important;
+}
+
+body.theme-vet .metric-label {
+  color: #64748B !important;
+}
+
+body.theme-vet .filter-bar {
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04) !important;
+}
+
+body.theme-vet .filter-label {
+  color: #64748B !important;
+}
+
+body.theme-vet .pill-btn {
+  background: #F1F5F9 !important;
+  border: 1px solid #CBD5E1 !important;
+  color: #475569 !important;
+}
+
+body.theme-vet .pill-btn.active {
+  background: #EA580C !important;
+  border-color: #EA580C !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 2px 10px rgba(234, 88, 12, 0.35) !important;
+}
+
+body.theme-vet .filter-select {
+  background: #FFFFFF !important;
+  border: 1px solid #CBD5E1 !important;
+  color: #1E293B !important;
+}
+
+/* Holiday / Flower Badge in VET */
+body.theme-vet .acleda-holiday-badge {
+  background: #FFF7ED !important;
+  border: 1px solid rgba(255, 102, 0, 0.35) !important;
+  color: #EA580C !important;
+  box-shadow: 0 2px 8px rgba(255, 102, 0, 0.12) !important;
+}
+
+/* Bottom Navigation in VET */
+body.theme-vet .acleda-bottom-nav {
+  background: #FFFFFF !important;
+  border-top: 1px solid #E2E8F0 !important;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06) !important;
+}
+
+body.theme-vet .acleda-bottom-btn {
+  color: #64748B !important;
+}
+
+body.theme-vet .acleda-bottom-btn.active {
+  color: #FF6600 !important;
+}
+
+body.theme-vet .acleda-bottom-btn.active svg {
+  color: #FF6600 !important;
+}
+
+body.theme-vet .quick-add-plus-circle {
+  background: linear-gradient(135deg, #FF6600 0%, #EA580C 100%) !important;
+  box-shadow: 0 6px 18px rgba(255, 102, 0, 0.45) !important;
+  border-color: #FFFFFF !important;
+}
+
+body.theme-vet .quick-add-nav-btn span {
+  color: #FF6600 !important;
+}
+
+/* Tables in VET */
+body.theme-vet .data-table th {
+  background: #FFF7ED !important;
+  color: #EA580C !important;
+  border-bottom: 1.5px solid rgba(255, 102, 0, 0.25) !important;
+}
+
+body.theme-vet .data-table td {
+  border-bottom: 1px solid #F1F5F9 !important;
+  color: #1E293B !important;
+}
+
+body.theme-vet .data-table tr:hover {
+  background: #FFF7ED !important;
 }
 
 /* ☀️ ពណ៍សរស្រទន់ (Soft Frosted Pearl / Luxury Slate Glass - មិនចាំងភ្នែក) */

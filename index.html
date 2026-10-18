@@ -22,7 +22,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" href="style.css?v=20261018_v3">
+  <link rel="stylesheet" href="style.css?v=20261018_v4">
 </head>
 <body>
   <!-- Mobile Pull-to-Refresh Indicator Container -->
@@ -125,37 +125,22 @@
       </div>
 
       <div class="header-right">
-        <!-- Month Selector Dropdown -->
-        <div class="header-filter-select-wrap">
-          <select id="header-month-select" class="header-select-dropdown" onchange="onHeaderMonthSelect(this.value)" title="ជ្រើសរើសខែ">
-            <option value="2026-10" selected>Oct 2026 (តុលា)</option>
-            <option value="2026-09">Sep 2026 (កញ្ញា)</option>
-            <option value="all">All 2026 (ពេញមួយឆ្នាំ)</option>
-          </select>
-        </div>
-
-        <!-- Currency Toggle ($ USD / ៛ KHR at 1$ = 4,100 KHR) -->
-        <div class="header-currency-toggle" title="ប្តូររូបិយប័ណ្ណបង្ហាញ ($ USD / ៛ KHR)">
-          <button type="button" id="btn-curr-usd" class="header-curr-pill active" onclick="setAppDisplayCurrency('USD')">$</button>
-          <button type="button" id="btn-curr-khr" class="header-curr-pill" onclick="setAppDisplayCurrency('KHR')">៛</button>
-        </div>
-
         <!-- Add Expense Button (Desktop/Tablet) -->
         <button id="open-expense-btn" class="header-action-btn-add hide-on-narrow-mobile" onclick="openExpenseModal()" title="កត់ត្រាចំណាយប្រចាំថ្ងៃ (Add Expense)">
           <i data-lucide="plus-circle"></i>
           <span class="btn-text" id="header-btn-add-text">កត់ត្រាចំណាយ</span>
         </button>
 
-        <!-- Theme Switcher: 💎 ថ្លា (Glass) / 🌙 ងងឹត (Dark) -->
-        <button id="theme-toggle-btn" class="header-pill-btn" onclick="toggleAppTheme()" title="ប្តូររចនាបថ ថ្លា/ងងឹត (Toggle Glass/Dark Mode)">
-          <i id="theme-icon" data-lucide="sparkles"></i>
-          <span id="theme-btn-label">ថ្លា</span>
+        <!-- Theme Switcher: 🧡 ទឹកក្រូច VET / 💎 ថ្លា / 🌙 ងងឹត -->
+        <button id="theme-toggle-btn" class="header-pill-btn" onclick="toggleAppTheme()" title="ប្តូររចនាបថ ទឹកក្រូច VET / ថ្លា / ងងឹត">
+          <i id="theme-icon" data-lucide="sun"></i>
+          <span id="theme-btn-label">ទឹកក្រូច VET</span>
         </button>
 
-        <!-- Language Switcher: 🇰🇭 ខ្មែរ / 🇬🇧 ENG -->
-        <button id="lang-toggle-btn" class="header-pill-btn" onclick="toggleAppLanguage()" title="ប្តូរភាសា (Switch Language)">
-          <i data-lucide="globe"></i>
-          <span id="lang-btn-label">🇰🇭 ខ្មែរ</span>
+        <!-- Language Switcher: 🇰🇭 ខ្មែរ / 🇬🇧 ENG (Cambodian / English Flag Badge like VET Express) -->
+        <button id="lang-toggle-btn" class="header-pill-btn header-lang-flag-btn" onclick="toggleAppLanguage()" title="ប្តូរភាសា (Switch Language)">
+          <span id="lang-flag-badge" class="header-flag-icon">🇰🇭</span>
+          <span id="lang-btn-label">ខ្មែរ</span>
         </button>
 
         <!-- Sync Button -->
@@ -434,6 +419,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=20261018_v3"></script>
+  <script src="app.js?v=20261018_v4"></script>
 </body>
 </html>

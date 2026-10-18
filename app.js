@@ -272,7 +272,7 @@ const state = {
   hideBalance: false,
   displayCurrency: localStorage.getItem('yem_display_currency') || 'USD', // 'USD' | 'KHR'
   overspendingAlert: JSON.parse(localStorage.getItem('yem_overspend_alert') || 'true'),
-  theme: localStorage.getItem('yem_theme') || 'glass', // 'glass' | 'dark'
+  theme: localStorage.getItem('yem_theme') || 'vet', // 'vet' | 'glass' | 'dark' | 'light'
   lang: localStorage.getItem('yem_lang') || 'km',       // 'km' | 'en'
   expenseCurrency: 'KHR',      // 'KHR' | 'USD'
   isLoading: false,
@@ -385,9 +385,11 @@ async function initApp() {
  * Apply App Theme: 💎 ថ្លា (Glass) vs 🌙 ងងឹត (Dark) vs ☀️ សរថ្លា (Light Glass)
  */
 function applyAppTheme() {
-  const theme = state.theme || 'glass';
-  document.body.classList.remove('theme-glass', 'theme-dark', 'theme-light');
-  if (theme === 'light') {
+  const theme = state.theme || 'vet';
+  document.body.classList.remove('theme-glass', 'theme-dark', 'theme-light', 'theme-vet');
+  if (theme === 'vet') {
+    document.body.classList.add('theme-vet');
+  } else if (theme === 'light') {
     document.body.classList.add('theme-light');
   } else if (theme === 'dark') {
     document.body.classList.add('theme-dark');
@@ -398,7 +400,9 @@ function applyAppTheme() {
   const themeBtnLabel = document.getElementById('theme-btn-label');
   const themeIcon = document.getElementById('theme-icon');
   if (themeBtnLabel) {
-    if (theme === 'light') {
+    if (theme === 'vet') {
+      themeBtnLabel.textContent = state.lang === 'en' ? 'VET Orange' : 'ទឹកក្រូច VET';
+    } else if (theme === 'light') {
       themeBtnLabel.textContent = state.lang === 'en' ? 'Soft Frost' : 'សរស្រទន់';
     } else if (theme === 'dark') {
       themeBtnLabel.textContent = state.lang === 'en' ? 'Dark' : 'ងងឹត';
@@ -407,7 +411,7 @@ function applyAppTheme() {
     }
   }
   if (themeIcon) {
-    themeIcon.setAttribute('data-lucide', theme === 'light' ? 'sun' : (theme === 'dark' ? 'moon' : 'sparkles'));
+    themeIcon.setAttribute('data-lucide', theme === 'vet' ? 'sun' : (theme === 'light' ? 'sun' : (theme === 'dark' ? 'moon' : 'sparkles')));
     if (window.lucide) window.lucide.createIcons();
   }
 }
@@ -419,8 +423,15 @@ function applyAppLanguage() {
   const lang = state.lang || 'km';
   const t = I18N[lang] || I18N.km;
 
+  const langFlag = document.getElementById('lang-flag-badge');
+  if (langFlag) {
+    langFlag.textContent = lang === 'en' ? '🇬🇧' : '🇰🇭';
+  }
+
   const langBtnLabel = document.getElementById('lang-btn-label');
-  if (langBtnLabel) langBtnLabel.textContent = t.langLabel;
+  if (langBtnLabel) {
+    langBtnLabel.textContent = lang === 'en' ? 'EN' : 'ខ្មែរ';
+  }
 
   const headerAddBtnText = document.getElementById('header-btn-add-text');
   if (headerAddBtnText) headerAddBtnText.textContent = t.addExpenseBtn;
@@ -1500,9 +1511,26 @@ function renderDashboardModule() {
     : (lang === 'en' ? 'Personal B2' : 'គណនីផ្ទាល់');
   const circleIcon = isBusiness ? 'trending-up' : 'wallet';
 
+  // Dynamic Current Date with Flower Badge
+  const now = new Date();
+  const dayNum = now.getDate();
+  const khmerNums = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
+  const dayKhmer = String(dayNum).split('').map(d => khmerNums[parseInt(d)] || d).join('');
+  const khmerMonths = ['មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា', 'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'];
+  const monthKhmer = khmerMonths[now.getMonth()] || 'តុលា';
+  const yearKhmer = String(now.getFullYear()).split('').map(d => khmerNums[parseInt(d)] || d).join('');
+  const dateBadgeText = lang === 'en'
+    ? `🌸 ${dayNum} ${now.toLocaleString('en-US', { month: 'short' })} ${now.getFullYear()}`
+    : `🌸 ថ្ងៃទី ${dayKhmer} ${monthKhmer} ${yearKhmer}`;
+
   moduleContainerEl.innerHTML = `
-    <!-- ACLEDA / ABA STYLE MOBILE BANKING HERO CARD -->
+    <!-- ACLEDA / ABA / VET HERO CARD CONTAINER -->
     <div class="acleda-hero-container">
+      <div class="acleda-date-strip">
+        <div class="acleda-holiday-badge" title="កាលបរិច្ឆេទថ្ងៃនេះ">
+          <span>${dateBadgeText}</span>
+        </div>
+      </div>
       <div class="acleda-balance-card">
         <div class="acleda-balance-top">
           <div class="acleda-account-circle-wrap">
@@ -3522,12 +3550,14 @@ window.handleSaveParsedOrders = async function() {
  * Toggle App Theme: 💎 ថ្លា (Glassmorphism) ➔ ☀️ សរថ្លា (Light Glass) ➔ 🌙 ងងឹត (Solid Dark)
  */
 window.toggleAppTheme = function() {
-  if (state.theme === 'glass') {
-    state.theme = 'light';
-  } else if (state.theme === 'light') {
-    state.theme = 'dark';
-  } else {
+  if (state.theme === 'vet') {
     state.theme = 'glass';
+  } else if (state.theme === 'glass') {
+    state.theme = 'dark';
+  } else if (state.theme === 'dark') {
+    state.theme = 'light';
+  } else {
+    state.theme = 'vet';
   }
   localStorage.setItem('yem_theme', state.theme);
   applyAppTheme();
