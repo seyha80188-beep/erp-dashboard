@@ -1683,10 +1683,10 @@ function renderDashboardModule() {
         <div class="dashboard-quick-actions-bar">
           <button type="button" class="dash-quick-btn dash-quick-expense" onclick="openExpenseModal()">
             <div class="dash-quick-icon-circle expense-circle">
-              <i data-lucide="plus"></i>
+              <i data-lucide="file-plus"></i>
             </div>
             <div class="dash-quick-text">
-              <span class="dash-quick-label">${lang === 'en' ? '+ Log Expense' : '+ កត់ត្រាចំណាយ'}</span>
+              <span class="dash-quick-label"><span class="dash-title-sparkle expense">✦</span> ${lang === 'en' ? 'Log Expense' : 'កត់ត្រាចំណាយ'}</span>
               <span class="dash-quick-sub">${lang === 'en' ? 'Daily Personal' : 'ចំណាយប្រចាំថ្ងៃ (Sheet B2)'}</span>
             </div>
           </button>
@@ -1696,7 +1696,7 @@ function renderDashboardModule() {
               <i data-lucide="clipboard-paste"></i>
             </div>
             <div class="dash-quick-text">
-              <span class="dash-quick-label">${lang === 'en' ? '+ Enter Orders' : '+ បញ្ចូលការកម្ម៉ង់'}</span>
+              <span class="dash-quick-label"><span class="dash-title-sparkle orders">✦</span> ${lang === 'en' ? 'Enter Orders' : 'បញ្ចូលការកម្ម៉ង់'}</span>
               <span class="dash-quick-sub">${lang === 'en' ? 'Paste Telegram' : 'Paste ពី Telegram'}</span>
             </div>
           </button>
@@ -2538,7 +2538,7 @@ function renderTeamSalesSectionHtml() {
         <div style="display:flex; align-items:center; gap:8px;">
           <button type="button" class="btn-large-paste-orders" onclick="openOrderModal()" style="padding:6px 14px; font-size:12.5px; border-radius:20px;">
             <i data-lucide="clipboard-paste" style="width:15px; height:15px;"></i>
-            <span>+ បញ្ចូលការកម្ម៉ង់</span>
+            <span>✦ បញ្ចូលការកម្ម៉ង់</span>
           </button>
           <span class="status-pill-disconnected" style="background:#DCFCE7; color:#15803D;">${lang === 'en' ? 'Total' : 'សរុប'} ${totalBoxes} ${lang === 'en' ? 'Boxes' : 'ប្រអប់'}</span>
         </div>
@@ -4441,11 +4441,11 @@ function renderOrdersModule() {
       <div class="orders-banner-action-wrap" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
         <button type="button" class="btn-large-paste-orders" onclick="openOrderModal()">
           <i data-lucide="clipboard-paste"></i>
-          <span>+ Paste បញ្ចូលការកម្ម៉ង់ពី Telegram</span>
+          <span>✦ Paste បញ្ចូលការកម្ម៉ង់ពី Telegram</span>
         </button>
         <button type="button" class="btn-large-paste-orders btn-expense-companion" onclick="openExpenseModal()">
-          <i data-lucide="plus-circle"></i>
-          <span>+ កត់ត្រាចំណាយ</span>
+          <i data-lucide="file-plus"></i>
+          <span>✦ កត់ត្រាចំណាយ</span>
         </button>
       </div>
     </div>
