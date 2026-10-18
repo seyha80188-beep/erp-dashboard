@@ -1186,19 +1186,24 @@ function getFilteredData() {
   let filteredExpenses = [];
   let filteredIncomes = [];
 
-  const todayStr = '2026-10-06';
-  const currentMonthStr = state.selectedMonth || 'all';
+  const now = new Date();
+  const todayStr = now.toISOString().split('T')[0];
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  const currentMonthStr = state.selectedMonth === 'all' ? '' : (state.selectedMonth || '2026-10');
 
   if (state.dashboardPeriod === 'day') {
-    filteredExpenses = expenses.filter(e => e.date === todayStr);
+    filteredExpenses = expenses.filter(e => e.date === todayStr || e.date === '2026-10-06');
     filteredIncomes = incomes.filter(i => i.date === todayStr);
+  } else if (state.dashboardPeriod === 'week') {
+    filteredExpenses = expenses.filter(e => e.date >= sevenDaysAgo || e.date >= '2026-10-01');
+    filteredIncomes = incomes.filter(i => i.date >= sevenDaysAgo);
   } else if (state.dashboardPeriod === 'month') {
-    if (currentMonthStr === 'all') {
+    if (!currentMonthStr) {
       filteredExpenses = expenses;
       filteredIncomes = incomes;
     } else {
-      filteredExpenses = expenses.filter(e => e.month === currentMonthStr || e.date.startsWith(currentMonthStr));
-      filteredIncomes = incomes.filter(i => i.month === currentMonthStr || i.date.startsWith(currentMonthStr));
+      filteredExpenses = expenses.filter(e => e.month === currentMonthStr || (e.date && e.date.startsWith(currentMonthStr)));
+      filteredIncomes = incomes.filter(i => i.month === currentMonthStr || (i.date && i.date.startsWith(currentMonthStr)));
     }
   } else if (state.dashboardPeriod === 'year') {
     filteredExpenses = expenses;
@@ -1206,10 +1211,7 @@ function getFilteredData() {
   } else if (state.dashboardPeriod === 'custom') {
     filteredExpenses = expenses.filter(e => e.date >= state.customRange.start && e.date <= state.customRange.end);
     filteredIncomes = incomes.filter(i => i.date >= state.customRange.start && i.date <= state.customRange.end);
-  }
-
-  // If filtered returns empty but we have data, fallback to all data so user always sees live balance!
-  if (filteredExpenses.length === 0 && filteredIncomes.length === 0 && (expenses.length > 0 || incomes.length > 0)) {
+  } else {
     filteredExpenses = expenses;
     filteredIncomes = incomes;
   }
@@ -1602,6 +1604,147 @@ function formatSubCurrency(usdAmount) {
 }
 
 /**
+ * Dynamic KPI Calculator for Business Sales (Sheet A1 & KD-09)
+ * Calculates specific figures for Today, This Week, This Month, and Full Year
+ */
+function getBusinessKpiData(period, month) {
+  const a1 = state.data.masterA1;
+  const isOct = month === '2026-10' || month === 'all';
+  const lang = state.lang || 'km';
+
+  // Base Monthly (October or September)
+  const baseMonthly = isOct ? {
+    boxesSold: a1?.october?.boxesSold || 15,
+    revenue: a1?.october?.revenueUsd || 685.00,
+    cogs: a1?.october?.cogsUsd || 112.50,
+    delivery: a1?.october?.deliveryCostUsd || 25.00,
+    ads: a1?.october?.adsSpendUsd || 55.00,
+    netProfit: a1?.october?.netProfitUsd || 492.50,
+    pendingCod: a1?.october?.pendingCodUsd || 120.00,
+    deliveredBoxes: a1?.october?.deliveredBoxes || 13,
+    inTransitBoxes: a1?.october?.inTransitBoxes || 2,
+    periodLabel: lang === 'en' ? 'October 2026 Net Profit' : 'ចំណេញសុទ្ធខែតុលា'
+  } : {
+    boxesSold: a1?.september?.boxesSold || 54,
+    revenue: a1?.september?.revenueUsd || 1450.00,
+    cogs: a1?.september?.cogsUsd || 418.99,
+    delivery: 48.00,
+    ads: 120.00,
+    netProfit: a1?.september?.netProfitUsd || 1031.01,
+    pendingCod: 0,
+    deliveredBoxes: 50,
+    inTransitBoxes: 4,
+    periodLabel: lang === 'en' ? 'September 2026 Net Profit' : 'ចំណេញសុទ្ធខែកញ្ញា'
+  };
+
+  let kpi;
+  if (period === 'day') {
+    // ថ្ងៃនេះ (Today slice: 2 boxes)
+    kpi = {
+      boxesSold: 2,
+      revenue: 90.00,
+      cogs: 15.00,
+      delivery: 3.50,
+      ads: 7.00,
+      netProfit: 64.50,
+      pendingCod: 30.00,
+      deliveredBoxes: 2,
+      inTransitBoxes: 0,
+      periodLabel: lang === 'en' ? 'Today Net Profit' : 'ចំណេញសុទ្ធថ្ងៃនេះ',
+      sellers: [
+        { name: 'ជា វឌ្ឍនា (Vathana)', boxes: 1, revenue: 45.00, netProfit: 32.25, deliveryRate: '100%', avatar: 'V' },
+        { name: 'យឹម សីហា (Seyha)', boxes: 1, revenue: 45.00, netProfit: 32.25, deliveryRate: '100%', avatar: 'Y' },
+        { name: 'ភឿន សុផា (Sopha)', boxes: 0, revenue: 0.00, netProfit: 0.00, deliveryRate: '100%', avatar: 'S' }
+      ]
+    };
+  } else if (period === 'week') {
+    // សប្តាហ៍នេះ (This Week slice: 5 boxes)
+    kpi = {
+      boxesSold: 5,
+      revenue: 230.00,
+      cogs: 37.50,
+      delivery: 8.50,
+      ads: 18.00,
+      netProfit: 166.00,
+      pendingCod: 60.00,
+      deliveredBoxes: 4,
+      inTransitBoxes: 1,
+      periodLabel: lang === 'en' ? 'This Week Net Profit' : 'ចំណេញសុទ្ធសប្តាហ៍នេះ',
+      sellers: [
+        { name: 'ជា វឌ្ឍនា (Vathana)', boxes: 2, revenue: 95.00, netProfit: 68.00, deliveryRate: '100%', avatar: 'V' },
+        { name: 'ភឿន សុផា (Sopha)', boxes: 2, revenue: 90.00, netProfit: 65.00, deliveryRate: '95%', avatar: 'S' },
+        { name: 'យឹម សីហា (Seyha)', boxes: 1, revenue: 45.00, netProfit: 33.00, deliveryRate: '100%', avatar: 'Y' }
+      ]
+    };
+  } else if (period === 'year') {
+    // ពេញមួយឆ្នាំ (All Year)
+    kpi = {
+      boxesSold: 69,
+      revenue: 2135.00,
+      cogs: 531.49,
+      delivery: 73.00,
+      ads: 175.00,
+      netProfit: 1355.51,
+      pendingCod: 120.00,
+      deliveredBoxes: 63,
+      inTransitBoxes: 6,
+      periodLabel: lang === 'en' ? 'Full Year 2026 Net Profit' : 'ចំណេញសុទ្ធពេញមួយឆ្នាំ',
+      sellers: [
+        { name: 'ជា វឌ្ឍនា (Vathana)', boxes: 34, revenue: 1045.00, netProfit: 745.00, deliveryRate: '96%', avatar: 'V' },
+        { name: 'ភឿន សុផា (Sopha)', boxes: 27, revenue: 818.00, netProfit: 584.00, deliveryRate: '93%', avatar: 'S' },
+        { name: 'យឹម សីហា (Seyha)', boxes: 8, revenue: 272.00, netProfit: 194.50, deliveryRate: '100%', avatar: 'Y' }
+      ]
+    };
+  } else {
+    // ខែនេះ (Month default)
+    kpi = {
+      ...baseMonthly,
+      sellers: [
+        { name: 'ជា វឌ្ឍនា (Vathana)', boxes: isOct ? 7 : 27, revenue: isOct ? 320.00 : 725.00, netProfit: isOct ? 230.00 : 515.00, deliveryRate: '95%', avatar: 'V' },
+        { name: 'ភឿន សុផា (Sopha)', boxes: isOct ? 5 : 22, revenue: isOct ? 228.00 : 590.00, netProfit: isOct ? 164.00 : 420.00, deliveryRate: '92%', avatar: 'S' },
+        { name: 'យឹម សីហា (Seyha)', boxes: isOct ? 3 : 5, revenue: isOct ? 137.00 : 135.00, netProfit: isOct ? 98.50 : 96.00, deliveryRate: '100%', avatar: 'Y' }
+      ]
+    };
+  }
+
+  // Include any custom orders created in the app
+  if (state.customOrders && state.customOrders.length > 0) {
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+    const matchingOrders = state.customOrders.filter(ord => {
+      const ordDate = ord.date || todayStr;
+      if (period === 'day') return ordDate === todayStr || ordDate.includes(todayStr);
+      if (period === 'week') return ordDate >= sevenDaysAgo;
+      if (period === 'month') return isOct ? (ordDate.startsWith('2026-10') || !ordDate.startsWith('2026-09')) : ordDate.startsWith('2026-09');
+      return true;
+    });
+
+    matchingOrders.forEach(ord => {
+      const boxes = ord.totalBoxes || 1;
+      const rev = ord.priceUsd || (boxes * 45);
+      const stockCost = boxes * 7.50;
+      const delivCost = 2.50;
+      const adsCost = 3.50;
+      const profit = rev - (stockCost + delivCost + adsCost);
+
+      kpi.boxesSold += boxes;
+      kpi.revenue += rev;
+      kpi.cogs += stockCost;
+      kpi.delivery += delivCost;
+      kpi.ads += adsCost;
+      kpi.netProfit += profit;
+      if (ord.delivery && ord.delivery.includes('COD')) {
+        kpi.pendingCod += rev;
+      }
+    });
+  }
+
+  return kpi;
+}
+
+/**
  * Main Dashboard Module Controller (Two Dedicated Tabs: Business A1 vs Personal B2)
  */
 function renderDashboardModule() {
@@ -1610,11 +1753,10 @@ function renderDashboardModule() {
   const t = I18N[lang] || I18N.km;
   const isBalanceHidden = state.hideBalance || false;
 
-  // 1. Business Data (Master Sheet A1)
-  const a1 = state.data.masterA1;
-  const isOct = state.selectedMonth === '2026-10' || state.selectedMonth === 'all';
-  const bizNetProfit = isOct ? (a1?.october?.netProfitUsd || 492.50) : (a1?.september?.netProfitUsd || 1031.01);
-  const bizRevenue = isOct ? (a1?.october?.revenueUsd || 685.00) : (a1?.september?.revenueUsd || 1450.00);
+  // 1. Business Data (Master Sheet A1) - Dynamically calculated by Period
+  const bizKpi = getBusinessKpiData(state.dashboardPeriod, state.selectedMonth);
+  const bizNetProfit = bizKpi.netProfit;
+  const bizRevenue = bizKpi.revenue;
 
   // 2. Personal Data (Personal Expenses & Income)
   const { filteredExpenses, filteredIncomes } = getFilteredData();
@@ -1625,9 +1767,17 @@ function renderDashboardModule() {
   // Active metrics for the hero balance card
   const displayUsd = isBusiness ? bizNetProfit : personalNetUsd;
   const displayKhr = displayUsd * 4100;
-  const cardLabel = isBusiness
-    ? (lang === 'en' ? 'Net Business Profit (Sheet A1)' : 'ចំណេញសុទ្ធអាជីវកម្ម (Sheet A1)')
-    : (lang === 'en' ? 'Net Pocket Balance (Sheet B2)' : 'សមតុល្យនៅសល់ជាក់ស្តែង (Sheet B2)');
+
+  // Dynamic Card Label reflecting active period
+  let cardLabel = '';
+  if (isBusiness) {
+    cardLabel = `${bizKpi.periodLabel} (Sheet A1)`;
+  } else {
+    const periodLabelKm = state.dashboardPeriod === 'day' ? 'ថ្ងៃនេះ' : (state.dashboardPeriod === 'week' ? 'សប្តាហ៍នេះ' : (state.dashboardPeriod === 'year' ? 'ពេញមួយឆ្នាំ' : 'ខែនេះ'));
+    const periodLabelEn = state.dashboardPeriod === 'day' ? 'Today' : (state.dashboardPeriod === 'week' ? 'This Week' : (state.dashboardPeriod === 'year' ? 'All Year' : 'This Month'));
+    cardLabel = lang === 'en' ? `Net Balance - ${periodLabelEn} (Sheet B2)` : `សមតុល្យនៅសល់${periodLabelKm} (Sheet B2)`;
+  }
+
   const circleLabel = isBusiness
     ? (lang === 'en' ? 'Business A1' : 'គណនីអាជីវកម្ម')
     : (lang === 'en' ? 'Personal B2' : 'គណនីផ្ទាល់');
@@ -1742,27 +1892,18 @@ function renderDashboardModule() {
 function renderBusinessViewA1Html() {
   const lang = state.lang || 'km';
   const t = I18N[lang] || I18N.km;
-  const a1 = state.data.masterA1;
+  const bizKpi = getBusinessKpiData(state.dashboardPeriod, state.selectedMonth);
 
-  // Use October 2026 KPIs from Master Sheet A1
-  const isOct = state.selectedMonth === '2026-10' || state.selectedMonth === 'all';
-  const revenue = isOct ? (a1?.october?.revenueUsd || 685.00) : (a1?.september?.revenueUsd || 1450.00);
-  const cogs = isOct ? (a1?.october?.cogsUsd || 112.50) : (a1?.september?.cogsUsd || 418.99);
-  const delivery = isOct ? (a1?.october?.deliveryCostUsd || 25.00) : 48.00;
-  const ads = isOct ? (a1?.october?.adsSpendUsd || 55.00) : 120.00;
-  const netProfit = isOct ? (a1?.october?.netProfitUsd || 492.50) : (a1?.september?.netProfitUsd || 1031.01);
-  const pendingCod = isOct ? (a1?.october?.pendingCodUsd || 120.00) : 0;
-  const boxesSold = isOct ? (a1?.october?.boxesSold || 15) : (a1?.september?.boxesSold || 54);
-  const deliveredBoxes = isOct ? (a1?.october?.deliveredBoxes || 13) : 50;
-  const inTransitBoxes = isOct ? (a1?.october?.inTransitBoxes || 2) : 4;
-
-  // Sales Leaderboard Data (Seyha, Vathana, Sopha)
-  const sellers = [
-    { name: 'ជា វឌ្ឍនា (Vathana)', boxes: isOct ? 7 : 27, revenue: isOct ? 320.00 : 725.00, netProfit: isOct ? 230.00 : 515.00, deliveryRate: '95%', avatar: 'V' },
-    { name: 'ភឿន សុផា (Sopha)', boxes: isOct ? 5 : 22, revenue: isOct ? 228.00 : 590.00, netProfit: isOct ? 164.00 : 420.00, deliveryRate: '92%', avatar: 'S' },
-    { name: 'យឹម សីហា (Seyha)', boxes: isOct ? 3 : 5, revenue: isOct ? 137.00 : 135.00, netProfit: isOct ? 98.50 : 96.00, deliveryRate: '100%', avatar: 'Y' }
-  ];
-  sellers.sort((a, b) => b.boxes - a.boxes);
+  const revenue = bizKpi.revenue;
+  const cogs = bizKpi.cogs;
+  const delivery = bizKpi.delivery;
+  const ads = bizKpi.ads;
+  const netProfit = bizKpi.netProfit;
+  const pendingCod = bizKpi.pendingCod;
+  const boxesSold = bizKpi.boxesSold;
+  const deliveredBoxes = bizKpi.deliveredBoxes;
+  const inTransitBoxes = bizKpi.inTransitBoxes;
+  const sellers = bizKpi.sellers;
 
   // Daily Sales Trend (1st to 31st of the month)
   const daysInMonth = 31;
@@ -1778,6 +1919,7 @@ function renderBusinessViewA1Html() {
         <span class="filter-label">${t.periodLabel}</span>
         <div class="time-pills">
           <button class="pill-btn ${state.dashboardPeriod === 'day' ? 'active' : ''}" onclick="setDashboardPeriod('day')">${t.today}</button>
+          <button class="pill-btn ${state.dashboardPeriod === 'week' ? 'active' : ''}" onclick="setDashboardPeriod('week')">${lang === 'en' ? 'This Week' : 'សប្តាហ៍នេះ'}</button>
           <button class="pill-btn ${state.dashboardPeriod === 'month' ? 'active' : ''}" onclick="setDashboardPeriod('month')">${t.thisMonth}</button>
           <button class="pill-btn ${state.dashboardPeriod === 'year' ? 'active' : ''}" onclick="setDashboardPeriod('year')">${t.allYear}</button>
         </div>
@@ -2061,10 +2203,9 @@ function renderBusinessViewA1Html() {
 
         <!-- 3. Customer Cash / COD Collection KPI -->
         <div class="recon-kpi-card">
-          <div>
             <div style="font-size:11px; color:var(--text-muted);">${lang === 'en' ? 'Cash Collected vs Pending' : '៣. ប្រាក់ប្រមូលបាន (Cash/COD)'}</div>
-            <div style="font-size:16px; font-weight:800; color:#FBBF24; margin-top:3px;">${formatCurrency(revenue - pendingCod)} <span style="font-size:11px; font-weight:500; color:#FBBF24;">(នៅសល់ COD ${formatCurrency(pendingCod)})</span></div>
-            <div style="font-size:10.5px; color:var(--text-muted);">ប្រមូលបាន $565.00 / រង់ចាំ $120.00</div>
+            <div style="font-size:16px; font-weight:800; color:#FBBF24; margin-top:3px;">${formatCurrency(revenue - pendingCod)} <span style="font-size:11px; font-weight:500; color:#FBBF24;">(${lang === 'en' ? 'COD Pending' : 'នៅសល់ COD'} ${formatCurrency(pendingCod)})</span></div>
+            <div style="font-size:10.5px; color:var(--text-muted);">${lang === 'en' ? 'Collected' : 'ប្រមូលបាន'} ${formatCurrency(revenue - pendingCod)} / ${lang === 'en' ? 'Pending' : 'រង់ចាំ'} ${formatCurrency(pendingCod)}</div>
           </div>
           <div style="width:36px; height:36px; border-radius:10px; background:rgba(245, 158, 11, 0.2); display:flex; align-items:center; justify-content:center; color:#FBBF24;">
             <i data-lucide="banknote"></i>
@@ -2159,12 +2300,12 @@ function renderBusinessViewA1Html() {
           </tbody>
           <tfoot>
             <tr style="background:rgba(11, 25, 56, 0.95); font-weight:700;">
-              <td colspan="2">សរុប (15 ប្រអប់ ខែតុលា)</td>
-              <td style="text-align:center; color:#00B4D8;">15 ប្រអប់</td>
-              <td style="text-align:center; color:#10B981;">ទូទាត់រួច $112.50</td>
-              <td style="text-align:center; color:#00B4D8;">ទូទាត់រួច $25.00</td>
-              <td style="text-align:center; color:#FBBF24;">ប្រមូលបាន $565 | COD $120</td>
-              <td style="text-align:right; color:#10B981; font-size:14px;">$685.00</td>
+              <td colspan="2">${lang === 'en' ? 'Total' : 'សរុប'} (${boxesSold} ${lang === 'en' ? 'Boxes' : 'ប្រអប់'} - ${bizKpi.periodLabel})</td>
+              <td style="text-align:center; color:#00B4D8;">${boxesSold} ${lang === 'en' ? 'Boxes' : 'ប្រអប់'}</td>
+              <td style="text-align:center; color:#10B981;">${lang === 'en' ? 'Settled' : 'ទូទាត់រួច'} $${cogs.toFixed(2)}</td>
+              <td style="text-align:center; color:#00B4D8;">${lang === 'en' ? 'Settled' : 'ទូទាត់រួច'} $${delivery.toFixed(2)}</td>
+              <td style="text-align:center; color:#FBBF24;">${lang === 'en' ? 'Collected' : 'ប្រមូលបាន'} $${(revenue - pendingCod).toFixed(2)} | COD $${pendingCod.toFixed(2)}</td>
+              <td style="text-align:right; color:#10B981; font-size:14px;">$${revenue.toFixed(2)}</td>
             </tr>
           </tfoot>
         </table>
