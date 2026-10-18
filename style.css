@@ -1294,6 +1294,426 @@ body {
   height: 18px;
 }
 
+/* Daily Interactive Expense & Sales Date Trackers */
+.daily-tracker-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 768px) {
+  .daily-tracker-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.daily-tracker-card {
+  background: linear-gradient(145deg, rgba(10, 25, 47, 0.85) 0%, rgba(6, 14, 34, 0.95) 100%);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  transition: all 0.25s ease;
+}
+
+.daily-tracker-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.35);
+}
+
+.daily-tracker-card.expense-card {
+  border-left: 4px solid #EF4444;
+}
+
+.daily-tracker-card.sales-card {
+  border-left: 4px solid #10B981;
+}
+
+.tracker-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.tracker-head-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tracker-badge-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tracker-badge-icon.badge-red {
+  background: rgba(239, 68, 68, 0.2);
+  color: #EF4444;
+}
+
+.tracker-badge-icon.badge-green {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10B981;
+}
+
+.tracker-badge-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.tracker-head-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #FFFFFF;
+  line-height: 1.2;
+}
+
+.tracker-head-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.tracker-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.tracker-action-btn svg {
+  width: 13px;
+  height: 13px;
+}
+
+.tracker-action-btn.btn-log-exp {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #F87171;
+}
+
+.tracker-action-btn.btn-log-exp:hover {
+  background: rgba(239, 68, 68, 0.35);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+}
+
+.tracker-action-btn.btn-log-order {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #34D399;
+}
+
+.tracker-action-btn.btn-log-order:hover {
+  background: rgba(16, 185, 129, 0.35);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+}
+
+/* Date picker controls */
+.tracker-picker-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 10px;
+  background: rgba(6, 14, 34, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+
+.tracker-picker-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.tracker-picker-label svg {
+  width: 13px;
+  height: 13px;
+  color: var(--primary-accent);
+}
+
+.tracker-input-wrapper {
+  position: relative;
+}
+
+.tracker-native-date {
+  background: rgba(10, 25, 47, 0.95);
+  border: 1px solid rgba(0, 180, 216, 0.35);
+  color: #FFFFFF;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  padding: 4px 8px;
+  border-radius: 6px;
+  outline: none;
+  cursor: pointer;
+  color-scheme: dark;
+}
+
+.tracker-native-date:focus {
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 8px rgba(0, 180, 216, 0.4);
+}
+
+/* Preset pills (Today, Yesterday, Tomorrow) */
+.tracker-preset-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.tracker-mini-pill {
+  flex: 1;
+  text-align: center;
+  padding: 4px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: inherit;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.tracker-mini-pill:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #FFFFFF;
+}
+
+.tracker-mini-pill.active {
+  background: rgba(0, 180, 216, 0.22);
+  border-color: rgba(0, 180, 216, 0.5);
+  color: #00B4D8;
+  font-weight: 700;
+}
+
+/* Figures container */
+.tracker-figures-container {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.tracker-amount-hero {
+  font-size: 21px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.3px;
+}
+
+.tracker-amount-hero.expense-amt {
+  color: #EF4444;
+}
+
+.tracker-amount-hero.sales-amt {
+  color: #00B4D8;
+}
+
+.tracker-amount-hero.profit-amt.pos {
+  color: #10B981;
+}
+
+.tracker-amount-hero.profit-amt.neg {
+  color: #EF4444;
+}
+
+.tracker-amount-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.tracker-status-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tracker-count-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 6px;
+}
+
+.tracker-count-badge svg {
+  width: 12px;
+  height: 12px;
+}
+
+.tracker-count-badge.badge-has {
+  background: rgba(239, 68, 68, 0.15);
+  color: #F87171;
+}
+
+.tracker-count-badge.badge-none {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-muted);
+}
+
+.tracker-fast-add {
+  background: none;
+  border: none;
+  color: var(--primary-accent);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.tracker-fast-add:hover {
+  color: #FFFFFF;
+}
+
+.tracker-items-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.08);
+}
+
+.tracker-item-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11.5px;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 3px 8px;
+  border-radius: 5px;
+}
+
+.tracker-item-chip .chip-desc {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tracker-item-chip .chip-amt {
+  font-weight: 700;
+  color: #FBBF24;
+}
+
+.chip-more {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-align: right;
+  font-style: italic;
+}
+
+/* Sales side stats */
+.tracker-sales-kpis-grid {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tracker-sales-stat .stat-lbl {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  display: block;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.tracker-sales-stat .stat-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 600;
+  display: block;
+  margin-top: 2px;
+}
+
+.tracker-sales-stat .stat-sub.pos {
+  color: #10B981;
+}
+
+.tracker-sales-stat.align-right {
+  text-align: right;
+}
+
+.tracker-sales-pills-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.08);
+}
+
+.sales-mini-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sales-mini-pill svg {
+  width: 11px;
+  height: 11px;
+}
+
+.sales-mini-pill.boxes {
+  background: rgba(0, 180, 216, 0.15);
+  color: #00B4D8;
+}
+
+.sales-mini-pill.cogs {
+  background: rgba(245, 158, 11, 0.15);
+  color: #FBBF24;
+}
+
+.sales-mini-pill.deliv {
+  background: rgba(139, 92, 246, 0.15);
+  color: #A78BFA;
+}
+
+.sales-mini-pill.ads {
+  background: rgba(239, 68, 68, 0.15);
+  color: #F87171;
+}
+
 /* 9-Grid ACLEDA Services (Service Buttons) */
 .acleda-services-grid {
   display: grid;

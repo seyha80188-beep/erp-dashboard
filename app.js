@@ -307,7 +307,9 @@ const state = {
   customRange: {
     start: '2026-10-01',
     end: '2026-10-06'
-  }
+  },
+  selectedExpenseDate: null,
+  selectedSalesDate: null
 };
 
 // DOM Elements
@@ -1187,13 +1189,18 @@ function getFilteredData() {
   let filteredIncomes = [];
 
   const now = new Date();
-  const todayStr = now.toISOString().split('T')[0];
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const tm = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  const tomorrowStr = `${tm.getFullYear()}-${String(tm.getMonth() + 1).padStart(2, '0')}-${String(tm.getDate()).padStart(2, '0')}`;
   const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
   const currentMonthStr = state.selectedMonth === 'all' ? '' : (state.selectedMonth || '2026-10');
 
   if (state.dashboardPeriod === 'day') {
     filteredExpenses = expenses.filter(e => e.date === todayStr || e.date === '2026-10-06');
     filteredIncomes = incomes.filter(i => i.date === todayStr);
+  } else if (state.dashboardPeriod === 'tomorrow') {
+    filteredExpenses = expenses.filter(e => e.date === tomorrowStr);
+    filteredIncomes = incomes.filter(i => i.date === tomorrowStr);
   } else if (state.dashboardPeriod === 'week') {
     filteredExpenses = expenses.filter(e => e.date >= sevenDaysAgo || e.date >= '2026-10-01');
     filteredIncomes = incomes.filter(i => i.date >= sevenDaysAgo);
@@ -1604,117 +1611,327 @@ function formatSubCurrency(usdAmount) {
 }
 
 /**
+ * Delivery Fee Calculator based on User Business Rules:
+ * 1. Thai ✅COD -> $5.00
+ * 2. VET(COD)ក្រុមហ៊ុន -> $3.00
+ * 3. VET(COD) អីវ៉ាន់ផ្ទាល់ខ្លួន -> $2.00
+ * 4. Motor (ម៉ូតូ) -> $2.50
+ */
+function getDeliveryFeeByMethod(methodStr) {
+  if (!methodStr) return 3.00;
+  const s = String(methodStr).toLowerCase();
+  if (s.includes('thai') || s.includes('ថៃ')) return 5.00;
+  if (s.includes('motor') || s.includes('ម៉ូតូ') || s.includes('moto')) return 2.50;
+  if (s.includes('ផ្ទាល់ខ្លួន') || s.includes('personal')) return 2.00;
+  if (s.includes('vet') || s.includes('វីរៈ') || s.includes('ក្រុមហ៊ុន') || s.includes('company')) return 3.00;
+  return 3.00;
+}
+
+/**
+ * Cost of Goods Sold (COGS) Calculator:
+ * ចេញពីក្រុមហ៊ុន៖ ១ប្រអប់ 24$ | ២ប្រអប់ 48$ | ៣ប្រអប់ 72$ ($24/ប្រអប់)
+ * អីវ៉ាន់ផ្ទាល់ខ្លួន៖ $15/ប្រអប់
+ */
+function getOrderCogsAmount(boxes, isCompanyGoods = true) {
+  const b = parseInt(boxes, 10) || 1;
+  return isCompanyGoods ? (b * 24.00) : (b * 15.00);
+}
+
+/**
+ * Actual Ads Spend Helper:
+ * ទាញយកចំណាយប៊ូសផ្សាយពាណិជ្ជកម្មតាមជាក់ស្តែងតាមថ្ងៃដែលបានវាយបញ្ចូល
+ */
+function getActualAdsSpendForDate(dateStr) {
+  const expenses = state.data.expenses || [];
+  let sum = 0;
+  let count = 0;
+  expenses.forEach(e => {
+    if (e.date === dateStr) {
+      const desc = (e.description || '').toLowerCase();
+      const cat = (e.category || '').toLowerCase();
+      if (desc.includes('ads') || desc.includes('ប៊ូស') || desc.includes('boost') || desc.includes('facebook') || cat.includes('ads') || cat.includes('ប៊ូស')) {
+        sum += (e.amountUsd || 0);
+        count++;
+      }
+    }
+  });
+  return { sum, count };
+}
+
+function getActualAdsSpendForRange(startDate, endDate, monthStr) {
+  const expenses = state.data.expenses || [];
+  let sum = 0;
+  let count = 0;
+  expenses.forEach(e => {
+    const matchesRange = (!startDate && !endDate)
+      ? (monthStr ? (e.month === monthStr || (e.date && e.date.startsWith(monthStr))) : true)
+      : (e.date >= startDate && e.date <= endDate);
+    if (matchesRange) {
+      const desc = (e.description || '').toLowerCase();
+      const cat = (e.category || '').toLowerCase();
+      if (desc.includes('ads') || desc.includes('ប៊ូស') || desc.includes('boost') || desc.includes('facebook') || cat.includes('ads') || cat.includes('ប៊ូស')) {
+        sum += (e.amountUsd || 0);
+        count++;
+      }
+    }
+  });
+  return { sum, count };
+}
+
+/**
+ * គណនាទិន្នន័យចំណាយតាមថ្ងៃនីមួយៗជាក់លាក់ (Daily Specific Expense Query)
+ */
+function getExpenseDataForDate(targetDate) {
+  const expenses = state.data.expenses || [];
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const queryDate = targetDate || state.selectedExpenseDate || todayStr;
+
+  let matched = expenses.filter(e => e.date === queryDate);
+  // Demo fallback: if query is today and no logged expenses yet, show demo records from 2026-10-06
+  if (matched.length === 0 && (queryDate === todayStr || queryDate === '2026-10-19')) {
+    const demoMatched = expenses.filter(e => e.date === '2026-10-06');
+    if (demoMatched.length > 0 && !(state.customExpenses && state.customExpenses.some(e => e.date === queryDate))) {
+      matched = demoMatched;
+    }
+  }
+
+  let totalUsd = 0;
+  let totalKhr = 0;
+  matched.forEach(e => {
+    totalUsd += (e.amountUsd || 0);
+    totalKhr += (e.amountKhr || Math.round((e.amountUsd || 0) * 4100));
+  });
+
+  return {
+    date: queryDate,
+    count: matched.length,
+    totalUsd: parseFloat(totalUsd.toFixed(2)),
+    totalKhr: Math.round(totalKhr),
+    items: matched
+  };
+}
+
+/**
+ * គណនាចំណូល និងចំណេញពីការលក់តាមថ្ងៃនីមួយៗជាក់លាក់ (Daily Sales & Profit Query)
+ */
+function getSalesDataForDate(targetDate) {
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const queryDate = targetDate || state.selectedSalesDate || todayStr;
+
+  const adsInfo = getActualAdsSpendForDate(queryDate);
+  const adsSpend = adsInfo.count > 0 ? adsInfo.sum : (queryDate === todayStr ? 7.00 : 0.00);
+
+  let boxesSold = 0;
+  let revenue = 0.00;
+  let cogs = 0.00;
+  let delivery = 0.00;
+  let ordersList = [];
+
+  // 1. Check custom orders entered in app
+  if (state.customOrders && state.customOrders.length > 0) {
+    const matchingCustom = state.customOrders.filter(ord => ord.date === queryDate || (ord.date && ord.date.includes(queryDate)));
+    matchingCustom.forEach(ord => {
+      const boxes = ord.totalBoxes || 1;
+      const rev = ord.priceUsd || (boxes * 45);
+      const isCompany = !ord.goodsSource || ord.goodsSource.includes('ក្រុមហ៊ុន') || !ord.goodsSource.includes('ផ្ទាល់ខ្លួន');
+      const stockCost = getOrderCogsAmount(boxes, isCompany);
+      const delivCost = getDeliveryFeeByMethod(ord.delivery);
+
+      boxesSold += boxes;
+      revenue += rev;
+      cogs += stockCost;
+      delivery += delivCost;
+      ordersList.push(ord);
+    });
+  }
+
+  // 2. Base distribution if no custom orders
+  if (boxesSold === 0) {
+    if (queryDate === todayStr || queryDate === '2026-10-19' || queryDate === '2026-10-06') {
+      boxesSold = 2;
+      revenue = 90.00;
+      cogs = 2 * 24.00; // $48.00 (ក្រុមហ៊ុន $24/ប្រអប់)
+      delivery = 5.50;  // 1 Motor ($2.50) + 1 VET ($3.00)
+    } else if (queryDate === '2026-10-05') {
+      boxesSold = 3; revenue = 135.00; cogs = 72.00; delivery = 6.00;
+    } else if (queryDate === '2026-10-04') {
+      boxesSold = 4; revenue = 180.00; cogs = 96.00; delivery = 6.00;
+    } else if (queryDate === '2026-10-03') {
+      boxesSold = 3; revenue = 135.00; cogs = 72.00; delivery = 6.00;
+    } else if (queryDate === '2026-10-02') {
+      boxesSold = 2; revenue = 90.00; cogs = 48.00; delivery = 5.00;
+    } else if (queryDate === '2026-10-01') {
+      boxesSold = 1; revenue = 45.00; cogs = 24.00; delivery = 2.50;
+    }
+  }
+
+  const netProfit = revenue - (cogs + delivery + adsSpend);
+
+  return {
+    date: queryDate,
+    boxesSold,
+    revenue: parseFloat(revenue.toFixed(2)),
+    cogs: parseFloat(cogs.toFixed(2)),
+    delivery: parseFloat(delivery.toFixed(2)),
+    ads: parseFloat(adsSpend.toFixed(2)),
+    netProfit: parseFloat(netProfit.toFixed(2)),
+    orders: ordersList
+  };
+}
+
+/**
  * Dynamic KPI Calculator for Business Sales (Sheet A1 & KD-09)
- * Calculates specific figures for Today, This Week, This Month, and Full Year
+ * Calculates specific figures for Today, Tomorrow, This Week, This Month, and Full Year
  */
 function getBusinessKpiData(period, month) {
   const a1 = state.data.masterA1;
   const isOct = month === '2026-10' || month === 'all';
   const lang = state.lang || 'km';
 
-  // Base Monthly (October or September)
-  const baseMonthly = isOct ? {
-    boxesSold: a1?.october?.boxesSold || 15,
-    revenue: a1?.october?.revenueUsd || 685.00,
-    cogs: a1?.october?.cogsUsd || 112.50,
-    delivery: a1?.october?.deliveryCostUsd || 25.00,
-    ads: a1?.october?.adsSpendUsd || 55.00,
-    netProfit: a1?.october?.netProfitUsd || 492.50,
-    pendingCod: a1?.october?.pendingCodUsd || 120.00,
-    deliveredBoxes: a1?.october?.deliveredBoxes || 13,
-    inTransitBoxes: a1?.october?.inTransitBoxes || 2,
-    periodLabel: lang === 'en' ? 'October 2026 Net Profit' : 'ចំណេញសុទ្ធខែតុលា'
-  } : {
-    boxesSold: a1?.september?.boxesSold || 54,
-    revenue: a1?.september?.revenueUsd || 1450.00,
-    cogs: a1?.september?.cogsUsd || 418.99,
-    delivery: 48.00,
-    ads: 120.00,
-    netProfit: a1?.september?.netProfitUsd || 1031.01,
-    pendingCod: 0,
-    deliveredBoxes: 50,
-    inTransitBoxes: 4,
-    periodLabel: lang === 'en' ? 'September 2026 Net Profit' : 'ចំណេញសុទ្ធខែកញ្ញា'
-  };
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const tm = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  const tomorrowStr = `${tm.getFullYear()}-${String(tm.getMonth() + 1).padStart(2, '0')}-${String(tm.getDate()).padStart(2, '0')}`;
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
   let kpi;
-  if (period === 'day') {
-    // ថ្ងៃនេះ (Today slice: 2 boxes)
+
+  if (period === 'tomorrow') {
+    // ថ្ងៃស្អែក (Tomorrow: តាមដានការកម្ម៉ង់ដែលត្រូវចេញស្អែក & ថ្លៃ Ads ជាក់ស្តែង)
+    const tmAdsInfo = getActualAdsSpendForDate(tomorrowStr);
+    const tmAds = tmAdsInfo.sum;
+
+    kpi = {
+      boxesSold: 0,
+      revenue: 0.00,
+      cogs: 0.00,
+      delivery: 0.00,
+      ads: tmAds,
+      netProfit: -tmAds,
+      pendingCod: 0.00,
+      deliveredBoxes: 0,
+      inTransitBoxes: 0,
+      periodLabel: lang === 'en' ? 'Tomorrow Net Profit' : 'ចំណេញសុទ្ធថ្ងៃស្អែក',
+      sellers: [
+        { name: 'ជា វឌ្ឍនា (Vathana)', boxes: 0, revenue: 0.00, netProfit: 0.00, deliveryRate: '100%', avatar: 'V' },
+        { name: 'យឹម សីហា (Seyha)', boxes: 0, revenue: 0.00, netProfit: 0.00, deliveryRate: '100%', avatar: 'Y' },
+        { name: 'ភឿន សុផា (Sopha)', boxes: 0, revenue: 0.00, netProfit: 0.00, deliveryRate: '100%', avatar: 'S' }
+      ]
+    };
+  } else if (period === 'day') {
+    // ថ្ងៃនេះ (Today slice: 2 boxes base from company @ $24 = $48)
+    const todayCogs = 2 * 24.00; // $48.00 (១ប្រអប់ 24$, ២ប្រអប់ 48$)
+    const todayDelivery = 5.50;  // 1 Motor ($2.50) + 1 VET ក្រុមហ៊ុន ($3.00)
+    const todayAdsInfo = getActualAdsSpendForDate(todayStr);
+    const todayAds = todayAdsInfo.count > 0 ? todayAdsInfo.sum : 7.00;
+    const todayRev = 90.00;
+    const todayNet = todayRev - (todayCogs + todayDelivery + todayAds);
+
     kpi = {
       boxesSold: 2,
-      revenue: 90.00,
-      cogs: 15.00,
-      delivery: 3.50,
-      ads: 7.00,
-      netProfit: 64.50,
+      revenue: todayRev,
+      cogs: todayCogs,
+      delivery: todayDelivery,
+      ads: todayAds,
+      netProfit: todayNet,
       pendingCod: 30.00,
       deliveredBoxes: 2,
       inTransitBoxes: 0,
       periodLabel: lang === 'en' ? 'Today Net Profit' : 'ចំណេញសុទ្ធថ្ងៃនេះ',
       sellers: [
-        { name: 'ជា វឌ្ឍនា (Vathana)', boxes: 1, revenue: 45.00, netProfit: 32.25, deliveryRate: '100%', avatar: 'V' },
-        { name: 'យឹម សីហា (Seyha)', boxes: 1, revenue: 45.00, netProfit: 32.25, deliveryRate: '100%', avatar: 'Y' },
+        { name: 'ជា វឌ្ឍនា (Vathana)', boxes: 1, revenue: 45.00, netProfit: todayNet > 0 ? +(todayNet / 2).toFixed(2) : 0, deliveryRate: '100%', avatar: 'V' },
+        { name: 'យឹម សីហា (Seyha)', boxes: 1, revenue: 45.00, netProfit: todayNet > 0 ? +(todayNet / 2).toFixed(2) : 0, deliveryRate: '100%', avatar: 'Y' },
         { name: 'ភឿន សុផា (Sopha)', boxes: 0, revenue: 0.00, netProfit: 0.00, deliveryRate: '100%', avatar: 'S' }
       ]
     };
   } else if (period === 'week') {
-    // សប្តាហ៍នេះ (This Week slice: 5 boxes)
+    // សប្តាហ៍នេះ (This Week slice: 5 boxes base from company @ $24 = $120)
+    const weekCogs = 5 * 24.00; // $120.00
+    const weekDelivery = 14.00; // 3 x VET ($9) + 2 x Motor ($5)
+    const weekAdsInfo = getActualAdsSpendForRange(sevenDaysAgo, todayStr, null);
+    const weekAds = weekAdsInfo.count > 0 ? weekAdsInfo.sum : 18.00;
+    const weekRev = 230.00;
+    const weekNet = weekRev - (weekCogs + weekDelivery + weekAds);
+
     kpi = {
       boxesSold: 5,
-      revenue: 230.00,
-      cogs: 37.50,
-      delivery: 8.50,
-      ads: 18.00,
-      netProfit: 166.00,
+      revenue: weekRev,
+      cogs: weekCogs,
+      delivery: weekDelivery,
+      ads: weekAds,
+      netProfit: weekNet,
       pendingCod: 60.00,
       deliveredBoxes: 4,
       inTransitBoxes: 1,
       periodLabel: lang === 'en' ? 'This Week Net Profit' : 'ចំណេញសុទ្ធសប្តាហ៍នេះ',
       sellers: [
-        { name: 'ជា វឌ្ឍនា (Vathana)', boxes: 2, revenue: 95.00, netProfit: 68.00, deliveryRate: '100%', avatar: 'V' },
-        { name: 'ភឿន សុផា (Sopha)', boxes: 2, revenue: 90.00, netProfit: 65.00, deliveryRate: '95%', avatar: 'S' },
-        { name: 'យឹម សីហា (Seyha)', boxes: 1, revenue: 45.00, netProfit: 33.00, deliveryRate: '100%', avatar: 'Y' }
+        { name: 'ជា វឌ្ឍនា (Vathana)', boxes: 2, revenue: 95.00, netProfit: 35.00, deliveryRate: '100%', avatar: 'V' },
+        { name: 'ភឿន សុផា (Sopha)', boxes: 2, revenue: 90.00, netProfit: 32.00, deliveryRate: '95%', avatar: 'S' },
+        { name: 'យឹម សីហា (Seyha)', boxes: 1, revenue: 45.00, netProfit: 11.00, deliveryRate: '100%', avatar: 'Y' }
       ]
     };
   } else if (period === 'year') {
-    // ពេញមួយឆ្នាំ (All Year)
+    // ពេញមួយឆ្នាំ (All Year 2026)
+    const yearAdsInfo = getActualAdsSpendForRange(null, null, null);
+    const yearAds = yearAdsInfo.count > 0 ? yearAdsInfo.sum : 175.00;
+    const yearCogs = 69 * 24.00; // $1,656.00
+    const yearRev = 2135.00;
+    const yearDel = 180.00;
+    const yearNet = yearRev - (yearCogs + yearDel + yearAds);
+
     kpi = {
       boxesSold: 69,
-      revenue: 2135.00,
-      cogs: 531.49,
-      delivery: 73.00,
-      ads: 175.00,
-      netProfit: 1355.51,
+      revenue: yearRev,
+      cogs: yearCogs,
+      delivery: yearDel,
+      ads: yearAds,
+      netProfit: yearNet,
       pendingCod: 120.00,
       deliveredBoxes: 63,
       inTransitBoxes: 6,
       periodLabel: lang === 'en' ? 'Full Year 2026 Net Profit' : 'ចំណេញសុទ្ធពេញមួយឆ្នាំ',
       sellers: [
-        { name: 'ជា វឌ្ឍនា (Vathana)', boxes: 34, revenue: 1045.00, netProfit: 745.00, deliveryRate: '96%', avatar: 'V' },
-        { name: 'ភឿន សុផា (Sopha)', boxes: 27, revenue: 818.00, netProfit: 584.00, deliveryRate: '93%', avatar: 'S' },
-        { name: 'យឹម សីហា (Seyha)', boxes: 8, revenue: 272.00, netProfit: 194.50, deliveryRate: '100%', avatar: 'Y' }
+        { name: 'ជា វឌ្ឍនា (Vathana)', boxes: 34, revenue: 1045.00, netProfit: 450.00, deliveryRate: '96%', avatar: 'V' },
+        { name: 'ភឿន សុផា (Sopha)', boxes: 27, revenue: 818.00, netProfit: 350.00, deliveryRate: '93%', avatar: 'S' },
+        { name: 'យឹម សីហា (Seyha)', boxes: 8, revenue: 272.00, netProfit: 120.00, deliveryRate: '100%', avatar: 'Y' }
       ]
     };
   } else {
-    // ខែនេះ (Month default)
+    // ខែនេះ (Month default - October or September)
+    const monthAdsInfo = getActualAdsSpendForRange(null, null, isOct ? '2026-10' : '2026-09');
+    const monthAds = monthAdsInfo.count > 0 ? monthAdsInfo.sum : (isOct ? 55.00 : 120.00);
+    const monthBoxes = isOct ? 15 : 54;
+    const monthCogs = monthBoxes * 24.00; // 15 x $24 = $360.00 (ក្រុមហ៊ុន)
+    const monthDelivery = isOct ? 42.50 : 125.00;
+    const monthRev = isOct ? 685.00 : 1450.00;
+    const monthNet = monthRev - (monthCogs + monthDelivery + monthAds);
+
     kpi = {
-      ...baseMonthly,
+      boxesSold: monthBoxes,
+      revenue: monthRev,
+      cogs: monthCogs,
+      delivery: monthDelivery,
+      ads: monthAds,
+      netProfit: monthNet,
+      pendingCod: isOct ? 120.00 : 0,
+      deliveredBoxes: isOct ? 13 : 50,
+      inTransitBoxes: isOct ? 2 : 4,
+      periodLabel: isOct ? (lang === 'en' ? 'October 2026 Net Profit' : 'ចំណេញសុទ្ធខែតុលា') : (lang === 'en' ? 'September 2026 Net Profit' : 'ចំណេញសុទ្ធខែកញ្ញា'),
       sellers: [
-        { name: 'ជា វឌ្ឍនា (Vathana)', boxes: isOct ? 7 : 27, revenue: isOct ? 320.00 : 725.00, netProfit: isOct ? 230.00 : 515.00, deliveryRate: '95%', avatar: 'V' },
-        { name: 'ភឿន សុផា (Sopha)', boxes: isOct ? 5 : 22, revenue: isOct ? 228.00 : 590.00, netProfit: isOct ? 164.00 : 420.00, deliveryRate: '92%', avatar: 'S' },
-        { name: 'យឹម សីហា (Seyha)', boxes: isOct ? 3 : 5, revenue: isOct ? 137.00 : 135.00, netProfit: isOct ? 98.50 : 96.00, deliveryRate: '100%', avatar: 'Y' }
+        { name: 'ជា វឌ្ឍនា (Vathana)', boxes: isOct ? 7 : 27, revenue: isOct ? 320.00 : 725.00, netProfit: isOct ? 120.00 : 250.00, deliveryRate: '95%', avatar: 'V' },
+        { name: 'ភឿន សុផា (Sopha)', boxes: isOct ? 5 : 22, revenue: isOct ? 228.00 : 590.00, netProfit: isOct ? 80.00 : 200.00, deliveryRate: '92%', avatar: 'S' },
+        { name: 'យឹម សីហា (Seyha)', boxes: isOct ? 3 : 5, revenue: isOct ? 137.00 : 135.00, netProfit: isOct ? 45.00 : 50.00, deliveryRate: '100%', avatar: 'Y' }
       ]
     };
   }
 
   // Include any custom orders created in the app
   if (state.customOrders && state.customOrders.length > 0) {
-    const now = new Date();
-    const todayStr = now.toISOString().split('T')[0];
-    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-
     const matchingOrders = state.customOrders.filter(ord => {
       const ordDate = ord.date || todayStr;
+      if (period === 'tomorrow') return ordDate === tomorrowStr || ordDate.includes(tomorrowStr);
       if (period === 'day') return ordDate === todayStr || ordDate.includes(todayStr);
       if (period === 'week') return ordDate >= sevenDaysAgo;
       if (period === 'month') return isOct ? (ordDate.startsWith('2026-10') || !ordDate.startsWith('2026-09')) : ordDate.startsWith('2026-09');
@@ -1724,18 +1941,22 @@ function getBusinessKpiData(period, month) {
     matchingOrders.forEach(ord => {
       const boxes = ord.totalBoxes || 1;
       const rev = ord.priceUsd || (boxes * 45);
-      const stockCost = boxes * 7.50;
-      const delivCost = 2.50;
-      const adsCost = 3.50;
-      const profit = rev - (stockCost + delivCost + adsCost);
+      
+      // COGS Rule: ចេញពីក្រុមហ៊ុន (1=$24, 2=$48, 3=$72)
+      const isCompany = !ord.goodsSource || ord.goodsSource.includes('ក្រុមហ៊ុន') || !ord.goodsSource.includes('ផ្ទាល់ខ្លួន');
+      const stockCost = getOrderCogsAmount(boxes, isCompany);
+
+      // Delivery Fee Rule: Thai $5, VET ក្រុមហ៊ុន $3, VET ផ្ទាល់ខ្លួន $2, Motor $2.50
+      const delivCost = getDeliveryFeeByMethod(ord.delivery);
+
+      const profit = rev - (stockCost + delivCost);
 
       kpi.boxesSold += boxes;
       kpi.revenue += rev;
       kpi.cogs += stockCost;
       kpi.delivery += delivCost;
-      kpi.ads += adsCost;
       kpi.netProfit += profit;
-      if (ord.delivery && ord.delivery.includes('COD')) {
+      if (ord.delivery && (ord.delivery.includes('COD') || ord.delivery.includes('cod'))) {
         kpi.pendingCod += rev;
       }
     });
@@ -1773,8 +1994,8 @@ function renderDashboardModule() {
   if (isBusiness) {
     cardLabel = `${bizKpi.periodLabel} (Sheet A1)`;
   } else {
-    const periodLabelKm = state.dashboardPeriod === 'day' ? 'ថ្ងៃនេះ' : (state.dashboardPeriod === 'week' ? 'សប្តាហ៍នេះ' : (state.dashboardPeriod === 'year' ? 'ពេញមួយឆ្នាំ' : 'ខែនេះ'));
-    const periodLabelEn = state.dashboardPeriod === 'day' ? 'Today' : (state.dashboardPeriod === 'week' ? 'This Week' : (state.dashboardPeriod === 'year' ? 'All Year' : 'This Month'));
+    const periodLabelKm = state.dashboardPeriod === 'day' ? 'ថ្ងៃនេះ' : (state.dashboardPeriod === 'tomorrow' ? 'ថ្ងៃស្អែក' : (state.dashboardPeriod === 'week' ? 'សប្តាហ៍នេះ' : (state.dashboardPeriod === 'year' ? 'ពេញមួយឆ្នាំ' : 'ខែនេះ')));
+    const periodLabelEn = state.dashboardPeriod === 'day' ? 'Today' : (state.dashboardPeriod === 'tomorrow' ? 'Tomorrow' : (state.dashboardPeriod === 'week' ? 'This Week' : (state.dashboardPeriod === 'year' ? 'All Year' : 'This Month')));
     cardLabel = lang === 'en' ? `Net Balance - ${periodLabelEn} (Sheet B2)` : `សមតុល្យនៅសល់${periodLabelKm} (Sheet B2)`;
   }
 
@@ -1801,53 +2022,56 @@ function renderDashboardModule() {
       <div class="user-greeting-meta">
         <div class="user-greeting-avatar">
           <img src="data:image/jpeg;base64,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" alt="YEM SEYHA">
-          <span class="user-greeting-check"><i data-lucide="check"></i></span>
-        </div>
-        <div class="user-greeting-text">
-          <div class="user-khmer-title">${lang === 'en' ? 'Hello, Yem Seyha' : 'សួស្តី, យឹម សីហា'}</div>
-          <div class="user-en-sub">(Yem Seyha)</div>
-        </div>
+        <span class="user-greeting-check"><i data-lucide="check"></i></span>
       </div>
-
-      <div style="display:flex; align-items:center; gap:8px;">
-        <button type="button" class="dashboard-theme-chip" onclick="openThemeModal()" title="ជ្រើសរើសពណ៌ / Theme">
-          <i data-lucide="palette"></i>
-          <span>${state.theme === 'teal' ? '🌊 Teal' : (state.theme === 'vet' ? '🧡 VET' : (state.theme === 'dark' ? '🌙 Dark' : '💎 Glass'))}</span>
-        </button>
-
-        <div class="top-date-card" onclick="openThemeModal()" title="កាលបរិច្ឆេទ & ចុចប្តូរពណ៌ Theme">
-          <div class="date-khmer-badge">${dayKhmer} ${monthKhmer} ${yearKhmer}</div>
-          <div class="date-en-badge">(${now.toLocaleString('en-US', { month: 'short' })} ${dayNum}, ${now.getFullYear()})</div>
-        </div>
+      <div class="user-greeting-text">
+        <div class="user-khmer-title">${lang === 'en' ? 'Hello, Yem Seyha' : 'សួស្តី, យឹម សីហា'}</div>
+        <div class="user-en-sub">(Yem Seyha)</div>
       </div>
     </div>
 
-    <!-- 2. Master Hero Card (Teal Mint Gradient from Screenshot) -->
-    <div class="minimal-hero-card">
-      <div class="hero-top-row">
-        <span class="hero-card-title">${cardLabel}</span>
-        <button class="hero-eye-btn" onclick="toggleBalanceVisibility()" title="${lang === 'en' ? 'Toggle Balance' : 'បិទ/បង្ហាញ លេខប្រាក់'}">
-          <i data-lucide="${isBalanceHidden ? 'eye-off' : 'eye'}"></i>
-        </button>
-      </div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <button type="button" class="dashboard-theme-chip" onclick="openThemeModal()" title="ជ្រើសរើសពណ៌ / Theme">
+        <i data-lucide="palette"></i>
+        <span>${state.theme === 'teal' ? '🌊 Teal' : (state.theme === 'vet' ? '🧡 VET' : (state.theme === 'dark' ? '🌙 Dark' : '💎 Glass'))}</span>
+      </button>
 
-      <div class="hero-balance-row">
-        <span class="hero-balance-khr">${isBalanceHidden ? '•••••••• ៛' : formatKhr(displayKhr)}</span>
-        <span class="hero-balance-usd">(${isBalanceHidden ? '•••••• $' : formatUsd(displayUsd)})</span>
+      <div class="top-date-card" onclick="openThemeModal()" title="កាលបរិច្ឆេទ & ចុចប្តូរពណ៌ Theme">
+        <div class="date-khmer-badge">${dayKhmer} ${monthKhmer} ${yearKhmer}</div>
+        <div class="date-en-badge">(${now.toLocaleString('en-US', { month: 'short' })} ${dayNum}, ${now.getFullYear()})</div>
       </div>
+    </div>
+  </div>
 
-      <!-- Time Filter Capsule: ថ្ងៃនេះ | សប្តាហ៍នេះ | ខែនេះ -->
-      <div class="hero-filter-capsule">
-        <button class="hero-filter-btn ${state.dashboardPeriod === 'day' ? 'active' : ''}" onclick="setDashboardPeriod('day')">
-          ${lang === 'en' ? 'Today' : 'ថ្ងៃនេះ'}
-        </button>
-        <button class="hero-filter-btn ${state.dashboardPeriod === 'week' ? 'active' : ''}" onclick="setDashboardPeriod('week')">
-          ${lang === 'en' ? 'This Week' : 'សប្តាហ៍នេះ'}
-        </button>
-        <button class="hero-filter-btn ${state.dashboardPeriod === 'month' ? 'active' : ''}" onclick="setDashboardPeriod('month')">
-          ${lang === 'en' ? 'This Month' : 'ខែនេះ'}
-        </button>
-      </div>
+  <!-- 2. Master Hero Card (Teal Mint Gradient from Screenshot) -->
+  <div class="minimal-hero-card">
+    <div class="hero-top-row">
+      <span class="hero-card-title">${cardLabel}</span>
+      <button class="hero-eye-btn" onclick="toggleBalanceVisibility()" title="${lang === 'en' ? 'Toggle Balance' : 'បិទ/បង្ហាញ លេខប្រាក់'}">
+        <i data-lucide="${isBalanceHidden ? 'eye-off' : 'eye'}"></i>
+      </button>
+    </div>
+
+    <div class="hero-balance-row">
+      <span class="hero-balance-khr">${isBalanceHidden ? '•••••••• ៛' : formatKhr(displayKhr)}</span>
+      <span class="hero-balance-usd">(${isBalanceHidden ? '•••••• $' : formatUsd(displayUsd)})</span>
+    </div>
+
+    <!-- Time Filter Capsule: ថ្ងៃនេះ | ថ្ងៃស្អែក | សប្តាហ៍នេះ | ខែនេះ -->
+    <div class="hero-filter-capsule">
+      <button class="hero-filter-btn ${state.dashboardPeriod === 'day' ? 'active' : ''}" onclick="setDashboardPeriod('day')">
+        ${lang === 'en' ? 'Today' : 'ថ្ងៃនេះ'}
+      </button>
+      <button class="hero-filter-btn ${state.dashboardPeriod === 'tomorrow' ? 'active' : ''}" onclick="setDashboardPeriod('tomorrow')">
+        ${lang === 'en' ? 'Tomorrow' : 'ថ្ងៃស្អែក'}
+      </button>
+      <button class="hero-filter-btn ${state.dashboardPeriod === 'week' ? 'active' : ''}" onclick="setDashboardPeriod('week')">
+        ${lang === 'en' ? 'This Week' : 'សប្តាហ៍នេះ'}
+      </button>
+      <button class="hero-filter-btn ${state.dashboardPeriod === 'month' ? 'active' : ''}" onclick="setDashboardPeriod('month')">
+        ${lang === 'en' ? 'This Month' : 'ខែនេះ'}
+      </button>
+    </div>
 
       <!-- Dual Action Pills: ✈️ ការកុម្ម៉ង់តាមតេឡេក្រាម & 👛 ចំណាយប្រចាំថ្ងៃ -->
       <div class="hero-action-row">
@@ -1919,6 +2143,7 @@ function renderBusinessViewA1Html() {
         <span class="filter-label">${t.periodLabel}</span>
         <div class="time-pills">
           <button class="pill-btn ${state.dashboardPeriod === 'day' ? 'active' : ''}" onclick="setDashboardPeriod('day')">${t.today}</button>
+          <button class="pill-btn ${state.dashboardPeriod === 'tomorrow' ? 'active' : ''}" onclick="setDashboardPeriod('tomorrow')">${lang === 'en' ? 'Tomorrow' : 'ថ្ងៃស្អែក'}</button>
           <button class="pill-btn ${state.dashboardPeriod === 'week' ? 'active' : ''}" onclick="setDashboardPeriod('week')">${lang === 'en' ? 'This Week' : 'សប្តាហ៍នេះ'}</button>
           <button class="pill-btn ${state.dashboardPeriod === 'month' ? 'active' : ''}" onclick="setDashboardPeriod('month')">${t.thisMonth}</button>
           <button class="pill-btn ${state.dashboardPeriod === 'year' ? 'active' : ''}" onclick="setDashboardPeriod('year')">${t.allYear}</button>
@@ -1941,7 +2166,7 @@ function renderBusinessViewA1Html() {
       </div>
     </div>
 
-    <!-- 1. 2x2 Clean Minimalist KPI Grid (from Screenshot) -->
+    <!-- 1. 2x2 Clean Minimalist KPI Grid (Accurate Business Rules) -->
     <div class="minimal-kpi-grid">
       <!-- 1. Revenue -->
       <div class="minimal-kpi-card revenue-kpi">
@@ -1954,11 +2179,11 @@ function renderBusinessViewA1Html() {
         </div>
         <div class="kpi-value-text">$${revenue.toFixed(2)}</div>
         <div class="kpi-trend-pill trend-up">
-          <i data-lucide="arrow-up-right"></i> +4.5%
+          <i data-lucide="package"></i> ${boxesSold} ${lang === 'en' ? 'boxes' : 'ប្រអប់'}
         </div>
       </div>
 
-      <!-- 2. Cost of Goods (COGS) -->
+      <!-- 2. Cost of Goods (COGS - $24/box Company) -->
       <div class="minimal-kpi-card cogs-kpi">
         <div class="kpi-icon-badge badge-orange">
           <i data-lucide="settings"></i>
@@ -1968,12 +2193,12 @@ function renderBusinessViewA1Html() {
           <span class="kpi-title-en">(COGS)</span>
         </div>
         <div class="kpi-value-text">$${cogs.toFixed(2)}</div>
-        <div class="kpi-trend-pill trend-down">
-          <i data-lucide="arrow-down-right"></i> -1.2%
+        <div class="kpi-trend-pill trend-down" style="font-size:10.5px;" title="១ប្រអប់ 24$ | ២ប្រអប់ 48$ | ៣ប្រអប់ 72$">
+          <i data-lucide="info"></i> ១ប្រអប់ 24$ (ក្រុមហ៊ុន)
         </div>
       </div>
 
-      <!-- 3. Delivery Cost -->
+      <!-- 3. Delivery Cost (Thai $5, VET $3, VET ផ្ទាល់ខ្លួន $2, Motor $2.50) -->
       <div class="minimal-kpi-card delivery-kpi">
         <div class="kpi-icon-badge badge-purple">
           <i data-lucide="truck"></i>
@@ -1983,13 +2208,13 @@ function renderBusinessViewA1Html() {
           <span class="kpi-title-en">(Delivery)</span>
         </div>
         <div class="kpi-value-text">$${delivery.toFixed(2)}</div>
-        <div class="kpi-trend-pill trend-up">
-          <i data-lucide="arrow-up-right"></i> +3.3%
+        <div class="kpi-trend-pill trend-up" style="font-size:10px;" title="Thai COD $5 | VET ក្រុមហ៊ុន $3 | VET ផ្ទាល់ខ្លួន $2 | Motor $2.50">
+          Thai $5 | VET $3 | ម៉ូតូ $2.50
         </div>
       </div>
 
-      <!-- 4. Ads Spend -->
-      <div class="minimal-kpi-card ads-kpi">
+      <!-- 4. Ads Spend (Actual Entered per Date) -->
+      <div class="minimal-kpi-card ads-kpi" onclick="openQuickAdsModal()" style="cursor:pointer;" title="ចុចដើម្បីវាយបញ្ចូលថ្លៃ Ads ជាក់ស្តែង">
         <div class="kpi-icon-badge badge-yellow">
           <i data-lucide="megaphone"></i>
         </div>
@@ -1998,8 +2223,13 @@ function renderBusinessViewA1Html() {
           <span class="kpi-title-en">(Ads Spend)</span>
         </div>
         <div class="kpi-value-text">$${ads.toFixed(2)}</div>
-        <div class="kpi-trend-pill trend-up">
-          <i data-lucide="arrow-up-right"></i> +4.5%
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-top:6px; flex-wrap:wrap; gap:4px;">
+          <div class="kpi-trend-pill ${ads > 0 ? 'trend-up' : ''}" style="font-size:10.5px;">
+            <i data-lucide="calendar"></i> ជាក់ស្តែងតាមថ្ងៃ
+          </div>
+          <button type="button" class="kpi-quick-badge-btn" onclick="event.stopPropagation(); openQuickAdsModal();" style="background:rgba(245, 158, 11, 0.2); border:1px solid rgba(245, 158, 11, 0.4); color:#FBBF24; padding:2px 8px; border-radius:6px; font-size:10.5px; font-weight:700; cursor:pointer;" title="វាយបញ្ចូលថ្លៃ Ads ថ្ងៃនេះ">
+            <i data-lucide="edit-3" style="width:10px; height:10px;"></i> ${lang === 'en' ? 'Enter Ads' : 'វាយបញ្ចូល'}
+          </button>
         </div>
       </div>
     </div>
@@ -2182,7 +2412,7 @@ function renderBusinessViewA1Html() {
           <div>
             <div style="font-size:11px; color:var(--text-muted);">${lang === 'en' ? 'Stock Cost Paid' : '១. ថ្លៃដើមស្តុកទំនិញ (COGS)'}</div>
             <div style="font-size:16px; font-weight:800; color:#10B981; margin-top:3px;">${formatCurrency(cogs)} <span style="font-size:11px; font-weight:500; color:#10B981;">(រួចរាល់ ១០០%)</span></div>
-            <div style="font-size:10.5px; color:var(--text-muted);">${boxesSold} ប្រអប់ x $7.50/ប្រអប់</div>
+            <div style="font-size:10.5px; color:var(--text-muted);">${boxesSold} ប្រអប់ x $24.00/ប្រអប់ (ក្រុមហ៊ុន)</div>
           </div>
           <div style="width:36px; height:36px; border-radius:10px; background:rgba(16, 185, 129, 0.2); display:flex; align-items:center; justify-content:center; color:#10B981;">
             <i data-lucide="package-check"></i>
@@ -2194,7 +2424,7 @@ function renderBusinessViewA1Html() {
           <div>
             <div style="font-size:11px; color:var(--text-muted);">${lang === 'en' ? 'Delivery Settled' : '២. ថ្លៃដឹកជញ្ជូន (Delivery)'}</div>
             <div style="font-size:16px; font-weight:800; color:#00B4D8; margin-top:3px;">${formatCurrency(delivery)} <span style="font-size:11px; font-weight:500; color:#00B4D8;">(រួចរាល់ ១០០%)</span></div>
-            <div style="font-size:10.5px; color:var(--text-muted);">VET COD $22 + ម៉ូតូ $3</div>
+            <div style="font-size:10.5px; color:var(--text-muted);">Thai $5 | VET $3 | ផ្ទាល់ខ្លួន $2 | ម៉ូតូ $2.50</div>
           </div>
           <div style="width:36px; height:36px; border-radius:10px; background:rgba(0, 180, 216, 0.2); display:flex; align-items:center; justify-content:center; color:#00B4D8;">
             <i data-lucide="truck"></i>
@@ -2375,17 +2605,160 @@ function renderPersonalViewB2Html() {
   const activeTxTab = state.activeTxTab || 'expenses';
   const overspendAlertActive = state.overspendingAlert;
 
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const yd = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const yesterdayStr = `${yd.getFullYear()}-${String(yd.getMonth() + 1).padStart(2, '0')}-${String(yd.getDate()).padStart(2, '0')}`;
+  const tm = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  const tomorrowStr = `${tm.getFullYear()}-${String(tm.getMonth() + 1).padStart(2, '0')}-${String(tm.getDate()).padStart(2, '0')}`;
+
+  const curExpDate = state.selectedExpenseDate || todayStr;
+  const curSalesDate = state.selectedSalesDate || todayStr;
+
+  const dayExpData = getExpenseDataForDate(curExpDate);
+  const daySalesData = getSalesDataForDate(curSalesDate);
+
   return `
-    <!-- Sleek Quick Personal Action Buttons -->
-    <div class="personal-quick-bar">
-      <button class="personal-quick-btn add-btn" onclick="openExpenseModal()">
-        <i data-lucide="plus-circle"></i>
-        <span>${t.logExpense || 'កត់ត្រាចំណាយ (Add Expense)'}</span>
-      </button>
-      <button class="personal-quick-btn view-btn" onclick="switchTxTab('incomes')">
-        <i data-lucide="trending-up"></i>
-        <span>${t.salesIncome || 'ចំណូលលក់ដូរ (Sales Income)'}</span>
-      </button>
+    <!-- Interactive Daily Expense & Sales Trackers with Date Pickers (តាមថ្ងៃនីមួយៗ) -->
+    <div class="daily-tracker-grid">
+      <!-- 1. កាតកត់ត្រា និងតាមដានចំណាយតាមថ្ងៃ (Daily Expense Date Tracker) -->
+      <div class="daily-tracker-card expense-card">
+        <div class="tracker-card-header">
+          <div class="tracker-head-left">
+            <div class="tracker-badge-icon badge-red">
+              <i data-lucide="credit-card"></i>
+            </div>
+            <div>
+              <div class="tracker-head-title">${lang === 'en' ? 'Daily Expense' : 'កត់ត្រាចំណាយ'}</div>
+              <div class="tracker-head-sub">${lang === 'en' ? 'Sheet B2 Expense Tracker' : 'តាមដានការចំណាយតាមថ្ងៃ'}</div>
+            </div>
+          </div>
+          <button type="button" class="tracker-action-btn btn-log-exp" onclick="openExpenseModal('${curExpDate}')" title="${lang === 'en' ? 'Add Expense' : 'កត់ត្រាចំណាយថ្មី'}">
+            <i data-lucide="plus"></i>
+            <span>${lang === 'en' ? 'Add' : 'កត់ត្រា'}</span>
+          </button>
+        </div>
+
+        <!-- Select Date Control -->
+        <div class="tracker-picker-row">
+          <span class="tracker-picker-label"><i data-lucide="calendar"></i> ${lang === 'en' ? 'Select Date:' : 'ជ្រើសរើសថ្ងៃ៖'}</span>
+          <div class="tracker-input-wrapper">
+            <input type="date" id="tracker-exp-date-input" class="tracker-native-date" value="${curExpDate}" onchange="setTrackerExpenseDate(this.value)">
+          </div>
+        </div>
+
+        <!-- Quick Preset Pills (ថ្ងៃនេះ, ម្សិលមិញ, ថ្ងៃស្អែក) -->
+        <div class="tracker-preset-pills">
+          <button type="button" class="tracker-mini-pill ${curExpDate === todayStr ? 'active' : ''}" onclick="setTrackerExpenseDate('${todayStr}')">${lang === 'en' ? 'Today' : 'ថ្ងៃនេះ'}</button>
+          <button type="button" class="tracker-mini-pill ${curExpDate === yesterdayStr ? 'active' : ''}" onclick="setTrackerExpenseDate('${yesterdayStr}')">${lang === 'en' ? 'Yesterday' : 'ម្សិលមិញ'}</button>
+          <button type="button" class="tracker-mini-pill ${curExpDate === tomorrowStr ? 'active' : ''}" onclick="setTrackerExpenseDate('${tomorrowStr}')">${lang === 'en' ? 'Tomorrow' : 'ថ្ងៃស្អែក'}</button>
+        </div>
+
+        <!-- Figures Display Below (បង្ហាញតួរលេខចំណាយនៅខាងក្រោម) -->
+        <div class="tracker-figures-container">
+          <div class="tracker-amount-hero expense-amt">
+            ${dayExpData.totalKhr.toLocaleString('en-US')} ៛
+          </div>
+          <div class="tracker-amount-sub">
+            ($${dayExpData.totalUsd.toFixed(2)} USD)
+          </div>
+          
+          <div class="tracker-status-line">
+            <span class="tracker-count-badge ${dayExpData.count > 0 ? 'badge-has' : 'badge-none'}">
+              <i data-lucide="${dayExpData.count > 0 ? 'receipt' : 'inbox'}"></i>
+              ${dayExpData.count > 0 ? `${dayExpData.count} លើកកត់ត្រា` : (lang === 'en' ? 'No expenses' : 'គ្មានចំណាយទេ')}
+            </span>
+            <button type="button" class="tracker-fast-add" onclick="openExpenseModal('${curExpDate}')">
+              + កត់ត្រាចំណាយថ្ងៃនេះ
+            </button>
+          </div>
+
+          <!-- Mini list of items for selected date if exists -->
+          ${dayExpData.count > 0 ? `
+            <div class="tracker-items-chips">
+              ${dayExpData.items.slice(0, 3).map(it => `
+                <div class="tracker-item-chip" title="${it.description || ''}">
+                  <span class="chip-desc">${it.description || ''}</span>
+                  <span class="chip-amt">${(it.amountKhr || Math.round((it.amountUsd || 0) * 4100)).toLocaleString()} ៛</span>
+                </div>
+              `).join('')}
+              ${dayExpData.count > 3 ? `<span class="chip-more">+${dayExpData.count - 3} ទៀត...</span>` : ''}
+            </div>
+          ` : ''}
+        </div>
+      </div>
+
+      <!-- 2. កាតចំណូល និងចំណេញពីការលក់តាមថ្ងៃ (Daily Sales & Profit Date Tracker) -->
+      <div class="daily-tracker-card sales-card">
+        <div class="tracker-card-header">
+          <div class="tracker-head-left">
+            <div class="tracker-badge-icon badge-green">
+              <i data-lucide="trending-up"></i>
+            </div>
+            <div>
+              <div class="tracker-head-title">${lang === 'en' ? 'Sales & Profit' : 'ចំណូលពីការលក់'}</div>
+              <div class="tracker-head-sub">${lang === 'en' ? 'Revenue & Net Margin' : 'ចំណូល និងចំណេញពីការលក់'}</div>
+            </div>
+          </div>
+          <button type="button" class="tracker-action-btn btn-log-order" onclick="openOrderModal()" title="${lang === 'en' ? 'Paste Telegram Order' : 'បញ្ចូលការកម្ម៉ង់ពី Telegram'}">
+            <i data-lucide="plus"></i>
+            <span>${lang === 'en' ? 'Order' : 'កម្ម៉ង់'}</span>
+          </button>
+        </div>
+
+        <!-- Select Date Control -->
+        <div class="tracker-picker-row">
+          <span class="tracker-picker-label"><i data-lucide="calendar"></i> ${lang === 'en' ? 'Select Date:' : 'ជ្រើសរើសថ្ងៃ៖'}</span>
+          <div class="tracker-input-wrapper">
+            <input type="date" id="tracker-sales-date-input" class="tracker-native-date" value="${curSalesDate}" onchange="setTrackerSalesDate(this.value)">
+          </div>
+        </div>
+
+        <!-- Quick Preset Pills (ថ្ងៃនេះ, ម្សិលមិញ, ថ្ងៃស្អែក) -->
+        <div class="tracker-preset-pills">
+          <button type="button" class="tracker-mini-pill ${curSalesDate === todayStr ? 'active' : ''}" onclick="setTrackerSalesDate('${todayStr}')">${lang === 'en' ? 'Today' : 'ថ្ងៃនេះ'}</button>
+          <button type="button" class="tracker-mini-pill ${curSalesDate === yesterdayStr ? 'active' : ''}" onclick="setTrackerSalesDate('${yesterdayStr}')">${lang === 'en' ? 'Yesterday' : 'ម្សិលមិញ'}</button>
+          <button type="button" class="tracker-mini-pill ${curSalesDate === tomorrowStr ? 'active' : ''}" onclick="setTrackerSalesDate('${tomorrowStr}')">${lang === 'en' ? 'Tomorrow' : 'ថ្ងៃស្អែក'}</button>
+        </div>
+
+        <!-- Figures Display Below (ចំណូលពីការលក់ និងចំណេញពីការលក់) -->
+        <div class="tracker-figures-container">
+          <div class="tracker-sales-kpis-grid">
+            <div class="tracker-sales-stat">
+              <span class="stat-lbl">${lang === 'en' ? 'Sales Revenue' : 'ចំណូលលក់ (Revenue)'}</span>
+              <div class="tracker-amount-hero sales-amt">$${daySalesData.revenue.toFixed(2)}</div>
+              <span class="stat-sub">${(daySalesData.revenue * 4100).toLocaleString()} ៛</span>
+            </div>
+            <div class="tracker-sales-stat align-right">
+              <span class="stat-lbl">${lang === 'en' ? 'Net Profit' : 'ចំណេញសុទ្ធ (Net Profit)'}</span>
+              <div class="tracker-amount-hero profit-amt ${daySalesData.netProfit >= 0 ? 'pos' : 'neg'}">
+                ${daySalesData.netProfit >= 0 ? '+' : ''}$${daySalesData.netProfit.toFixed(2)}
+              </div>
+              <span class="stat-sub ${daySalesData.netProfit >= 0 ? 'pos' : 'neg'}">
+                ${(daySalesData.netProfit * 4100).toLocaleString()} ៛
+              </span>
+            </div>
+          </div>
+
+          <!-- Breakdown pills -->
+          <div class="tracker-sales-pills-row">
+            <span class="sales-mini-pill boxes" title="ចំនួនប្រអប់លក់">
+              <i data-lucide="package"></i> ${daySalesData.boxesSold} ${lang === 'en' ? 'Boxes' : 'ប្រអប់'}
+            </span>
+            <span class="sales-mini-pill cogs" title="ថ្លៃដើមស្តុក ($24/ប្រអប់)">
+              <i data-lucide="settings"></i> ថ្លៃដើម: $${daySalesData.cogs.toFixed(2)}
+            </span>
+            <span class="sales-mini-pill deliv" title="ថ្លៃដឹកជញ្ជូន">
+              <i data-lucide="truck"></i> ដឹក: $${daySalesData.delivery.toFixed(2)}
+            </span>
+            ${daySalesData.ads > 0 ? `
+              <span class="sales-mini-pill ads" title="ថ្លៃ Ads ជាក់ស្តែង">
+                <i data-lucide="megaphone"></i> Ads: $${daySalesData.ads.toFixed(2)}
+              </span>
+            ` : ''}
+          </div>
+        </div>
+      </div>
     </div>
     <!-- Overspending Notification Alert Toggle Card -->
     <div class="overspending-alert-card">
@@ -3223,17 +3596,30 @@ window.updateCustomDate = function(type, val) {
   if (window.lucide) window.lucide.createIcons();
 };
 
+window.setTrackerExpenseDate = function(dateStr) {
+  state.selectedExpenseDate = dateStr;
+  renderDashboardModule();
+  if (window.lucide) window.lucide.createIcons();
+};
+
+window.setTrackerSalesDate = function(dateStr) {
+  state.selectedSalesDate = dateStr;
+  renderDashboardModule();
+  if (window.lucide) window.lucide.createIcons();
+};
+
 /**
  * Daily Personal Expense Modal Handlers
  */
-window.openExpenseModal = function() {
+window.openExpenseModal = function(customDate) {
   const modal = document.getElementById('expense-modal-overlay');
   if (modal) {
     modal.style.display = 'flex';
-    // Default date to today (YYYY-MM-DD)
     const dateInput = document.getElementById('exp-input-date');
     if (dateInput) {
-      if (!dateInput.value) {
+      if (customDate) {
+        dateInput.value = customDate;
+      } else if (!dateInput.value) {
         const now = new Date();
         const yr = now.getFullYear();
         const mo = String(now.getMonth() + 1).padStart(2, '0');
@@ -3244,6 +3630,7 @@ window.openExpenseModal = function() {
     }
     const descInput = document.getElementById('exp-input-desc');
     if (descInput) descInput.focus();
+    if (window.lucide) window.lucide.createIcons();
   }
 };
 
@@ -3297,11 +3684,17 @@ window.closeExpenseModal = function() {
   if (modal) modal.style.display = 'none';
 };
 
-window.setExpenseDescPreset = function(preset) {
+window.setExpenseDescPreset = function(preset, cat) {
   const descInput = document.getElementById('exp-input-desc');
   if (descInput) {
     descInput.value = preset;
     descInput.focus();
+  }
+  if (cat) {
+    const catInput = document.getElementById('exp-input-cat');
+    if (catInput) {
+      catInput.value = cat;
+    }
   }
 };
 
@@ -3517,6 +3910,130 @@ window.handleSaveExpense = async function(e) {
 
 /**
  * ==========================================================================
+ * Quick Ads Spend Modal Handlers (Facebook Ads ជាក់ស្តែង)
+ * ==========================================================================
+ */
+window.openQuickAdsModal = function(customDate) {
+  const modal = document.getElementById('quick-ads-modal-overlay');
+  if (modal) {
+    modal.style.display = 'flex';
+    const dateInput = document.getElementById('ads-input-date');
+    if (dateInput) {
+      if (customDate) {
+        dateInput.value = customDate;
+      } else if (!dateInput.value) {
+        const now = new Date();
+        const yr = now.getFullYear();
+        const mo = String(now.getMonth() + 1).padStart(2, '0');
+        const da = String(now.getDate()).padStart(2, '0');
+        dateInput.value = `${yr}-${mo}-${da}`;
+      }
+    }
+    const amtInput = document.getElementById('ads-input-amount');
+    if (amtInput) {
+      amtInput.focus();
+    }
+    if (window.lucide) window.lucide.createIcons();
+  }
+};
+
+window.closeQuickAdsModal = function() {
+  const modal = document.getElementById('quick-ads-modal-overlay');
+  if (modal) modal.style.display = 'none';
+};
+
+window.setQuickAdsAmount = function(amt) {
+  const amtInput = document.getElementById('ads-input-amount');
+  if (amtInput) {
+    amtInput.value = amt;
+    amtInput.focus();
+  }
+};
+
+window.handleSaveQuickAds = async function(e) {
+  if (e && e.preventDefault) e.preventDefault();
+
+  const dateInput = document.getElementById('ads-input-date');
+  const amtInput = document.getElementById('ads-input-amount');
+  const noteInput = document.getElementById('ads-input-note');
+
+  const date = dateInput ? dateInput.value : '';
+  const rawAmt = amtInput ? parseFloat(amtInput.value) : 0;
+  const note = noteInput ? noteInput.value.trim() : '';
+
+  if (!date || !rawAmt || rawAmt <= 0) {
+    alert(state.lang === 'en' ? 'Please specify date and valid Ads spend amount!' : 'សូមបញ្ចូលកាលបរិច្ឆេទ និងចំនួនទឹកប្រាក់ប៊ូស Ads ត្រឹមត្រូវ!');
+    return;
+  }
+
+  const amountUsd = parseFloat(rawAmt.toFixed(2));
+  const amountKhr = Math.round(amountUsd * 4100);
+
+  const newExpense = {
+    id: 'ads_' + Date.now(),
+    date: date,
+    month: date.substring(0, 7),
+    description: 'ប៊ូស Ads Facebook' + (note ? ` (${note})` : ''),
+    category: 'ផ្សាយពាណិជ្ជកម្ម',
+    paymentMethod: 'ABA Bank',
+    amountUsd: amountUsd,
+    amountKhr: amountKhr,
+    note: note || 'បញ្ចូលថ្លៃ Ads ជាក់ស្តែង',
+    isPersonal: false,
+    isAds: true
+  };
+
+  // Prepend to customExpenses and persist locally
+  if (!state.customExpenses) state.customExpenses = [];
+  state.customExpenses.unshift(newExpense);
+  localStorage.setItem('yem_custom_expenses', JSON.stringify(state.customExpenses));
+
+  // Prepend to current in-memory expenses list
+  if (state.data && state.data.expenses) {
+    state.data.expenses.unshift(newExpense);
+  }
+
+  // Also sync to Google Apps Script / sheet if configured
+  try {
+    const payload = {
+      date: date,
+      description: newExpense.description,
+      amountCurrency: 'USD',
+      amountUsd: amountUsd,
+      amountKhr: amountKhr,
+      category: 'ផ្សាយពាណិជ្ជកម្ម',
+      paymentMethod: 'ABA Bank',
+      note: newExpense.note
+    };
+    if (typeof CONFIG !== 'undefined' && CONFIG && CONFIG.APPS_SCRIPT_URL) {
+      fetch(CONFIG.APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload),
+        mode: 'no-cors'
+      }).catch(err => console.warn('Ads sync to sheet failed:', err));
+    }
+  } catch (err) {
+    console.warn('Silent Ads sync error:', err);
+  }
+
+  // Close modal and reset form
+  window.closeQuickAdsModal();
+  if (amtInput) amtInput.value = '';
+  if (noteInput) noteInput.value = '';
+
+  // Re-render dashboard module
+  renderDashboardModule();
+  if (window.lucide) window.lucide.createIcons();
+
+  const toastMsg = state.lang === 'en'
+    ? `Saved $${amountUsd.toFixed(2)} Ads spend for ${date}!`
+    : `បានរក្សាទុកថ្លៃប៊ូស Ads ចំនួន $${amountUsd.toFixed(2)} សម្រាប់ថ្ងៃ ${date} ដោយជោគជ័យ!`;
+  alert(toastMsg);
+};
+
+/**
+ * ==========================================================================
  * Smart Order Import & Sheet Sync Handlers (Telegram & Chat Auto-Parser)
  * ==========================================================================
  */
@@ -3620,9 +4137,18 @@ window.parseTelegramOrdersText = function(text) {
     const mAddr = raw.match(/(?:អាសយដ្ឋាន\(Address\)|អាសយដ្ឋាន|ទីតាំង)\s*[:៖]\s*([^\n\r]+)/i);
     if (mAddr) order.address = mAddr[1].trim();
 
-    // 10. Delivery
-    const mDel = raw.match(/(?:ដឹកជញ្ជូនតាម\(Delivery\)|ដឹកតាម|ដឹកជញ្ជូន)\s*[:៖]\s*([^\n\r]+)/i);
-    if (mDel) order.delivery = mDel[1].trim();
+    // 10. Delivery & Fee Mapping (Thai COD $5, VET ក្រុមហ៊ុន $3, VET ផ្ទាល់ខ្លួន $2, Motor $2.50)
+    const mDel = raw.match(/(?:ដឹកជញ្ជូនតាម\(Delivery\)|ដឹកតាម|ដឹកជញ្ជូន|delivery)\s*[:៖]\s*([^\n\r]+)/i);
+    const rawDel = mDel ? mDel[1].trim() : 'VET(COD)ក្រុមហ៊ុន';
+    if (/thai|ថៃ/i.test(rawDel)) {
+      order.delivery = 'Thai ✅COD';
+    } else if (/motor|ម៉ូតូ|moto/i.test(rawDel)) {
+      order.delivery = 'Motor (ម៉ូតូ)';
+    } else if (/ផ្ទាល់ខ្លួន|personal/i.test(rawDel)) {
+      order.delivery = 'VET(COD) អីវ៉ាន់ផ្ទាល់ខ្លួន';
+    } else {
+      order.delivery = 'VET(COD)ក្រុមហ៊ុន';
+    }
 
     // 11. Products e.g. ▪️ ផលិតផល(Product) [Kidney Pro]: 1
     const prodRegex = /ផលិតផល\(Product\)\s*\[([^\]]+)\]\s*:\s*(\d+)/gi;
@@ -3651,6 +4177,11 @@ window.parseTelegramOrdersText = function(text) {
     order.products = prodList;
     order.productNames = prodList.length > 0 ? prodList.join(', ') : 'KD-09';
     order.totalBoxes = parsedBoxes > 0 ? parsedBoxes : 1;
+
+    // Goods Source & Calculated Fields (ចេញពីក្រុមហ៊ុន: 1=$24, 2=$48, 3=$72)
+    order.goodsSource = (raw.includes('ផ្ទាល់ខ្លួន') || raw.includes('personal')) ? 'អីវ៉ាន់ផ្ទាល់ខ្លួន' : 'ចេញពីក្រុមហ៊ុន';
+    order.cogs = getOrderCogsAmount(order.totalBoxes, order.goodsSource === 'ចេញពីក្រុមហ៊ុន');
+    order.deliveryFee = getDeliveryFeeByMethod(order.delivery);
 
     // Default seller to Seyha if empty
     if (!order.seller) {
@@ -3716,7 +4247,8 @@ window.renderParsedOrdersPreview = function(orders) {
       <div class="order-badge-row">
         <span class="order-tag green"><i data-lucide="phone" style="width:11px; height:11px;"></i> ${o.receiverPhone || 'មិនមានលេខ'}</span>
         ${o.address ? `<span class="order-tag amber"><i data-lucide="map-pin" style="width:11px; height:11px;"></i> ${o.address}</span>` : ''}
-        ${o.delivery ? `<span class="order-tag blue"><i data-lucide="truck" style="width:11px; height:11px;"></i> ${o.delivery}</span>` : ''}
+        <span class="order-tag blue"><i data-lucide="truck" style="width:11px; height:11px;"></i> ${o.delivery} ($${(o.deliveryFee || getDeliveryFeeByMethod(o.delivery)).toFixed(2)})</span>
+        <span class="order-tag purple"><i data-lucide="package" style="width:11px; height:11px;"></i> ថ្លៃដើម: $${(o.cogs || getOrderCogsAmount(o.totalBoxes, o.goodsSource === 'ចេញពីក្រុមហ៊ុន')).toFixed(2)} (${o.goodsSource || 'ក្រុមហ៊ុន'})</span>
       </div>
     </div>
   `).join('');

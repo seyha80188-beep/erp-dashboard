@@ -22,7 +22,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" href="style.css?v=20261018_v14">
+  <link rel="stylesheet" href="style.css?v=20261019_v17">
 </head>
 <body>
   <!-- Mobile Pull-to-Refresh Indicator Container -->
@@ -252,6 +252,7 @@
           <input type="text" id="exp-input-desc" class="form-input" placeholder="ឧ. អាហារថ្ងៃត្រង់, កាហ្វេ, សាំង, ទឹកភ្លើង..." required autocomplete="off">
           <!-- Quick Suggestion Chips (អាហារ៣ពេល, ផ្ញើទៅអ្នកផ្ទះ, បញ្ចូលកាត, etc.) -->
           <div class="quick-chips-row">
+            <button type="button" class="quick-chip" onclick="setExpenseDescPreset('ប៊ូស Facebook Ads (Ads Spend)', 'តម្រូវការចាំបាច់ (55%)')" style="background:rgba(245, 158, 11, 0.2); color:#FBBF24; border-color:rgba(245, 158, 11, 0.4); font-weight:700;">📢 ប៊ូស Ads</button>
             <button type="button" class="quick-chip" onclick="setExpenseDescPreset('អាហារពេលព្រឹក')">🥣 អាហារពេលព្រឹក</button>
             <button type="button" class="quick-chip" onclick="setExpenseDescPreset('អាហារថ្ងៃត្រង់')">🍛 អាហារថ្ងៃត្រង់</button>
             <button type="button" class="quick-chip" onclick="setExpenseDescPreset('អាហារពេលល្ងាច')">🍲 អាហារពេលល្ងាច</button>
@@ -317,6 +318,66 @@
           <button type="submit" class="btn-primary" id="btn-save-exp">
             <i data-lucide="check"></i>
             <span>រក្សាទុកចំណាយ</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal សម្រាប់បញ្ចូលថ្លៃប៊ូសផ្សាយពាណិជ្ជកម្ម Ads (Quick Ads Spend Modal) -->
+  <div id="quick-ads-modal-overlay" class="modal-overlay" style="display: none;" onclick="if(event.target === this) closeQuickAdsModal()">
+    <div class="expense-modal-card" style="max-width: 420px;">
+      <div class="modal-header-row">
+        <div style="display:flex; align-items:center; gap:12px; flex:1;">
+          <div class="expense-icon-circle" style="background:rgba(245, 158, 11, 0.2); color:#FBBF24; box-shadow:0 0 16px rgba(245,158,11,0.4);">
+            <i data-lucide="megaphone"></i>
+          </div>
+          <div>
+            <h3 class="modal-title" style="font-size:16px;">បញ្ចូលថ្លៃប៊ូសផ្សាយពាណិជ្ជកម្ម</h3>
+            <span class="modal-subtitle">Facebook Page Ads Spend (តាមជាក់ស្តែង)</span>
+          </div>
+        </div>
+        <button type="button" class="modal-close-icon-btn" onclick="closeQuickAdsModal()" aria-label="បិទ">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <form id="quick-ads-form" onsubmit="handleSaveQuickAds(event)">
+        <!-- 1. Date -->
+        <div class="form-group">
+          <label for="ads-input-date" style="font-size:12.5px; font-weight:600; color:#FFFFFF; margin-bottom:5px; display:block;">កាលបរិច្ឆេទប៊ូស (Date)</label>
+          <input type="date" id="ads-input-date" class="form-input" required>
+        </div>
+
+        <!-- 2. Amount USD -->
+        <div class="form-group">
+          <label for="ads-input-amount" style="font-size:12.5px; font-weight:600; color:#FFFFFF; margin-bottom:5px; display:block;">ចំនួនទឹកប្រាក់ប៊ូស ($ USD ជាក់ស្តែង)</label>
+          <div class="amount-input-wrap">
+            <span class="currency-prefix" style="color:#FBBF24;">$</span>
+            <input type="number" step="any" id="ads-input-amount" class="form-input amount-field" placeholder="0.00" required>
+          </div>
+          <!-- Quick Preset Chips -->
+          <div class="quick-chips-row" style="margin-top:8px;">
+            <button type="button" class="quick-chip" onclick="setQuickAdsAmount(5)">$5.00</button>
+            <button type="button" class="quick-chip" onclick="setQuickAdsAmount(7)">$7.00</button>
+            <button type="button" class="quick-chip" onclick="setQuickAdsAmount(10)">$10.00</button>
+            <button type="button" class="quick-chip" onclick="setQuickAdsAmount(15)">$15.00</button>
+            <button type="button" class="quick-chip" onclick="setQuickAdsAmount(20)">$20.00</button>
+            <button type="button" class="quick-chip" onclick="setQuickAdsAmount(30)">$30.00</button>
+          </div>
+        </div>
+
+        <!-- 3. Note -->
+        <div class="form-group">
+          <label for="ads-input-note" style="font-size:12.5px; font-weight:600; color:#FFFFFF; margin-bottom:5px; display:block;">ចំណាំទំព័រ / យុទ្ធនាការ (Note)</label>
+          <input type="text" id="ads-input-note" class="form-input" placeholder="ឧ. ប៊ូសផេក KD-09, វីដេអូថ្មី...">
+        </div>
+
+        <div class="modal-actions-row">
+          <button type="button" class="btn-secondary" onclick="closeQuickAdsModal()">បោះបង់</button>
+          <button type="submit" class="btn-primary" style="background:#FBBF24; color:#060E22; font-weight:700;">
+            <i data-lucide="check"></i>
+            <span>រក្សាទុកថ្លៃ Ads</span>
           </button>
         </div>
       </form>
@@ -495,6 +556,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=20261018_v15"></script>
+  <script src="app.js?v=20261019_v17"></script>
 </body>
 </html>
