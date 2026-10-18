@@ -1629,79 +1629,80 @@ function renderDashboardModule() {
     : `🌸 ថ្ងៃទី ${dayKhmer} ${monthKhmer} ${yearKhmer}`;
 
   moduleContainerEl.innerHTML = `
-    <!-- ACLEDA / ABA / VET HERO CARD CONTAINER -->
-    <div class="acleda-hero-container">
-      <div class="acleda-date-strip">
-        <div class="acleda-holiday-badge" title="កាលបរិច្ឆេទថ្ងៃនេះ">
+    <!-- FINTECH HERO CONTAINER -->
+    <div class="fintech-hero-container">
+      <!-- 1. Refined Sub-Header Greeting Strip -->
+      <div class="fintech-greeting-strip">
+        <div class="greeting-date-pill">
           <span class="flower-icon-glow">🌸</span>
-          <span class="embossed-date-text">${lang === 'en' ? `${dayNum} ${now.toLocaleString('en-US', { month: 'short' })} ${now.getFullYear()}` : `ថ្ងៃទី ${dayKhmer} ${monthKhmer} ${yearKhmer}`}</span>
+          <span class="greeting-date-text">${lang === 'en' ? `${dayNum} ${now.toLocaleString('en-US', { month: 'short' })} ${now.getFullYear()}` : `ថ្ងៃទី ${dayKhmer} ${monthKhmer} ${yearKhmer}`}</span>
+        </div>
+        <div class="live-sync-pill">
+          <span class="pulse-live-indicator"></span>
+          <span>${lang === 'en' ? 'Live Master Sync' : 'ទិន្នន័យផ្ទាល់ A1 & B2'}</span>
         </div>
       </div>
-      <div class="acleda-balance-card">
-        <div class="acleda-balance-top">
-          <div class="acleda-account-circle-wrap">
-            <div class="acleda-circle-meter">
-              <i data-lucide="${circleIcon}"></i>
-              <span>${circleLabel}</span>
-            </div>
-            <div class="acleda-balance-details">
-              <div class="acleda-balance-label-row">
-                <span class="acleda-balance-label">${cardLabel}</span>
-                <button class="eye-toggle-btn" onclick="toggleBalanceVisibility()" title="${lang === 'en' ? 'Toggle Balance Visibility' : 'បិទ/បង្ហាញ លេខប្រាក់'}">
-                  <i data-lucide="${isBalanceHidden ? 'eye-off' : 'eye'}"></i>
-                </button>
-              </div>
-              <div class="acleda-balance-khr">
-                ${isBalanceHidden ? '•••••••• ៛' : formatKhr(displayKhr)}
-              </div>
-              <div class="acleda-balance-usd">
-                ${isBalanceHidden ? '•••••• $' : formatUsd(displayUsd)}
-              </div>
-            </div>
+
+      <!-- 2. Master Bank Card -->
+      <div class="fintech-balance-card">
+        <div class="fintech-card-glow-bg"></div>
+        <div class="fintech-card-header">
+          <div class="fintech-chip-badge">
+            <div class="fintech-chip-icon"><i data-lucide="${circleIcon}"></i></div>
+            <span class="fintech-account-title">${circleLabel}</span>
+          </div>
+          <button class="fintech-eye-btn" onclick="toggleBalanceVisibility()" title="${lang === 'en' ? 'Toggle Balance Visibility' : 'បិទ/បង្ហាញ លេខប្រាក់'}">
+            <i data-lucide="${isBalanceHidden ? 'eye-off' : 'eye'}"></i>
+          </button>
+        </div>
+
+        <div class="fintech-balance-body">
+          <span class="fintech-balance-subtitle">${cardLabel}</span>
+          <div class="fintech-primary-amount">${isBalanceHidden ? '•••••••• ៛' : formatKhr(displayKhr)}</div>
+          <div class="fintech-secondary-amount">
+            <span class="fintech-sub-val">${isBalanceHidden ? '•••••• $' : formatUsd(displayUsd)}</span>
+            <span class="fintech-rate-badge">${lang === 'en' ? 'Rate $1 = 4,100៛' : 'អត្រា $1 = 4,100៛'}</span>
           </div>
         </div>
 
-        <!-- ACLEDA Dual Action Pill Switchers (Identical twins like ACLEDA «បង់ប្រាក់» & «បញ្ចូលលុយទូរស័ព្ទ») -->
-        <div class="acleda-card-actions acleda-dual-tab-nav">
-          <button class="acleda-tab-btn ${isBusiness ? 'active' : ''}" onclick="switchDashboardSection('business')">
-            <div class="acleda-tab-icon-wrap">
-              <i data-lucide="file-text"></i>
-            </div>
-            <span class="acleda-tab-title">${lang === 'en' ? 'Business' : 'អាជីវកម្ម'}</span>
-            ${isBusiness ? '<span class="acleda-active-dot"></span>' : ''}
-          </button>
-
-          <button class="acleda-tab-btn ${!isBusiness ? 'active' : ''}" onclick="switchDashboardSection('personal')">
-            <div class="acleda-tab-icon-wrap">
-              <i data-lucide="smartphone"></i>
-            </div>
-            <span class="acleda-tab-title">${lang === 'en' ? 'Personal' : 'ចំណូល-ចំណាយ'}</span>
-            ${!isBusiness ? '<span class="acleda-active-dot"></span>' : ''}
-          </button>
+        <!-- 3. iOS/Revolut Segmented Pill Control -->
+        <div class="fintech-segmented-wrapper">
+          <div class="fintech-segmented-control">
+            <button class="segmented-tab-btn ${isBusiness ? 'active' : ''}" onclick="switchDashboardSection('business')">
+              <i data-lucide="building-2"></i>
+              <span>${lang === 'en' ? 'Business Sales' : 'អាជីវកម្ម'}</span>
+            </button>
+            <button class="segmented-tab-btn ${!isBusiness ? 'active' : ''}" onclick="switchDashboardSection('personal')">
+              <i data-lucide="wallet"></i>
+              <span>${lang === 'en' ? 'Personal Finance' : 'ចំណូល-ចំណាយ'}</span>
+            </button>
+          </div>
         </div>
+      </div>
 
-        <!-- Quick Action Twin Pills: បញ្ចូលការកម្ម៉ង់ (ឆ្វេង) & កត់ត្រាចំណាយ (ស្តាំ) -->
-        <div class="dashboard-quick-actions-bar">
-          <button type="button" class="dash-quick-btn dash-quick-orders" onclick="openOrderModal()">
-            <div class="dash-quick-icon-circle orders-circle">
-              <i data-lucide="clipboard-paste"></i>
-            </div>
-            <div class="dash-quick-text">
-              <span class="dash-quick-label"><span class="dash-title-sparkle orders">✦</span> ${lang === 'en' ? 'Enter Orders' : 'បញ្ចូលការកម្ម៉ង់'}</span>
-              <span class="dash-quick-sub">${lang === 'en' ? 'Paste Telegram' : 'Paste ពី Telegram'}</span>
-            </div>
-          </button>
+      <!-- 4. Quick Action Twin Hub (Outside the Card) -->
+      <div class="fintech-action-hub">
+        <button type="button" class="fintech-action-pill orders-action-pill" onclick="openOrderModal()">
+          <div class="action-pill-icon orders-glow">
+            <i data-lucide="clipboard-paste"></i>
+          </div>
+          <div class="action-pill-meta">
+            <span class="action-pill-title"><span class="action-star green">✦</span> ${lang === 'en' ? 'Enter Orders' : 'បញ្ចូលការកម្ម៉ង់'}</span>
+            <span class="action-pill-desc">${lang === 'en' ? 'Paste from Telegram' : 'Paste ពី Telegram'}</span>
+          </div>
+          <div class="action-pill-arrow"><i data-lucide="arrow-right"></i></div>
+        </button>
 
-          <button type="button" class="dash-quick-btn dash-quick-expense" onclick="openExpenseModal()">
-            <div class="dash-quick-icon-circle expense-circle">
-              <i data-lucide="file-plus"></i>
-            </div>
-            <div class="dash-quick-text">
-              <span class="dash-quick-label"><span class="dash-title-sparkle expense">✦</span> ${lang === 'en' ? 'Log Expense' : 'កត់ត្រាចំណាយ'}</span>
-              <span class="dash-quick-sub">${lang === 'en' ? 'Daily Personal' : 'ចំណាយប្រចាំថ្ងៃ (Sheet B2)'}</span>
-            </div>
-          </button>
-        </div>
+        <button type="button" class="fintech-action-pill expense-action-pill" onclick="openExpenseModal()">
+          <div class="action-pill-icon expense-glow">
+            <i data-lucide="file-plus"></i>
+          </div>
+          <div class="action-pill-meta">
+            <span class="action-pill-title"><span class="action-star orange">✦</span> ${lang === 'en' ? 'Log Expense' : 'កត់ត្រាចំណាយ'}</span>
+            <span class="action-pill-desc">${lang === 'en' ? 'Daily Personal (B2)' : 'ចំណាយប្រចាំថ្ងៃ (Sheet B2)'}</span>
+          </div>
+          <div class="action-pill-arrow"><i data-lucide="arrow-right"></i></div>
+        </button>
       </div>
     </div>
 
