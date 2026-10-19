@@ -4759,8 +4759,17 @@ window.handleDirectOrderSubmit = async function(event) {
       const gFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSd_hP30dqB-F5gCV44AuxcftgmoDjo5zzkN-NSMiK-1rDEqPQ/formResponse';
       const formParams = new URLSearchParams();
       formParams.append('entry.1581364351', date);
+      if (date && date.includes('-')) {
+        const parts = date.split('-');
+        if (parts.length === 3) {
+          formParams.append('entry.1581364351_year', String(parseInt(parts[0])));
+          formParams.append('entry.1581364351_month', String(parseInt(parts[1])));
+          formParams.append('entry.1581364351_day', String(parseInt(parts[2])));
+        }
+      }
       formParams.append('entry.2053044994', team);
       formParams.append('entry.193760049', seller);
+      formParams.append('entry.1608045144', seller);
       formParams.append('entry.1250998064', sellerPhone);
       formParams.append('entry.615821671', String(priceUsd));
       formParams.append('entry.485783433', receiverName);
