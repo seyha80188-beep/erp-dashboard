@@ -179,18 +179,21 @@ class ERPHandler(SimpleHTTPRequestHandler):
 
         # 1. /api/data (Proxy Google Sheets CSVs)
         if url_path == '/api/data':
+            A1_SHEET_ID = '1GI-wAYeSR4o3rYo5QcghXb4_zNpLgIGNDl8_83XnrKk'
             gids = {
-                'expensesCsv': '859033776',
-                'incomesCsv': '1280452951',
-                'teamSalesCsv': '944458554',
-                'boostPlanCsv': '455285947',
-                'formResponses1Csv': '301276705',
-                'masterA1Csv': '1102512547'
+                'expensesCsv': (SHEET_ID, '859033776'),
+                'incomesCsv': (SHEET_ID, '1280452951'),
+                'teamSalesCsv': (SHEET_ID, '944458554'),
+                'boostPlanCsv': (SHEET_ID, '455285947'),
+                'formResponses1Csv': (SHEET_ID, '301276705'),
+                'masterA1Csv': (SHEET_ID, '1102512547'),
+                'a1DataInputCsv': (A1_SHEET_ID, '613388513'),
+                'a1MasterDashboardCsv': (A1_SHEET_ID, '2105527680')
             }
 
             data = {}
-            for key, gid in gids.items():
-                csv_url = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid={gid}"
+            for key, (sid, gid) in gids.items():
+                csv_url = f"https://docs.google.com/spreadsheets/d/{sid}/export?format=csv&gid={gid}"
                 try:
                     req = urllib.request.Request(csv_url, headers={'User-Agent': 'Mozilla/5.0'})
                     with urllib.request.urlopen(req, timeout=10) as response:

@@ -1343,6 +1343,164 @@ body {
   color: #00B4D8;
 }
 
+/* Daily Seller Sales Scorecard under Hero Card (Image 1 & 2 Request) */
+.hero-daily-sellers-card {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.38);
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hero-daily-sellers-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.hero-daily-sellers-header .card-subtitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hero-daily-total-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #FFFFFF;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.hero-daily-total-pill.active {
+  background: rgba(255, 255, 255, 0.35);
+  border-color: #FFFFFF;
+  color: #FFFFFF;
+}
+
+.hero-daily-total-pill strong {
+  color: #FDE047;
+  font-weight: 800;
+}
+
+.hero-daily-sellers-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.daily-seller-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.daily-seller-chip.has-sales {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+}
+
+.seller-chip-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: #FFFFFF;
+  flex-shrink: 0;
+}
+
+.seller-chip-avatar.y {
+  background: linear-gradient(135deg, #10B981, #059669);
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
+}
+
+.seller-chip-avatar.v {
+  background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+}
+
+.seller-chip-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.seller-chip-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #FFFFFF;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.seller-chip-count {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.seller-chip-count.highlight {
+  color: #FDE047;
+  font-weight: 800;
+}
+
+/* Theme overrides for hero-daily-sellers-card */
+body.theme-sage .hero-daily-sellers-card,
+body.theme-teal .hero-daily-sellers-card,
+body.theme-warm .hero-daily-sellers-card,
+body.theme-vet .hero-daily-sellers-card {
+  background: rgba(255, 255, 255, 0.22) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  color: #FFFFFF !important;
+}
+
+body.theme-sage .daily-seller-chip,
+body.theme-teal .daily-seller-chip,
+body.theme-warm .daily-seller-chip,
+body.theme-vet .daily-seller-chip {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  color: #FFFFFF !important;
+}
+
+body.theme-sage .daily-seller-chip.has-sales,
+body.theme-teal .daily-seller-chip.has-sales,
+body.theme-warm .daily-seller-chip.has-sales,
+body.theme-vet .daily-seller-chip.has-sales {
+  background: rgba(255, 255, 255, 0.32) !important;
+  border-color: #FFFFFF !important;
+}
+
 /* Tracker Scope Panel (តាមថ្ងៃ / ចន្លោះ ២-៣ថ្ងៃ / តាមខែ / តាមឆ្នាំ) */
 .tracker-scope-panel {
   background: linear-gradient(145deg, rgba(10, 25, 47, 0.9) 0%, rgba(6, 14, 34, 0.95) 100%);

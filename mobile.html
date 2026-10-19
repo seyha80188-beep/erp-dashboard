@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iPhone Preview - YEM SEYHA ERP</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 20%, #151F32 0%, #080D1A 60%, #03060C 100%);
+      color: #F8FAFC;
+      font-family: 'Kantumruy Pro', 'Plus Jakarta Sans', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      overflow-x: hidden;
+      padding: 24px 16px 40px;
+    }
+
+    /* Top Navigation Toolbar */
+    .preview-header {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      object-fit: cover;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .brand-text h1 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #FFFFFF;
+      letter-spacing: -0.01em;
+    }
+
+    .brand-text p {
+      font-size: 11px;
+      color: #94A3B8;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .device-pill-group {
+      display: flex;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 3px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .device-btn {
+      background: transparent;
+      border: none;
+      color: #94A3B8;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 7px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .device-btn.active, .device-btn:hover {
+      background: rgba(16, 185, 129, 0.2);
+      color: #10B981;
+    }
+
+    .device-btn.active {
+      background: #10B981;
+      color: #FFFFFF;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+    }
+
+    .action-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #F8FAFC;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      font-family: inherit;
+    }
+
+    .action-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.25);
+      color: #FFFFFF;
+      transform: translateY(-1px);
+    }
+
+    /* iPhone Frame Mockup */
+    .simulator-container {
+      position: relative;
+      perspective: 1200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .iphone-case {
+      position: relative;
+      width: 432px;
+      height: 928px;
+      background: #1C1F26;
+      border-radius: 50px;
+      padding: 12px;
+      box-shadow: 
+        0 0 0 2px #3E4756,
+        0 0 0 4px #12141A,
+        0 25px 60px rgba(0, 0, 0, 0.75),
+        0 50px 100px -20px rgba(0, 0, 0, 0.85);
+      transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), height 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s ease;
+    }
+
+    /* Buttons on the sides of iPhone */
+    .iphone-case::before {
+      content: '';
+      position: absolute;
+      left: -5px;
+      top: 130px;
+      width: 4px;
+      height: 32px;
+      background: #3E4756;
+      border-radius: 3px 0 0 3px;
+      box-shadow: 0 45px 0 #3E4756, 0 90px 0 #3E4756;
+    }
+
+    .iphone-case::after {
+      content: '';
+      position: absolute;
+      right: -5px;
+      top: 170px;
+      width: 4px;
+      height: 60px;
+      background: #3E4756;
+      border-radius: 0 3px 3px 0;
+    }
+
+    /* Screen Wrapper */
+    .iphone-screen {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: #060E22;
+      border-radius: 44px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* iPhone 12 Pro Max Classic Notch */
+    .iphone-notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 172px;
+      height: 30px;
+      background: #000000;
+      border-radius: 0 0 18px 18px;
+      z-index: 9999;
+      pointer-events: none;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding-bottom: 2px;
+    }
+
+    .notch-speaker {
+      width: 50px;
+      height: 4px;
+      background: #1E232E;
+      border-radius: 3px;
+      border: 0.5px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .notch-camera {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #1E293B, #020617);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    /* Dynamic Island (for iPhone 16 Pro mode) */
+    .dynamic-island {
+      position: absolute;
+      top: 11px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 115px;
+      height: 30px;
+      background: #000000;
+      border-radius: 20px;
+      z-index: 9999;
+      pointer-events: none;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+    }
+
+    .island-camera {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #1E293B, #020617);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .island-sensor {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #0F172A, #020617);
+    }
+
+    /* Status Bar */
+    .ios-status-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 44px;
+      z-index: 9998;
+      pointer-events: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 28px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #FFFFFF;
+      letter-spacing: -0.01em;
+    }
+
+    .ios-status-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Actual ERP Frame */
+    .app-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      outline: none;
+      background: #060E22;
+      border-radius: 44px;
+      flex: 1;
+    }
+
+    /* Home Indicator */
+    .home-indicator {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 135px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 10px;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    /* Bottom helper tips */
+    .preview-footer {
+      text-align: center;
+      color: #94A3B8;
+      font-size: 13px;
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      justify-content: center;
+    }
+
+    .preview-footer a {
+      color: #10B981;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .preview-footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Scale presets */
+    .zoom-ctrl {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 4px 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 12px;
+      color: #94A3B8;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Toolbar -->
+  <header class="preview-header">
+    <div class="brand-title">
+      <img src="apple-touch-icon.png" alt="YS Logo" class="brand-logo">
+      <div class="brand-text">
+        <h1>YEM SEYHA ERP (Mobile View)</h1>
+        <p>ទម្រង់ទូរស័ព្ទ iPhone Preview</p>
+      </div>
+    </div>
+
+    <div class="toolbar-actions">
+      <!-- Device Switcher -->
+      <div class="device-pill-group">
+        <button type="button" class="device-btn active" onclick="setDevice('16pro', this)">
+          <i data-lucide="smartphone" style="width:14px; height:14px;"></i> iPhone 16 Pro
+        </button>
+        <button type="button" class="device-btn" onclick="setDevice('15plus', this)">
+          <i data-lucide="smartphone" style="width:14px; height:14px;"></i> Plus / Max
+        </button>
+        <button type="button" class="device-btn" onclick="setDevice('se', this)">
+          <i data-lucide="smartphone" style="width:14px; height:14px;"></i> Compact
+        </button>
+      </div>
+
+      <!-- Refresh Button -->
+      <button type="button" class="action-btn" onclick="reloadFrame()" title="Reload App">
+        <i data-lucide="rotate-cw" style="width:14px; height:14px;"></i> ផ្ទុកឡើងវិញ
+      </button>
+
+      <!-- Desktop Mode Switch -->
+      <a href="index.html" class="action-btn" target="_blank" title="Open Fullscreen on Desktop">
+        <i data-lucide="monitor" style="width:14px; height:14px;"></i> Desktop View
+      </a>
+    </div>
+  </header>
+
+  <!-- iPhone Frame Mockup -->
+  <div class="simulator-container">
+    <div class="iphone-case" id="iphone-case">
+      <div class="iphone-screen">
+        
+        <!-- iOS Status Bar -->
+        <div class="ios-status-bar">
+          <span id="ios-time">9:41</span>
+          <div class="ios-status-right">
+            <i data-lucide="signal" style="width:14px; height:14px;"></i>
+            <span style="font-size:11px; font-weight:700;">5G</span>
+            <i data-lucide="battery-charging" style="width:18px; height:18px; color:#10B981;"></i>
+          </div>
+        </div>
+
+        <!-- Dynamic Island -->
+        <div class="dynamic-island" id="dynamic-island">
+          <div class="island-camera"></div>
+          <div class="island-sensor"></div>
+        </div>
+
+        <!-- Embedded ERP Web App -->
+        <iframe src="index.html?v=20261019_v39" id="erp-frame" class="app-iframe" title="YEM SEYHA ERP"></iframe>
+
+        <!-- iOS Home Indicator -->
+        <div class="home-indicator"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Tip -->
+  <div class="preview-footer">
+    <span>💡 អាចចុច Scroll, បញ្ចូលការកម្ម៉ង់, ឬកត់ត្រាចំណាយផ្ទាល់បានលើអេក្រង់នេះ</span>
+    <span>•</span>
+    <a href="index.html">មើលទម្រង់ពេញលេញ Desktop &rarr;</a>
+  </div>
+
+  <script>
+    if (window.lucide) {
+      lucide.createIcons();
+    }
+
+    // Live iOS Clock
+    function updateClock() {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      const el = document.getElementById('ios-time');
+      if (el) el.textContent = `${h}:${m}`;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // Device size switcher
+    function setDevice(type, btn) {
+      document.querySelectorAll('.device-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+
+      const phoneCase = document.getElementById('iphone-case');
+      const island = document.getElementById('dynamic-island');
+
+      if (type === '16pro') {
+        phoneCase.style.width = '395px';
+        phoneCase.style.height = '835px';
+        phoneCase.style.borderRadius = '54px';
+        if (island) island.style.display = 'flex';
+      } else if (type === '15plus') {
+        phoneCase.style.width = '430px';
+        phoneCase.style.height = '890px';
+        phoneCase.style.borderRadius = '56px';
+        if (island) island.style.display = 'flex';
+      } else if (type === 'se') {
+        phoneCase.style.width = '375px';
+        phoneCase.style.height = '720px';
+        phoneCase.style.borderRadius = '40px';
+        if (island) island.style.display = 'none';
+      }
+    }
+
+    // Reload iframe
+    function reloadFrame() {
+      const frame = document.getElementById('erp-frame');
+      if (frame) {
+        frame.src = 'index.html?t=' + Date.now();
+      }
+    }
+  </script>
+</body>
+</html>

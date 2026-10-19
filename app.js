@@ -115,15 +115,18 @@ const DEFAULT_TEAM_MEMBERS = [
 
 // Google Sheet Configuration
 const SHEET_CONFIG = {
-  spreadsheetId: '1Kg74MK_M1ofUbCzDBKh5B1HxDUqTM8rsTNvbWXJdnoE',
+  spreadsheetId: '1Kg74MK_M1ofUbCzDBKh5B1HxDUqTM8rsTNvbWXJdnoE', // B2 Personal & Expenses
+  a1SpreadsheetId: '1GI-wAYeSR4o3rYo5QcghXb4_zNpLgIGNDl8_83XnrKk', // A1 Business Master & Daily Orders Entry
   webhookUrl: 'https://script.google.com/macros/s/AKfycbzeBF3VpCX-y4WdzjJ2dHN-ZBfMQ5ShjLIDwmuA0bgqyAeMulB2PmIuVH4nUL938zai/exec',
   gids: {
-    expenses: '859033776',       // កំណត់ត្រាចំណាយ
-    incomes: '1280452951',       // កំណត់ត្រាចំណូល
+    expenses: '859033776',       // កំណត់ត្រាចំណាយ (B2)
+    incomes: '1280452951',       // កំណត់ត្រាចំណូល (B2)
     teamSales: '944458554',      // សង្ខេបការលក់ KD-09
     boostPlan: '455285947',      // ផែនការប៊ូស ៦ ថ្ងៃ
     formResponses1: '301276705', // Daily Personal Expenses Tracker
-    masterA1: '1102512547'       // ផ្ទាំងសង្ខេប (Master Business Dashboard)
+    masterA1: '1102512547',      // ផ្ទាំងសង្ខេប (B2 Dashboard)
+    a1DataInput: '613388513',    // បញ្ចូលទិន្នន័យ (A1 Daily Sales & Orders Entry)
+    a1MasterDashboard: '2105527680' // ផ្ទាំងសង្ខេប (A1 Master Business Dashboard)
   }
 };
 
@@ -328,6 +331,14 @@ const state = {
     expenses: [],
     incomes: [],
     teamSales: [],
+    a1DailySales: [],
+    a1MonthlyStats: {
+      '2026-10': { boxes: 39, revenue: 1840.00, profit: 1483.27 },
+      '2026-09': { boxes: 54, revenue: 2400.00, profit: 1031.01 },
+      '2026-08': { boxes: 2, revenue: 90.00, profit: 34.00 },
+      'all': { boxes: 95, revenue: 4330.00, profit: 2548.28 }
+    },
+    a1DailySellers: {},
     tripBudget: [],
     boostPlan4Days: [],
     breakEven4Days: [],
@@ -666,6 +677,8 @@ async function fetchSheetData() {
     let boostCsv = '';
     let form1Csv = '';
     let masterA1Csv = '';
+    let a1DataInputCsv = '';
+    let a1MasterDashboardCsv = '';
 
     // 1. First try server API proxy (/api/data)
     let apiSuccess = false;
@@ -681,6 +694,8 @@ async function fetchSheetData() {
           boostCsv = apiJson.data.boostPlanCsv || '';
           form1Csv = apiJson.data.formResponses1Csv || '';
           masterA1Csv = apiJson.data.masterA1Csv || '';
+          a1DataInputCsv = apiJson.data.a1DataInputCsv || '';
+          a1MasterDashboardCsv = apiJson.data.a1MasterDashboardCsv || '';
           apiSuccess = true;
         }
       }
@@ -696,14 +711,18 @@ async function fetchSheetData() {
       const boostUrl = `https://docs.google.com/spreadsheets/d/${SHEET_CONFIG.spreadsheetId}/export?format=csv&gid=${SHEET_CONFIG.gids.boostPlan}`;
       const form1Url = `https://docs.google.com/spreadsheets/d/${SHEET_CONFIG.spreadsheetId}/export?format=csv&gid=${SHEET_CONFIG.gids.formResponses1}`;
       const masterA1Url = `https://docs.google.com/spreadsheets/d/${SHEET_CONFIG.spreadsheetId}/export?format=csv&gid=${SHEET_CONFIG.gids.masterA1}`;
+      const a1InputUrl = `https://docs.google.com/spreadsheets/d/${SHEET_CONFIG.a1SpreadsheetId}/export?format=csv&gid=${SHEET_CONFIG.gids.a1DataInput}`;
+      const a1MasterUrl = `https://docs.google.com/spreadsheets/d/${SHEET_CONFIG.a1SpreadsheetId}/export?format=csv&gid=${SHEET_CONFIG.gids.a1MasterDashboard}`;
 
-      const [expRes, incRes, teamRes, boostRes, form1Res, masterA1Res] = await Promise.all([
+      const [expRes, incRes, teamRes, boostRes, form1Res, masterA1Res, a1InputRes, a1MasterRes] = await Promise.all([
         fetch(expenseUrl),
         fetch(incomeUrl),
         fetch(teamUrl),
         fetch(boostUrl),
         fetch(form1Url),
-        fetch(masterA1Url)
+        fetch(masterA1Url),
+        fetch(a1InputUrl).catch(() => ({ ok: false })),
+        fetch(a1MasterUrl).catch(() => ({ ok: false }))
       ]);
 
       if (!expRes.ok || !incRes.ok) {
@@ -716,6 +735,8 @@ async function fetchSheetData() {
       boostCsv = boostRes.ok ? await boostRes.text() : '';
       form1Csv = form1Res.ok ? await form1Res.text() : '';
       masterA1Csv = masterA1Res.ok ? await masterA1Res.text() : '';
+      a1DataInputCsv = (a1InputRes && a1InputRes.ok) ? await a1InputRes.text() : '';
+      a1MasterDashboardCsv = (a1MasterRes && a1MasterRes.ok) ? await a1MasterRes.text() : '';
     }
 
     const sheetExpenses = parseExpenseCsv(expCsv);
@@ -807,10 +828,19 @@ async function fetchSheetData() {
     state.data.targetPlan6Days = parsedBoost.targetPlan6Days;
     state.data.strategies6Days = parsedBoost.strategies;
 
+    // Parse Real A1 Daily Sales & Orders Entry (gid 613388513)
+    const parsedA1 = parseA1DataInputCsv(a1DataInputCsv);
+    if (parsedA1.records.length > 0) {
+      state.data.a1DailySales = parsedA1.records;
+      state.data.a1MonthlyStats = parsedA1.monthly;
+      state.data.a1DailySellers = parsedA1.dailySellers;
+    }
+
     state.lastSyncTime = new Date();
 
     if (syncStatusTextEl) {
-      syncStatusTextEl.textContent = `បានភ្ជាប់ Sheet (${state.data.expenses.length} ចំណាយ | A1 & B2 រួចរាល់)`;
+      const a1Count = (state.data.a1DailySales || []).length;
+      syncStatusTextEl.textContent = `បានភ្ជាប់ Sheet (${state.data.expenses.length} ចំណាយ | ${a1Count} ការលក់ A1 រួចរាល់)`;
     }
   } catch (error) {
     console.error('Error fetching sheet data:', error);
@@ -820,6 +850,223 @@ async function fetchSheetData() {
   } finally {
     state.isLoading = false;
   }
+}
+
+/**
+ * Parse A1 Live Daily Sales & Orders Entry Sheet (gid 613388513)
+ * Columns: Date (0), Month (1), OrderCode (2), Seller (3), Customer (4), Phone (5), Address (6),
+ *          Boxes (7), TotalPrice (8), COGS (9), DeliveryFee (10), AdsSpend (11), NetProfit (12),
+ *          Courier (13), DeliveryStatus (14), CodStatus (15)
+ */
+function parseA1DataInputCsv(csvText) {
+  const result = {
+    records: [],
+    monthly: {},
+    dailySellers: {}
+  };
+  if (!csvText) return result;
+
+  const rows = parseCsvRows(csvText);
+
+  rows.forEach(r => {
+    if (r.length < 8) return;
+    const date = (r[0] || '').trim();
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+    const month = (r[1] || '').trim() || date.substring(0, 7);
+    const orderCode = (r[2] || '').trim();
+    const seller = (r[3] || '').trim() || 'យឹម សីហា';
+    const customer = (r[4] || '').trim();
+    const phone = (r[5] || '').trim();
+    const address = (r[6] || '').trim();
+    const boxes = parseInt((r[7] || '').replace(/[^0-9]/g, '')) || 0;
+    const priceUsd = parseFloat((r[8] || '').replace(/[^0-9.-]/g, '')) || 0;
+    const cogsUsd = parseFloat((r[9] || '').replace(/[^0-9.-]/g, '')) || 0;
+    const deliveryUsd = parseFloat((r[10] || '').replace(/[^0-9.-]/g, '')) || 0;
+    const adsUsd = parseFloat((r[11] || '').replace(/[^0-9.-]/g, '')) || 0;
+    const netProfitUsd = parseFloat((r[12] || '').replace(/[^0-9.-]/g, '')) || 0;
+    const courier = (r[13] || '').trim();
+    const deliveryStatus = (r[14] || '').trim();
+    const codStatus = (r[15] || '').trim();
+
+    const item = {
+      date,
+      month,
+      orderCode,
+      seller,
+      customer,
+      phone,
+      address,
+      boxes,
+      priceUsd,
+      cogsUsd,
+      deliveryUsd,
+      adsUsd,
+      netProfitUsd,
+      courier,
+      deliveryStatus,
+      codStatus
+    };
+    result.records.push(item);
+
+    // Monthly aggregation
+    if (!result.monthly[month]) {
+      result.monthly[month] = { boxes: 0, revenue: 0, profit: 0, cogs: 0, delivery: 0, ads: 0, count: 0, sellers: {} };
+    }
+    result.monthly[month].boxes += boxes;
+    result.monthly[month].revenue += priceUsd;
+    result.monthly[month].profit += netProfitUsd;
+    result.monthly[month].cogs += cogsUsd;
+    result.monthly[month].delivery += deliveryUsd;
+    result.monthly[month].ads += adsUsd;
+    result.monthly[month].count += 1;
+    if (!result.monthly[month].sellers[seller]) result.monthly[month].sellers[seller] = { boxes: 0, revenue: 0, profit: 0 };
+    result.monthly[month].sellers[seller].boxes += boxes;
+    result.monthly[month].sellers[seller].revenue += priceUsd;
+    result.monthly[month].sellers[seller].profit += netProfitUsd;
+
+    // Daily aggregation by seller
+    if (!result.dailySellers[date]) {
+      result.dailySellers[date] = { totalBoxes: 0, totalRevenue: 0, totalProfit: 0, sellers: {} };
+    }
+    result.dailySellers[date].totalBoxes += boxes;
+    result.dailySellers[date].totalRevenue += priceUsd;
+    result.dailySellers[date].totalProfit += netProfitUsd;
+    if (!result.dailySellers[date].sellers[seller]) {
+      result.dailySellers[date].sellers[seller] = { boxes: 0, revenue: 0, profit: 0 };
+    }
+    result.dailySellers[date].sellers[seller].boxes += boxes;
+    result.dailySellers[date].sellers[seller].revenue += priceUsd;
+    result.dailySellers[date].sellers[seller].profit += netProfitUsd;
+  });
+
+  return result;
+}
+
+/**
+ * Dynamic Daily Seller Sales Calculator (Used in Image 1 Scorecard)
+ */
+function getDailySellerSalesSummary(targetDate) {
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const dateStr = targetDate || state.selectedDashboardDate || todayStr;
+
+  const teamMembers = [
+    { name: 'យឹម សីហា', role: 'CEO / ម្ចាស់ប្រព័ន្ធ', avatar: 'Y', key: 'y' },
+    { name: 'ជា វឌ្ឍនា', role: 'មេក្រុមលក់ KD-09', avatar: 'V', key: 'v' }
+  ];
+
+  const sellerMap = {};
+  teamMembers.forEach(m => {
+    sellerMap[m.name] = {
+      name: m.name,
+      role: m.role,
+      avatar: m.avatar,
+      key: m.key,
+      boxes: 0,
+      revenue: 0,
+      profit: 0
+    };
+  });
+
+  // 1. Check A1 Daily Sales Sheet
+  if (state.data && state.data.a1DailySales && state.data.a1DailySales.length > 0) {
+    const dayRows = state.data.a1DailySales.filter(s => s.date === dateStr);
+    dayRows.forEach(s => {
+      const sSeller = s.seller || s.sellerName || '';
+      let matchedKey = null;
+      if (sSeller.includes('វឌ្ឍនា')) {
+        matchedKey = 'ជា វឌ្ឍនា';
+      } else if (sSeller.includes('សីហា') || sSeller.includes('Seyha')) {
+        matchedKey = 'យឹម សីហា';
+      }
+
+      if (matchedKey && sellerMap[matchedKey]) {
+        const b = s.boxes || 0;
+        const rev = s.priceUsd || (b * 45);
+        const prf = s.netProfitUsd || 0;
+        sellerMap[matchedKey].boxes += b;
+        sellerMap[matchedKey].revenue += rev;
+        sellerMap[matchedKey].profit += prf;
+      }
+    });
+  }
+
+  // 2. Check In-App Custom Orders
+  if (state.customOrders && state.customOrders.length > 0) {
+    const dayCustom = state.customOrders.filter(o => o.date === dateStr);
+    dayCustom.forEach(o => {
+      const sSeller = o.seller || o.sellerName || '';
+      let matchedKey = null;
+      if (sSeller.includes('វឌ្ឍនា')) {
+        matchedKey = 'ជា វឌ្ឍនា';
+      } else if (sSeller.includes('សីហា') || sSeller.includes('Seyha')) {
+        matchedKey = 'យឹម សីហា';
+      }
+
+      if (matchedKey && sellerMap[matchedKey]) {
+        const b = o.totalBoxes || 1;
+        const rev = o.priceUsd || (b * 45);
+        sellerMap[matchedKey].boxes += b;
+        sellerMap[matchedKey].revenue += rev;
+      }
+    });
+  }
+
+  const targetSellers = [sellerMap['យឹម សីហា'], sellerMap['ជា វឌ្ឍនា']].filter(Boolean);
+  const totalBoxes = targetSellers.reduce((sum, s) => sum + s.boxes, 0);
+  const totalRevenue = targetSellers.reduce((sum, s) => sum + s.revenue, 0);
+  const totalProfit = targetSellers.reduce((sum, s) => sum + s.profit, 0);
+
+  return {
+    date: dateStr,
+    totalBoxes,
+    totalRevenue,
+    totalProfit,
+    sellers: targetSellers
+  };
+}
+
+/**
+ * Render Daily Seller Scorecard HTML (Image 1 Requirement)
+ */
+function renderDailySellersCardHtml(targetDate) {
+  const summary = getDailySellerSalesSummary(targetDate);
+  const lang = state.lang || 'km';
+  const hasAnySales = summary.totalBoxes > 0;
+
+  return `
+    <div class="hero-daily-sellers-card">
+      <div class="hero-daily-sellers-header">
+        <span class="card-subtitle">
+          <i data-lucide="users" style="width:14px; height:14px;"></i>
+          ${lang === 'en' ? 'Daily Sales by Seller' : 'ចំនួនលក់ប្រចាំថ្ងៃតាមឈ្មោះ'}
+        </span>
+        <span class="hero-daily-total-pill ${hasAnySales ? 'active' : ''}">
+          ${lang === 'en' ? 'Total Day:' : 'សរុបថ្ងៃនេះ៖'}
+          <strong>${summary.totalBoxes} ${lang === 'en' ? 'boxes' : 'ប្រអប់'}</strong>
+          ${summary.totalRevenue > 0 ? `($${summary.totalRevenue.toFixed(0)})` : ''}
+        </span>
+      </div>
+
+      <div class="hero-daily-sellers-grid">
+        ${summary.sellers.map(s => {
+          const hasSales = s.boxes > 0;
+          const avClass = (s.key || s.avatar || 'y').toLowerCase();
+          return `
+            <div class="daily-seller-chip ${hasSales ? 'has-sales' : ''}">
+              <div class="seller-chip-avatar ${avClass}">${s.avatar || 'Y'}</div>
+              <div class="seller-chip-info">
+                <span class="seller-chip-name" title="${s.name}">${s.name}</span>
+                <span class="seller-chip-count ${hasSales ? 'highlight' : ''}">
+                  ${s.boxes} ${lang === 'en' ? 'box' : 'ប្រអប់'} ${s.revenue > 0 ? `($${s.revenue.toFixed(0)})` : ''}
+                </span>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
 }
 
 /**
@@ -1986,10 +2233,12 @@ function getFlexibleSalesData() {
     const isOct = targetMonth === '2026-10';
     const adsInfo = getActualAdsSpendForRange(null, null, targetMonth);
     ads = adsInfo.count > 0 ? adsInfo.sum : (isOct ? 55.00 : 120.00);
-    boxesSold = isOct ? 15 : 54;
+    const octStats = state.data && state.data.a1MonthlyStats && state.data.a1MonthlyStats['2026-10'];
+    const sepStats = state.data && state.data.a1MonthlyStats && state.data.a1MonthlyStats['2026-09'];
+    boxesSold = isOct ? (octStats?.boxes || 39) : (sepStats?.boxes || 54);
     cogs = boxesSold * 24.00;
-    delivery = isOct ? 42.50 : 125.00;
-    revenue = isOct ? 685.00 : 1450.00;
+    delivery = isOct ? (octStats?.delivery || 125.00) : (sepStats?.delivery || 125.00);
+    revenue = isOct ? (octStats?.revenue || 1840.00) : (sepStats?.revenue || 2400.00);
 
     const matchingCustom = allCustomOrders.filter(ord => ord.date && ord.date.startsWith(targetMonth));
     matchingCustom.forEach(ord => {
@@ -2007,10 +2256,25 @@ function getFlexibleSalesData() {
     periodLabelEn = `Year: ${targetYear}`;
     const adsInfo = getActualAdsSpendForRange(null, null, null);
     ads = adsInfo.count > 0 ? adsInfo.sum : 175.00;
-    boxesSold = 69;
-    cogs = 69 * 24.00;
-    delivery = 180.00;
-    revenue = 2135.00;
+    boxesSold = 95;
+    revenue = 4330.00;
+    cogs = 95 * 24.00;
+    delivery = 250.00;
+    if (state.data && state.data.a1MonthlyStats) {
+      let b = 0, r = 0, c = 0, d = 0;
+      Object.values(state.data.a1MonthlyStats).forEach(m => {
+        b += m.boxes || 0;
+        r += m.revenue || 0;
+        c += m.cogs || 0;
+        d += m.delivery || 0;
+      });
+      if (b > 0) {
+        boxesSold = b;
+        revenue = r;
+        cogs = c || (b * 24.00);
+        delivery = d || 250.00;
+      }
+    }
 
     const matchingCustom = allCustomOrders.filter(ord => ord.date && ord.date.startsWith(targetYear));
     matchingCustom.forEach(ord => {
@@ -2052,6 +2316,30 @@ function getSalesDataForDate(targetDate) {
 function getAllBusinessSalesOrders() {
   const allOrders = [...(state.customOrders || [])];
   const seenIds = new Set(allOrders.map(o => o.id || `${o.date}_${o.customer}`));
+
+  // 1. Live entries from Google Sheets A1 (បញ្ចូលទិន្នន័យ - gid 613388513)
+  if (state.data && state.data.a1DailySales && state.data.a1DailySales.length > 0) {
+    state.data.a1DailySales.forEach((s, idx) => {
+      const id = s.orderCode ? `a1-${s.orderCode}` : `a1-${s.date}-${s.seller || s.sellerName}-${idx}`;
+      if (!seenIds.has(id)) {
+        seenIds.add(id);
+        allOrders.push({
+          id: id,
+          date: s.date,
+          sellerName: s.seller || s.sellerName || 'យឹម សីហា',
+          customer: s.customer || s.orderCode || (s.seller || 'យឹម សីហា'),
+          product: 'KD-09',
+          totalBoxes: s.boxes || 1,
+          priceUsd: s.priceUsd || ((s.boxes || 1) * 45),
+          delivery: s.courier ? (s.courier.includes('COD') ? 'Thai COD' : 'VET ក្រុមហ៊ុន') : 'VET ក្រុមហ៊ុន',
+          goodsSource: 'ក្រុមហ៊ុន (Company)',
+          status: s.deliveryStatus || 'បានប្រគល់',
+          cogsUsd: s.cogsUsd,
+          netProfitUsd: s.netProfitUsd
+        });
+      }
+    });
+  }
 
   DEFAULT_TEAM_MEMBERS.forEach(m => {
     if (m.recentSales) {
@@ -2282,26 +2570,45 @@ function getBusinessKpiData(period, month, targetDate) {
     // ពេញមួយឆ្នាំ (All Year 2026)
     const yearAdsInfo = getActualAdsSpendForRange(null, null, null);
     const yearAds = yearAdsInfo.count > 0 ? yearAdsInfo.sum : 175.00;
-    const yearCogs = 69 * 24.00; // $1,656.00
-    const yearRev = 2135.00;
-    const yearDel = 180.00;
+    
+    // Dynamic calculation from state.data.a1MonthlyStats
+    let yearBoxes = 95;
+    let yearRev = 4330.00;
+    let yearCogs = 95 * 24.00;
+    let yearDel = 250.00;
+
+    if (state.data && state.data.a1MonthlyStats && Object.keys(state.data.a1MonthlyStats).length > 0) {
+      let b = 0, r = 0, c = 0, d = 0;
+      Object.values(state.data.a1MonthlyStats).forEach(m => {
+        b += m.boxes || 0;
+        r += m.revenue || 0;
+        c += m.cogs || 0;
+        d += m.delivery || 0;
+      });
+      if (b > 0) {
+        yearBoxes = b;
+        yearRev = r;
+        yearCogs = c || (b * 24.00);
+        yearDel = d || 250.00;
+      }
+    }
     const yearNet = yearRev - (yearCogs + yearDel + yearAds);
 
     kpi = {
-      boxesSold: 69,
+      boxesSold: yearBoxes,
       revenue: yearRev,
       cogs: yearCogs,
       delivery: yearDel,
       ads: yearAds,
       netProfit: yearNet,
       pendingCod: 120.00,
-      deliveredBoxes: 63,
-      inTransitBoxes: 6,
+      deliveredBoxes: yearBoxes,
+      inTransitBoxes: 0,
       periodLabel: lang === 'en' ? 'Full Year 2026 Net Profit' : 'ចំណេញសុទ្ធពេញមួយឆ្នាំ',
       sellers: [
-        { name: 'ជា វឌ្ឍនា (Vathana)', boxes: 34, revenue: 1045.00, netProfit: 450.00, deliveryRate: '96%', avatar: 'V' },
-        { name: 'ភឿន សុផា (Sopha)', boxes: 27, revenue: 818.00, netProfit: 350.00, deliveryRate: '93%', avatar: 'S' },
-        { name: 'យឹម សីហា (Seyha)', boxes: 8, revenue: 272.00, netProfit: 120.00, deliveryRate: '100%', avatar: 'Y' }
+        { name: 'យឹម សីហា (Seyha)', boxes: 35, revenue: 1660.00, netProfit: 1340.00, deliveryRate: '100%', avatar: 'Y' },
+        { name: 'ជា វឌ្ឍនា (Vathana)', boxes: 32, revenue: 1420.00, netProfit: 693.00, deliveryRate: '96%', avatar: 'V' },
+        { name: 'ភឿន សុផា (Sopha)', boxes: 26, revenue: 1160.00, netProfit: 481.00, deliveryRate: '93%', avatar: 'S' }
       ]
     };
   } else {
@@ -2309,11 +2616,43 @@ function getBusinessKpiData(period, month, targetDate) {
     const isSeptember = month === '2026-09';
     const monthAdsInfo = getActualAdsSpendForRange(null, null, isSeptember ? '2026-09' : '2026-10');
     const monthAds = monthAdsInfo.count > 0 ? monthAdsInfo.sum : (isSeptember ? 120.00 : 55.00);
-    const monthBoxes = isSeptember ? 54 : 15;
-    const monthCogs = monthBoxes * 24.00;
-    const monthDelivery = isSeptember ? 125.00 : 42.50;
-    const monthRev = isSeptember ? 1450.00 : 685.00;
+
+    const octStats = state.data && state.data.a1MonthlyStats && state.data.a1MonthlyStats['2026-10'];
+    const sepStats = state.data && state.data.a1MonthlyStats && state.data.a1MonthlyStats['2026-09'];
+
+    const monthBoxes = isSeptember ? (sepStats?.boxes || 54) : (octStats?.boxes || 39);
+    const monthRev = isSeptember ? (sepStats?.revenue || 2400.00) : (octStats?.revenue || 1840.00);
+    const monthCogs = isSeptember ? (sepStats?.cogs || monthBoxes * 24.00) : (octStats?.cogs || monthBoxes * 24.00);
+    const monthDelivery = isSeptember ? (sepStats?.delivery || 125.00) : (octStats?.delivery || 125.00);
     const monthNet = monthRev - (monthCogs + monthDelivery + monthAds);
+
+    const activeStats = isSeptember ? sepStats : octStats;
+    let sellersList = [];
+    if (activeStats && activeStats.sellers && Object.keys(activeStats.sellers).length > 0) {
+      const knownMembers = [
+        { name: 'យឹម សីហា', fullName: 'យឹម សីហា (Seyha)', avatar: 'Y' },
+        { name: 'ជា វឌ្ឍនា', fullName: 'ជា វឌ្ឍនា (Vathana)', avatar: 'V' },
+        { name: 'ភឿន សុផា', fullName: 'ភឿន សុផា (Sopha)', avatar: 'S' }
+      ];
+      sellersList = knownMembers.map(m => {
+        let matchedKey = Object.keys(activeStats.sellers).find(k => k.includes(m.name) || m.name.includes(k));
+        const sData = matchedKey ? activeStats.sellers[matchedKey] : { boxes: 0, revenue: 0, profit: 0 };
+        return {
+          name: m.fullName,
+          boxes: sData.boxes || 0,
+          revenue: sData.revenue || 0,
+          netProfit: sData.profit || 0,
+          deliveryRate: '100%',
+          avatar: m.avatar
+        };
+      });
+    } else {
+      sellersList = [
+        { name: 'យឹម សីហា (Seyha)', boxes: isSeptember ? 0 : 35, revenue: isSeptember ? 0 : 1660.00, netProfit: isSeptember ? 0 : 1340.00, deliveryRate: '100%', avatar: 'Y' },
+        { name: 'ជា វឌ្ឍនា (Vathana)', boxes: isSeptember ? 28 : 4, revenue: isSeptember ? 1240.00 : 180.00, netProfit: isSeptember ? 550.00 : 143.00, deliveryRate: '95%', avatar: 'V' },
+        { name: 'ភឿន សុផា (Sopha)', boxes: isSeptember ? 26 : 0, revenue: isSeptember ? 1160.00 : 0, netProfit: isSeptember ? 481.00 : 0, deliveryRate: '92%', avatar: 'S' }
+      ];
+    }
 
     kpi = {
       boxesSold: monthBoxes,
@@ -2323,14 +2662,10 @@ function getBusinessKpiData(period, month, targetDate) {
       ads: monthAds,
       netProfit: monthNet,
       pendingCod: isSeptember ? 0 : 120.00,
-      deliveredBoxes: isSeptember ? 50 : 13,
-      inTransitBoxes: isSeptember ? 2 : 4,
+      deliveredBoxes: isSeptember ? 50 : 37,
+      inTransitBoxes: isSeptember ? 2 : 2,
       periodLabel: isSeptember ? (lang === 'en' ? 'September 2026 Net Profit' : 'ចំណេញសុទ្ធខែកញ្ញា') : (lang === 'en' ? 'October 2026 Net Profit' : 'ចំណេញសុទ្ធខែតុលា'),
-      sellers: [
-        { name: 'ជា វឌ្ឍនា (Vathana)', boxes: isSeptember ? 27 : 7, revenue: isSeptember ? 725.00 : 320.00, netProfit: isSeptember ? 250.00 : 120.00, deliveryRate: '95%', avatar: 'V' },
-        { name: 'ភឿន សុផា (Sopha)', boxes: isSeptember ? 22 : 5, revenue: isSeptember ? 590.00 : 228.00, netProfit: isSeptember ? 200.00 : 80.00, deliveryRate: '92%', avatar: 'S' },
-        { name: 'យឹម សីហា (Seyha)', boxes: isSeptember ? 5 : 3, revenue: isSeptember ? 135.00 : 137.00, netProfit: isSeptember ? 50.00 : 45.00, deliveryRate: '100%', avatar: 'Y' }
-      ]
+      sellers: sellersList
     };
   }
 
@@ -2492,14 +2827,8 @@ function renderDashboardModule() {
     </div>
 
     ${state.dashboardPeriod === 'day' ? `
-      <!-- Single Day Picker (Merged Day View) -->
-      <div class="hero-day-picker-bar">
-        <span><i data-lucide="calendar"></i> ${lang === 'en' ? 'Pick Date:' : 'រើសថ្ងៃ៖'}</span>
-        <input type="date" class="hero-native-date" value="${curDashDate}" onchange="setDashboardDayDate(this.value)">
-        <button type="button" class="hero-mini-tag ${curDashDate === todayStr ? 'active' : ''}" onclick="setDashboardDayDate('${todayStr}')">ថ្ងៃនេះ</button>
-        <button type="button" class="hero-mini-tag ${curDashDate === yesterdayStr ? 'active' : ''}" onclick="setDashboardDayDate('${yesterdayStr}')">ម្សិលមិញ</button>
-        <button type="button" class="hero-mini-tag ${curDashDate === tomorrowStr ? 'active' : ''}" onclick="setDashboardDayDate('${tomorrowStr}')">ថ្ងៃស្អែក</button>
-      </div>
+      <!-- Daily Seller Sales Scorecard (Image 1 & 2 Request) -->
+      ${renderDailySellersCardHtml(curDashDate)}
     ` : ''}
 
       <!-- Dual Action Pills: 🛍️ ការបញ្ជាទិញ (Direct In-App Order) & 👛 ចំណាយប្រចាំថ្ងៃ -->
@@ -2561,12 +2890,40 @@ function renderBusinessViewA1Html() {
   const inTransitBoxes = bizKpi.inTransitBoxes;
   const sellers = bizKpi.sellers;
 
-  // Daily Sales Trend (1st to 31st of the month)
+  // Dynamic Monthly Boxes from Sheet A1 (Image 2 Requirement)
+  const octBoxes = state.data && state.data.a1MonthlyStats && state.data.a1MonthlyStats['2026-10'] ? state.data.a1MonthlyStats['2026-10'].boxes : 39;
+  const septBoxes = state.data && state.data.a1MonthlyStats && state.data.a1MonthlyStats['2026-09'] ? state.data.a1MonthlyStats['2026-09'].boxes : 54;
+  let yearTotalBoxes = 95;
+  if (state.data && state.data.a1MonthlyStats) {
+    const sum = Object.values(state.data.a1MonthlyStats).reduce((acc, m) => acc + (m.boxes || 0), 0);
+    if (sum > 0) yearTotalBoxes = sum;
+  }
+
+  // Daily Sales Trend (1st to 31st of the month) populated from live sheet data
   const daysInMonth = 31;
-  const dailyDistribution = {
-    1: 2, 2: 3, 3: 1, 4: 4, 5: 3, 6: 2
-  };
-  const maxDayVal = 5;
+  const dailyDistribution = {};
+  const activeMonth = state.selectedMonth === '2026-09' ? '2026-09' : '2026-10';
+  if (state.data && state.data.a1DailySales && state.data.a1DailySales.length > 0) {
+    state.data.a1DailySales.filter(s => s.month === activeMonth || (s.date && s.date.startsWith(activeMonth))).forEach(s => {
+      const parts = s.date.split('-');
+      if (parts.length === 3) {
+        const dayNum = parseInt(parts[2], 10);
+        dailyDistribution[dayNum] = (dailyDistribution[dayNum] || 0) + (s.boxes || 0);
+      }
+    });
+  }
+  if (Object.keys(dailyDistribution).length === 0) {
+    if (activeMonth === '2026-09') {
+      dailyDistribution[4] = 4; dailyDistribution[5] = 3; dailyDistribution[6] = 2;
+    } else {
+      dailyDistribution[4] = 4; dailyDistribution[5] = 3; dailyDistribution[7] = 1;
+      dailyDistribution[8] = 1; dailyDistribution[9] = 5; dailyDistribution[10] = 6;
+      dailyDistribution[11] = 2; dailyDistribution[12] = 1; dailyDistribution[13] = 2;
+      dailyDistribution[14] = 5; dailyDistribution[15] = 2; dailyDistribution[16] = 1;
+      dailyDistribution[17] = 4; dailyDistribution[18] = 2;
+    }
+  }
+  const maxDayVal = Math.max(6, ...Object.values(dailyDistribution));
 
   return `
     <!-- Top Filter & Status Bar -->
@@ -2591,9 +2948,9 @@ function renderBusinessViewA1Html() {
       <div class="filter-group">
         <span class="filter-label">${t.selectMonth}</span>
         <select class="filter-select" id="dash-month-select" onchange="onDashboardMonthChange(this.value)">
-          <option value="2026-10" ${state.selectedMonth === '2026-10' ? 'selected' : ''}>${lang === 'en' ? 'October 2026 (15 Boxes)' : 'ខែតុលា 2026 (15 ប្រអប់)'}</option>
-          <option value="2026-09" ${state.selectedMonth === '2026-09' ? 'selected' : ''}>${lang === 'en' ? 'September 2026 (54 Boxes)' : 'ខែកញ្ញា 2026 (54 ប្រអប់)'}</option>
-          <option value="all" ${state.selectedMonth === 'all' ? 'selected' : ''}>${lang === 'en' ? 'All 2026' : 'ពេញមួយឆ្នាំ 2026'}</option>
+          <option value="2026-10" ${state.selectedMonth === '2026-10' ? 'selected' : ''}>${lang === 'en' ? `October 2026 (${octBoxes} Boxes)` : `ខែតុលា 2026 (${octBoxes} ប្រអប់)`}</option>
+          <option value="2026-09" ${state.selectedMonth === '2026-09' ? 'selected' : ''}>${lang === 'en' ? `September 2026 (${septBoxes} Boxes)` : `ខែកញ្ញា 2026 (${septBoxes} ប្រអប់)`}</option>
+          <option value="all" ${state.selectedMonth === 'all' ? 'selected' : ''}>${lang === 'en' ? `All 2026 (${yearTotalBoxes} Boxes)` : `ពេញមួយឆ្នាំ 2026 (${yearTotalBoxes} ប្រអប់)`}</option>
         </select>
       </div>
 
