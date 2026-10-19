@@ -286,7 +286,19 @@ const state = {
   expenseCurrency: 'KHR',      // 'KHR' | 'USD'
   isLoading: false,
   lastSyncTime: null,
-  customExpenses: JSON.parse(localStorage.getItem('yem_custom_expenses') || '[]'),
+  customExpenses: (() => {
+    try {
+      const raw = JSON.parse(localStorage.getItem('yem_custom_expenses') || '[]');
+      // Auto-clean stale demo expense from 2026-10-19 ($16 / 65,600)
+      const cleaned = raw.filter(e => !(e.date === '2026-10-19' && (e.amountUsd === 16 || e.amountKhr === 65600)));
+      if (cleaned.length !== raw.length) {
+        localStorage.setItem('yem_custom_expenses', JSON.stringify(cleaned));
+      }
+      return cleaned;
+    } catch (err) {
+      return [];
+    }
+  })(),
   customOrders: JSON.parse(localStorage.getItem('yem_custom_orders') || '[]'),
   parsedPendingOrders: [],
   // Raw Data from Sheets
