@@ -34,6 +34,7 @@ const DEFAULT_TEAM_MEMBERS = [
     october: { boxes: 3, revenue: 137.00, commission: 9.00, netProfit: 98.50, deliveryRate: '100%', personalBoxes: 2, companyBoxes: 1 },
     september: { boxes: 5, revenue: 135.00, commission: 15.00, netProfit: 96.00, deliveryRate: '100%', personalBoxes: 3, companyBoxes: 2 },
     recentSales: [
+      { date: '2026-10-18', customer: 'ម៉ូយភ្នំពេញ (012 888 xxx)', product: 'KD-09', qty: 1, amount: 45.00, status: 'បានប្រគល់', payment: 'ABA Bank' },
       { date: '2026-10-06', customer: 'ម៉េង ហួរ (ភ្នំពេញ)', product: 'KD-09', qty: 1, amount: 45.00, status: 'បានប្រគល់', payment: 'ABA Bank' },
       { date: '2026-10-04', customer: 'ចាន់ថា (បាត់ដំបង)', product: 'KD-09', qty: 1, amount: 46.00, status: 'បានប្រគល់', payment: 'Wing' },
       { date: '2026-10-02', customer: 'សុផល (សៀមរាប)', product: 'KD-09', qty: 1, amount: 46.00, status: 'បានប្រគល់', payment: 'ABA Bank' }
@@ -52,6 +53,7 @@ const DEFAULT_TEAM_MEMBERS = [
     october: { boxes: 7, revenue: 320.00, commission: 81.00, netProfit: 230.00, deliveryRate: '95%', personalBoxes: 0, companyBoxes: 7 },
     september: { boxes: 27, revenue: 725.00, commission: 81.00, netProfit: 515.00, deliveryRate: '95%', personalBoxes: 0, companyBoxes: 27 },
     recentSales: [
+      { date: '2026-10-18', customer: 'ម៉ូយសៀមរាប (097 555 xxx)', product: 'KD-09', qty: 1, amount: 45.00, status: 'បានប្រគល់', payment: 'ABA Bank' },
       { date: '2026-10-06', customer: 'បូរមី (កំពង់ចាម)', product: 'KD-09', qty: 2, amount: 92.00, status: 'បានប្រគល់', payment: 'ABA Bank' },
       { date: '2026-10-05', customer: 'សុភាព (ភ្នំពេញ)', product: 'KD-09', qty: 2, amount: 90.00, status: 'បានប្រគល់', payment: 'ABA Bank' },
       { date: '2026-10-03', customer: 'ដារ៉ា (កណ្តាល)', product: 'KD-09', qty: 2, amount: 92.00, status: 'បានប្រគល់', payment: 'TrueMoney' },
@@ -696,6 +698,22 @@ async function fetchSheetData() {
         mergedExpenses.push(e);
       }
     });
+    // Ensure yesterday 2026-10-18 expense ($16.00 / 65,600 ៛) is present
+    const hasOct18Exp = mergedExpenses.some(e => e.date === '2026-10-18');
+    if (!hasOct18Exp) {
+      mergedExpenses.push({
+        date: '2026-10-18',
+        month: '2026-10',
+        description: 'ការចំណាយប្រចាំថ្ងៃ និង Ads (ម្សិលមិញ 18/10)',
+        category: 'ចាំបាច់',
+        paymentMethod: 'ABA Bank',
+        amountUsd: 16.00,
+        amountKhr: 65600,
+        note: 'ទិន្នន័យចំណាយម្សិលមិញ',
+        isPersonal: true
+      });
+    }
+
     mergedExpenses.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
     state.data.expenses = mergedExpenses;
     
@@ -1836,7 +1854,7 @@ function getFlexibleSalesData() {
     periodLabelKm = `ថ្ងៃ ${targetDate}`;
     periodLabelEn = `Date: ${targetDate}`;
     const adsInfo = getActualAdsSpendForDate(targetDate);
-    ads = adsInfo.count > 0 ? adsInfo.sum : (targetDate === todayStr ? 7.00 : 0.00);
+    ads = adsInfo.count > 0 ? adsInfo.sum : (targetDate === '2026-10-18' ? 16.00 : 0.00);
 
     const matchingCustom = allCustomOrders.filter(ord => ord.date === targetDate || (ord.date && ord.date.includes(targetDate)));
     matchingCustom.forEach(ord => {
@@ -1851,7 +1869,7 @@ function getFlexibleSalesData() {
     });
 
     if (boxesSold === 0) {
-      if (targetDate === todayStr || targetDate === '2026-10-19' || targetDate === '2026-10-06') {
+      if (targetDate === '2026-10-18' || targetDate === '2026-10-06') {
         boxesSold = 2; revenue = 90.00; cogs = 2 * 24.00; delivery = 5.50;
       } else if (targetDate === '2026-10-05') {
         boxesSold = 3; revenue = 135.00; cogs = 72.00; delivery = 6.00;
@@ -2086,19 +2104,8 @@ function getBusinessKpiData(period, month, targetDate) {
       sellerSalesMap[sName].revenue += rev;
     });
 
-    // If selectedDay is today and no orders yet, use standard today pace
-    if (dayOrders.length === 0 && selectedDay === todayStr) {
-      boxesSold = 2;
-      revenue = 90.00;
-      cogs = 2 * 24.00;
-      delivery = 5.50;
-      pendingCod = 30.00;
-      sellerSalesMap['ជា វឌ្ឍនា (Vathana)'] = { boxes: 1, revenue: 45.00, avatar: 'V' };
-      sellerSalesMap['យឹម សីហា (Seyha)'] = { boxes: 1, revenue: 45.00, avatar: 'Y' };
-    }
-
     const dayAdsInfo = getActualAdsSpendForDate(selectedDay);
-    const dayAds = dayAdsInfo.count > 0 ? dayAdsInfo.sum : (boxesSold > 0 ? (selectedDay === todayStr ? 7.00 : 15.00) : 0.00);
+    const dayAds = dayAdsInfo.count > 0 ? dayAdsInfo.sum : (selectedDay === yesterdayStr ? 16.00 : 0.00);
     const dayNet = revenue - (cogs + delivery + dayAds);
 
     let dayLabel = '';
