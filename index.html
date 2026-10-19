@@ -16,13 +16,13 @@
   <meta name="apple-mobile-web-app-title" content="YEM SEYHA">
   <meta name="theme-color" content="#060E22">
 
-  <!-- Google Fonts: Noto Sans Khmer -->
+  <!-- Google Fonts: Kantumruy Pro, Noto Sans Khmer, Koh Santepheap, Battambang, Siemreap -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Battambang:wght@400;700&family=Kantumruy+Pro:ital,wght@0,300..700;1,300..700&family=Koh+Santepheap:wght@300;400;700&family=Noto+Sans+Khmer:wght@300;400;500;600;700&family=Siemreap&display=swap" rel="stylesheet">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" href="style.css?v=20261019_v23">
+  <link rel="stylesheet" href="style.css?v=20261019_v24">
 </head>
 <body>
   <!-- Mobile Pull-to-Refresh Indicator Container -->
@@ -198,10 +198,10 @@
         <span id="nav-expenses-text">ចំណាយ B2</span>
       </button>
 
-      <!-- [5] ពណ៌ & ការកំណត់ (Theme Settings) -->
-      <button class="acleda-bottom-btn" id="tab-nav-theme" onclick="openThemeModal()" title="ជ្រើសរើសពណ៌ / Themes">
-        <i data-lucide="palette"></i>
-        <span id="nav-theme-text">ពណ៌</span>
+      <!-- [5] ការកំណត់ (Settings: ពណ៌, Font, ទំហំអក្សរ, ភាសា) -->
+      <button class="acleda-bottom-btn" id="tab-nav-theme" onclick="openThemeModal()" title="ការកំណត់ (Settings)">
+        <i data-lucide="settings"></i>
+        <span id="nav-theme-text">ការកំណត់</span>
       </button>
     </nav>
   </div>
@@ -476,17 +476,17 @@
     </div>
   </div>
 
-  <!-- Theme Selector Modal Overlay (ជ្រើសរើសពណ៌ / Theme) -->
+  <!-- Settings & Appearance Modal Overlay (ការកំណត់: ពណ៌, Font, ទំហំអក្សរ, ភាសា) -->
   <div id="theme-modal-overlay" class="modal-overlay" style="display: none; z-index: 99999;" onclick="if(event.target === this) closeThemeModal()">
-    <div class="theme-modal-card">
-      <div class="modal-header-row">
+    <div class="theme-modal-card settings-modal-card">
+      <div class="modal-header-row" style="padding-bottom: 14px; border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.08));">
         <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:0;">
-          <div class="theme-palette-icon">
-            <i data-lucide="palette"></i>
+          <div class="theme-palette-icon" style="background: linear-gradient(135deg, #0F766E, #2DD4BF);">
+            <i data-lucide="settings"></i>
           </div>
           <div>
-            <h3 class="modal-title">ជ្រើសរើសពណ៌ និងរចនាបថ</h3>
-            <span class="modal-subtitle">Select Dashboard Theme</span>
+            <h3 class="modal-title" id="settings-modal-title">ការកំណត់ប្រព័ន្ធ & រចនាបថ</h3>
+            <span class="modal-subtitle" id="settings-modal-sub">Settings: Theme, Font, Size & Language</span>
           </div>
         </div>
         <button type="button" class="modal-close-icon-btn" onclick="closeThemeModal()" aria-label="បិទ">
@@ -494,41 +494,156 @@
         </button>
       </div>
 
-      <div class="theme-options-grid">
-        <!-- 1. Modern Emerald & Sage -->
-        <div class="theme-option-card" id="theme-opt-sage" onclick="selectTheme('sage')">
-          <div class="theme-swatch sage-swatch" style="background: linear-gradient(135deg, #0F766E 0%, #2DD4BF 100%);">
-            <i data-lucide="leaf" style="color:#FFF; width:22px; height:22px;"></i>
+      <div class="settings-modal-scrollable">
+        <!-- Section 1: 🎨 ពណ៌ប្រព័ន្ធ (Eye-Friendly Themes) -->
+        <div class="settings-group-section">
+          <div class="settings-group-header">
+            <span class="settings-group-title"><i data-lucide="palette"></i> ពណ៌ប្រព័ន្ធ (Themes)</span>
+            <span class="settings-group-badge" id="settings-current-theme-badge">🌿 Sage</span>
           </div>
-          <div class="theme-info">
-            <span class="theme-name">🌿 Modern Emerald & Sage</span>
-            <span class="theme-desc">BG: #E8F0EE | Cards: #F7FAF9 (បៃតងខ្ចីស្រទន់ភ្នែក)</span>
+          <div class="theme-options-grid">
+            <!-- 1. Modern Emerald & Sage -->
+            <div class="theme-option-card" id="theme-opt-sage" onclick="selectTheme('sage')">
+              <div class="theme-swatch sage-swatch" style="background: linear-gradient(135deg, #0F766E 0%, #2DD4BF 100%);">
+                <i data-lucide="leaf" style="color:#FFF; width:20px; height:20px;"></i>
+              </div>
+              <div class="theme-info">
+                <span class="theme-name">🌿 Modern Emerald & Sage</span>
+                <span class="theme-desc">BG: #E8F0EE | Cards: #F7FAF9 (បៃតងខ្ចីស្រទន់ភ្នែក)</span>
+              </div>
+              <div class="theme-check-mark"><i data-lucide="check"></i></div>
+            </div>
+
+            <!-- 2. Luxury Warm Alabaster & Gold -->
+            <div class="theme-option-card" id="theme-opt-warm" onclick="selectTheme('warm')">
+              <div class="theme-swatch warm-swatch" style="background: linear-gradient(135deg, #B45309 0%, #EFECE6 100%);">
+                <i data-lucide="sun" style="color:#FFF; width:20px; height:20px;"></i>
+              </div>
+              <div class="theme-info">
+                <span class="theme-name">🌾 Luxury Warm Alabaster & Gold</span>
+                <span class="theme-desc">BG: #EFECE6 | Cards: #FAF8F5 (ពងមាន់ស្រទន់ គ្មានពន្លឺចាំង)</span>
+              </div>
+              <div class="theme-check-mark"><i data-lucide="check"></i></div>
+            </div>
+
+            <!-- 3. Midnight Teal Glass -->
+            <div class="theme-option-card" id="theme-opt-midnight" onclick="selectTheme('midnight')">
+              <div class="theme-swatch midnight-swatch" style="background: linear-gradient(135deg, #0F172A 0%, #2DD4BF 100%);">
+                <i data-lucide="moon" style="color:#38BDF8; width:20px; height:20px;"></i>
+              </div>
+              <div class="theme-info">
+                <span class="theme-name">🌙 Midnight Teal Glass</span>
+                <span class="theme-desc">BG: #0F172A | Cards: #1E293B (ងងឹតស្រទន់ការពារភ្នែកពេលយប់)</span>
+              </div>
+              <div class="theme-check-mark"><i data-lucide="check"></i></div>
+            </div>
           </div>
-          <div class="theme-check-mark"><i data-lucide="check"></i></div>
         </div>
 
-        <!-- 2. Luxury Warm Alabaster & Gold -->
-        <div class="theme-option-card" id="theme-opt-warm" onclick="selectTheme('warm')">
-          <div class="theme-swatch warm-swatch" style="background: linear-gradient(135deg, #B45309 0%, #EFECE6 100%);">
-            <i data-lucide="sun" style="color:#FFF; width:22px; height:22px;"></i>
+        <!-- Section 2: 🔍 ទំហំអក្សរ (Font Size) -->
+        <div class="settings-group-section">
+          <div class="settings-group-header">
+            <span class="settings-group-title"><i data-lucide="type"></i> ទំហំអក្សរ (Text Size)</span>
+            <span class="settings-group-badge" id="settings-current-size-badge">ធម្មតា</span>
           </div>
-          <div class="theme-info">
-            <span class="theme-name">🌾 Luxury Warm Alabaster & Gold</span>
-            <span class="theme-desc">BG: #EFECE6 | Cards: #FAF8F5 (ពងមាន់ស្រទន់ គ្មានពន្លឺចាំង)</span>
+          <div class="font-size-pills-grid">
+            <button type="button" class="font-size-pill" id="font-size-small" onclick="selectFontSize('small')">
+              <span class="size-preview-sample" style="font-size: 11px;">A</span>
+              <span class="size-label">តូច (Small)</span>
+            </button>
+            <button type="button" class="font-size-pill" id="font-size-normal" onclick="selectFontSize('normal')">
+              <span class="size-preview-sample" style="font-size: 13.5px;">A</span>
+              <span class="size-label">ធម្មតា (Normal)</span>
+            </button>
+            <button type="button" class="font-size-pill" id="font-size-large" onclick="selectFontSize('large')">
+              <span class="size-preview-sample" style="font-size: 16.5px;">A</span>
+              <span class="size-label">ធំ (Large)</span>
+            </button>
+            <button type="button" class="font-size-pill" id="font-size-xlarge" onclick="selectFontSize('xlarge')">
+              <span class="size-preview-sample" style="font-size: 19.5px;">A</span>
+              <span class="size-label">ធំខ្លាំង (Extra)</span>
+            </button>
           </div>
-          <div class="theme-check-mark"><i data-lucide="check"></i></div>
         </div>
 
-        <!-- 3. Midnight Teal Glass -->
-        <div class="theme-option-card" id="theme-opt-midnight" onclick="selectTheme('midnight')">
-          <div class="theme-swatch midnight-swatch" style="background: linear-gradient(135deg, #0F172A 0%, #2DD4BF 100%);">
-            <i data-lucide="moon" style="color:#38BDF8; width:22px; height:22px;"></i>
+        <!-- Section 3: 🔤 ពុម្ពអក្សរ (Font Family) -->
+        <div class="settings-group-section">
+          <div class="settings-group-header">
+            <span class="settings-group-title"><i data-lucide="case-sensitive"></i> ពុម្ពអក្សរ (Font Family)</span>
+            <span class="settings-group-badge" id="settings-current-font-badge">Kantumruy</span>
           </div>
-          <div class="theme-info">
-            <span class="theme-name">🌙 Midnight Teal Glass</span>
-            <span class="theme-desc">BG: #0F172A | Cards: #1E293B (ងងឹតស្រទន់ការពារភ្នែកពេលយប់)</span>
+          <div class="font-family-options-list">
+            <!-- 1. Kantumruy Pro -->
+            <div class="font-option-row" id="font-opt-kantumruy" onclick="selectFont('kantumruy')">
+              <div class="font-preview-wrap" style="font-family: 'Kantumruy Pro', sans-serif;">
+                <div class="font-name-title">Kantumruy Pro <span class="font-badge-rec">ពេញនិយម</span></div>
+                <div class="font-sample-khmer">សួស្តី យឹម សីហា! សមតុល្យសរុប 17,634,100 ៛ ($4,301.00)</div>
+              </div>
+              <div class="theme-check-mark"><i data-lucide="check"></i></div>
+            </div>
+
+            <!-- 2. Noto Sans Khmer -->
+            <div class="font-option-row" id="font-opt-noto" onclick="selectFont('noto')">
+              <div class="font-preview-wrap" style="font-family: 'Noto Sans Khmer', sans-serif;">
+                <div class="font-name-title">Noto Sans Khmer <span class="font-badge-sub">Google Standard</span></div>
+                <div class="font-sample-khmer">សួស្តី យឹម សីហា! សមតុល្យសរុប 17,634,100 ៛ ($4,301.00)</div>
+              </div>
+              <div class="theme-check-mark"><i data-lucide="check"></i></div>
+            </div>
+
+            <!-- 3. Koh Santepheap -->
+            <div class="font-option-row" id="font-opt-koh-santepheap" onclick="selectFont('koh-santepheap')">
+              <div class="font-preview-wrap" style="font-family: 'Koh Santepheap', serif, sans-serif;">
+                <div class="font-name-title">Koh Santepheap <span class="font-badge-sub">កោះសន្តិភាព ផ្លូវការ</span></div>
+                <div class="font-sample-khmer">សួស្តី យឹម សីហា! សមតុល្យសរុប 17,634,100 ៛ ($4,301.00)</div>
+              </div>
+              <div class="theme-check-mark"><i data-lucide="check"></i></div>
+            </div>
+
+            <!-- 4. Battambang -->
+            <div class="font-option-row" id="font-opt-battambang" onclick="selectFont('battambang')">
+              <div class="font-preview-wrap" style="font-family: 'Battambang', sans-serif;">
+                <div class="font-name-title">Battambang <span class="font-badge-sub">បាត់ដំបង ច្បាស់ៗ</span></div>
+                <div class="font-sample-khmer">សួស្តី យឹម សីហា! សមតុល្យសរុប 17,634,100 ៛ ($4,301.00)</div>
+              </div>
+              <div class="theme-check-mark"><i data-lucide="check"></i></div>
+            </div>
+
+            <!-- 5. Siemreap -->
+            <div class="font-option-row" id="font-opt-siemreap" onclick="selectFont('siemreap')">
+              <div class="font-preview-wrap" style="font-family: 'Siemreap', cursive, sans-serif;">
+                <div class="font-name-title">Siemreap <span class="font-badge-sub">សៀមរាប រចនាបទខ្មែរ</span></div>
+                <div class="font-sample-khmer">សួស្តី យឹម សីហា! សមតុល្យសរុប 17,634,100 ៛ ($4,301.00)</div>
+              </div>
+              <div class="theme-check-mark"><i data-lucide="check"></i></div>
+            </div>
           </div>
-          <div class="theme-check-mark"><i data-lucide="check"></i></div>
+        </div>
+
+        <!-- Section 4: 🌐 ភាសាប្រព័ន្ធ (Language) -->
+        <div class="settings-group-section">
+          <div class="settings-group-header">
+            <span class="settings-group-title"><i data-lucide="globe"></i> ភាសាប្រព័ន្ធ (Language)</span>
+            <span class="settings-group-badge" id="settings-current-lang-badge">ខ្មែរ</span>
+          </div>
+          <div class="lang-pills-grid">
+            <button type="button" class="lang-option-pill" id="lang-opt-km" onclick="selectLanguage('km')">
+              <span class="lang-flag">🇰🇭</span>
+              <div class="lang-text-wrap">
+                <span class="lang-primary">ភាសាខ្មែរ</span>
+                <span class="lang-secondary">Khmer</span>
+              </div>
+              <div class="theme-check-mark"><i data-lucide="check"></i></div>
+            </button>
+            <button type="button" class="lang-option-pill" id="lang-opt-en" onclick="selectLanguage('en')">
+              <span class="lang-flag">🇬🇧</span>
+              <div class="lang-text-wrap">
+                <span class="lang-primary">English</span>
+                <span class="lang-secondary">អង់គ្លេស</span>
+              </div>
+              <div class="theme-check-mark"><i data-lucide="check"></i></div>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -561,6 +676,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=20261019_v25"></script>
+  <script src="app.js?v=20261019_v26"></script>
 </body>
 </html>

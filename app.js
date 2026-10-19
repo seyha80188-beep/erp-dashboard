@@ -278,6 +278,9 @@ const state = {
     if (t === 'dark' || t === 'glass') return 'midnight';
     return ['sage', 'warm', 'midnight'].includes(t) ? t : 'sage';
   })(),
+  fontFamily: localStorage.getItem('yem_font') || 'kantumruy',
+  fontSize: localStorage.getItem('yem_font_size') || 'normal',
+  lang: localStorage.getItem('yem_lang') || 'km',
   expenseCurrency: 'KHR',      // 'KHR' | 'USD'
   isLoading: false,
   lastSyncTime: null,
@@ -350,6 +353,8 @@ const sidebarUserRole = document.getElementById('sidebar-user-role');
 async function initApp() {
   try {
     applyAppTheme();
+    applyAppFont();
+    applyAppFontSize();
     applyAppLanguage();
     renderSidebarNav();
     setupSidebarEventListeners();
@@ -477,6 +482,8 @@ function applyAppLanguage() {
   if (navExpenses) navExpenses.textContent = lang === 'en' ? 'Expense B2' : 'ចំណាយ B2';
   const navReports = document.getElementById('nav-reports-text');
   if (navReports) navReports.textContent = lang === 'en' ? 'Reports' : 'របាយការណ៍';
+  const navTheme = document.getElementById('nav-theme-text');
+  if (navTheme) navTheme.textContent = lang === 'en' ? 'Settings' : 'ការកំណត់';
 
   // Modal
   const expModalTitle = document.getElementById('exp-modal-title');
@@ -4633,21 +4640,35 @@ window.handleSaveParsedOrders = async function() {
 };
 
 /**
- * Theme Modal Handlers & Selection
+ * Settings & Appearance Modal Handlers (Themes, Font Family, Font Size, Language)
  */
+window.applyAppFont = function() {
+  const font = state.fontFamily || 'kantumruy';
+  const fontMap = {
+    'kantumruy': "'Kantumruy Pro', 'Noto Sans Khmer', -apple-system, sans-serif",
+    'noto': "'Noto Sans Khmer', -apple-system, sans-serif",
+    'koh-santepheap': "'Koh Santepheap', serif, -apple-system, sans-serif",
+    'battambang': "'Battambang', -apple-system, sans-serif",
+    'siemreap': "'Siemreap', cursive, -apple-system, sans-serif"
+  };
+  const family = fontMap[font] || fontMap['kantumruy'];
+  document.documentElement.style.setProperty('--font-family', family);
+  document.body.classList.remove('font-kantumruy', 'font-noto', 'font-koh-santepheap', 'font-battambang', 'font-siemreap');
+  document.body.classList.add(`font-${font}`);
+};
+
+window.applyAppFontSize = function() {
+  const size = state.fontSize || 'normal';
+  document.body.classList.remove('font-size-small', 'font-size-normal', 'font-size-large', 'font-size-xlarge');
+  document.body.classList.add(`font-size-${size}`);
+};
+
 window.openThemeModal = function() {
   const overlay = document.getElementById('theme-modal-overlay');
   if (overlay) {
     overlay.style.display = 'flex';
     overlay.classList.add('active');
-    ['sage', 'warm', 'midnight'].forEach(t => {
-      const card = document.getElementById(`theme-opt-${t}`);
-      if (card) {
-        if (state.theme === t) card.classList.add('selected');
-        else card.classList.remove('selected');
-      }
-    });
-    if (window.lucide) window.lucide.createIcons();
+    updateSettingsModalActiveStates();
   }
 };
 
@@ -4664,7 +4685,87 @@ window.selectTheme = function(themeName) {
   localStorage.setItem('yem_theme', themeName);
   applyAppTheme();
   renderDashboardModule();
-  closeThemeModal();
+  updateSettingsModalActiveStates();
+};
+
+window.selectFont = function(fontKey) {
+  state.fontFamily = fontKey;
+  localStorage.setItem('yem_font', fontKey);
+  applyAppFont();
+  updateSettingsModalActiveStates();
+};
+
+window.selectFontSize = function(sizeKey) {
+  state.fontSize = sizeKey;
+  localStorage.setItem('yem_font_size', sizeKey);
+  applyAppFontSize();
+  updateSettingsModalActiveStates();
+};
+
+window.selectLanguage = function(langKey) {
+  state.lang = langKey;
+  localStorage.setItem('yem_lang', langKey);
+  applyAppLanguage();
+  renderSidebarNav();
+  renderModuleContent(state.activeModule);
+  updateSettingsModalActiveStates();
+};
+
+window.updateSettingsModalActiveStates = function() {
+  // 1. Themes active state
+  ['sage', 'warm', 'midnight'].forEach(t => {
+    const card = document.getElementById(`theme-opt-${t}`);
+    if (card) {
+      if (state.theme === t) card.classList.add('selected');
+      else card.classList.remove('selected');
+    }
+  });
+  const themeBadges = { 'sage': '🌿 Sage', 'warm': '🌾 Alabaster', 'midnight': '🌙 Midnight' };
+  const curThemeBadge = document.getElementById('settings-current-theme-badge');
+  if (curThemeBadge) curThemeBadge.textContent = themeBadges[state.theme] || '🌿 Sage';
+
+  // 2. Font Size active state
+  ['small', 'normal', 'large', 'xlarge'].forEach(s => {
+    const pill = document.getElementById(`font-size-${s}`);
+    if (pill) {
+      if ((state.fontSize || 'normal') === s) pill.classList.add('selected');
+      else pill.classList.remove('selected');
+    }
+  });
+  const sizeLabels = { 'small': 'តូច', 'normal': 'ធម្មតា', 'large': 'ធំ', 'xlarge': 'ធំខ្លាំង' };
+  const curSizeBadge = document.getElementById('settings-current-size-badge');
+  if (curSizeBadge) curSizeBadge.textContent = sizeLabels[state.fontSize || 'normal'] || 'ធម្មតា';
+
+  // 3. Font Family active state
+  ['kantumruy', 'noto', 'koh-santepheap', 'battambang', 'siemreap'].forEach(f => {
+    const row = document.getElementById(`font-opt-${f}`);
+    if (row) {
+      if ((state.fontFamily || 'kantumruy') === f) row.classList.add('selected');
+      else row.classList.remove('selected');
+    }
+  });
+  const fontLabels = {
+    'kantumruy': 'Kantumruy Pro',
+    'noto': 'Noto Sans',
+    'koh-santepheap': 'Koh Santepheap',
+    'battambang': 'Battambang',
+    'siemreap': 'Siemreap'
+  };
+  const curFontBadge = document.getElementById('settings-current-font-badge');
+  if (curFontBadge) curFontBadge.textContent = fontLabels[state.fontFamily || 'kantumruy'] || 'Kantumruy Pro';
+
+  // 4. Language active state
+  ['km', 'en'].forEach(l => {
+    const pill = document.getElementById(`lang-opt-${l}`);
+    if (pill) {
+      if ((state.lang || 'km') === l) pill.classList.add('selected');
+      else pill.classList.remove('selected');
+    }
+  });
+  const curLangBadge = document.getElementById('settings-current-lang-badge');
+  if (curLangBadge) curLangBadge.textContent = (state.lang || 'km') === 'en' ? 'English' : 'ខ្មែរ';
+
+  if (window.lucide) window.lucide.createIcons();
 };
 
 /**

@@ -7303,44 +7303,139 @@ body.theme-glass .quick-add-plus-circle.orders-circle {
 /* --------------------------------------------------------------------------
    THEME SWITCHER MODAL (Exact 3 Options matching user specification)
    -------------------------------------------------------------------------- */
-.theme-modal-card {
+.theme-modal-card.settings-modal-card {
   background: #FFFFFF;
   border: 1px solid #E2E8F0;
   border-radius: 24px;
-  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.15);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
   color: #0F172A;
-  max-width: 440px;
-  width: 90%;
-  padding: 24px;
+  max-width: 500px;
+  width: 92%;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  padding: 22px 20px;
+  overflow: hidden;
 }
 
-body.theme-midnight .theme-modal-card,
-body.theme-dark .theme-modal-card,
-body.theme-glass .theme-modal-card {
+body.theme-sage .theme-modal-card.settings-modal-card {
+  background: #F7FAF9 !important;
+  border-color: #D4E2DE !important;
+}
+
+body.theme-warm .theme-modal-card.settings-modal-card {
+  background: #FAF8F5 !important;
+  border-color: #E5DFD6 !important;
+}
+
+body.theme-midnight .theme-modal-card.settings-modal-card,
+body.theme-dark .theme-modal-card.settings-modal-card,
+body.theme-glass .theme-modal-card.settings-modal-card {
   background: #1E293B !important;
   border-color: rgba(45, 212, 191, 0.3) !important;
   color: #F8FAFC !important;
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.5) !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6) !important;
 }
 
+.settings-modal-scrollable {
+  overflow-y: auto;
+  padding-right: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 14px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.settings-group-section {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 18px;
+  padding: 14px 16px;
+}
+
+body.theme-sage .settings-group-section {
+  background: #EFF5F3 !important;
+  border-color: #D4E2DE !important;
+}
+
+body.theme-warm .settings-group-section {
+  background: #F3EFE8 !important;
+  border-color: #E7E0D5 !important;
+}
+
+body.theme-midnight .settings-group-section,
+body.theme-dark .settings-group-section,
+body.theme-glass .settings-group-section {
+  background: rgba(15, 23, 42, 0.6) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.settings-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.settings-group-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0F172A;
+}
+
+body.theme-midnight .settings-group-title,
+body.theme-dark .settings-group-title,
+body.theme-glass .settings-group-title {
+  color: #F8FAFC !important;
+}
+
+.settings-group-title svg {
+  width: 17px;
+  height: 17px;
+  color: #0D9488;
+}
+
+.settings-group-badge {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: rgba(13, 148, 136, 0.12);
+  color: #0D9488;
+}
+
+/* Themes list in settings */
 .theme-options-grid {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 16px;
+  gap: 10px;
 }
 
 .theme-option-card {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 14px 16px;
-  border-radius: 16px;
-  background: #F8FAFC;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #FFFFFF;
   border: 1.5px solid #E2E8F0;
   cursor: pointer;
   transition: all 0.2s ease;
   user-select: none;
+}
+
+body.theme-sage .theme-option-card {
+  background: #F7FAF9 !important;
+  border-color: #D4E2DE !important;
+}
+
+body.theme-warm .theme-option-card {
+  background: #FAF8F5 !important;
+  border-color: #E5DFD6 !important;
 }
 
 body.theme-midnight .theme-option-card,
@@ -7370,9 +7465,9 @@ body.theme-glass .theme-option-card.selected {
 }
 
 .theme-swatch {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -7388,7 +7483,7 @@ body.theme-glass .theme-option-card.selected {
 }
 
 .theme-name {
-  font-size: 14.5px;
+  font-size: 13.5px;
   font-weight: 700;
   color: #0F172A;
 }
@@ -7400,7 +7495,7 @@ body.theme-glass .theme-name {
 }
 
 .theme-desc {
-  font-size: 11.5px;
+  font-size: 11px;
   color: #64748B;
   font-weight: 500;
 }
@@ -7412,8 +7507,8 @@ body.theme-glass .theme-desc {
 }
 
 .theme-check-mark {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   border: 1.5px solid #CBD5E1;
   display: flex;
@@ -7424,19 +7519,364 @@ body.theme-glass .theme-desc {
   transition: all 0.2s ease;
 }
 
-.theme-option-card.selected .theme-check-mark {
+.theme-option-card.selected .theme-check-mark,
+.font-option-row.selected .theme-check-mark,
+.lang-option-pill.selected .theme-check-mark {
   background: #0D9488;
   border-color: #0D9488;
   color: #FFFFFF;
 }
 
 .theme-check-mark svg {
-  width: 14px;
-  height: 14px;
+  width: 13px;
+  height: 13px;
   stroke-width: 3;
 }
 
-/* Ensure Theme Modal Card is above everything and styled */
+/* Section 2: Font Size Pills Grid */
+.font-size-pills-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.font-size-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 6px;
+  border-radius: 14px;
+  background: #FFFFFF;
+  border: 1.5px solid #E2E8F0;
+  color: #0F172A;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+body.theme-sage .font-size-pill {
+  background: #F7FAF9 !important;
+  border-color: #D4E2DE !important;
+}
+
+body.theme-warm .font-size-pill {
+  background: #FAF8F5 !important;
+  border-color: #E5DFD6 !important;
+}
+
+body.theme-midnight .font-size-pill,
+body.theme-dark .font-size-pill,
+body.theme-glass .font-size-pill {
+  background: rgba(15, 23, 42, 0.7) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #F8FAFC !important;
+}
+
+.font-size-pill:hover {
+  transform: translateY(-2px);
+  border-color: #0D9488;
+}
+
+.font-size-pill.selected {
+  background: #F0FDFA !important;
+  border-color: #0D9488 !important;
+  color: #0D9488 !important;
+  font-weight: 700;
+  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.2) !important;
+}
+
+body.theme-midnight .font-size-pill.selected,
+body.theme-dark .font-size-pill.selected,
+body.theme-glass .font-size-pill.selected {
+  background: rgba(13, 148, 136, 0.25) !important;
+  border-color: #2DD4BF !important;
+  color: #2DD4BF !important;
+}
+
+.size-preview-sample {
+  font-weight: 800;
+  line-height: 1;
+}
+
+.size-label {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Section 3: Font Family Options List */
+.font-family-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.font-option-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: 14px;
+  background: #FFFFFF;
+  border: 1.5px solid #E2E8F0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+body.theme-sage .font-option-row {
+  background: #F7FAF9 !important;
+  border-color: #D4E2DE !important;
+}
+
+body.theme-warm .font-option-row {
+  background: #FAF8F5 !important;
+  border-color: #E5DFD6 !important;
+}
+
+body.theme-midnight .font-option-row,
+body.theme-dark .font-option-row,
+body.theme-glass .font-option-row {
+  background: rgba(15, 23, 42, 0.7) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.font-option-row:hover {
+  transform: translateY(-2px);
+  border-color: #0D9488;
+}
+
+.font-option-row.selected {
+  border-color: #0D9488 !important;
+  background: #F0FDFA !important;
+  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.2) !important;
+}
+
+body.theme-midnight .font-option-row.selected,
+body.theme-dark .font-option-row.selected,
+body.theme-glass .font-option-row.selected {
+  background: rgba(13, 148, 136, 0.22) !important;
+  border-color: #2DD4BF !important;
+}
+
+.font-preview-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.font-name-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0F172A;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+body.theme-midnight .font-name-title,
+body.theme-dark .font-name-title,
+body.theme-glass .font-name-title {
+  color: #F8FAFC !important;
+}
+
+.font-badge-rec {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 8px;
+  background: #DCFCE7;
+  color: #15803D;
+}
+
+.font-badge-sub {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 8px;
+  background: #F1F5F9;
+  color: #64748B;
+}
+
+body.theme-midnight .font-badge-sub,
+body.theme-dark .font-badge-sub,
+body.theme-glass .font-badge-sub {
+  background: rgba(255, 255, 255, 0.1);
+  color: #94A3B8;
+}
+
+.font-sample-khmer {
+  font-size: 11.5px;
+  color: #64748B;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.theme-midnight .font-sample-khmer,
+body.theme-dark .font-sample-khmer,
+body.theme-glass .font-sample-khmer {
+  color: #94A3B8 !important;
+}
+
+/* Section 4: Language Pills Grid */
+.lang-pills-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.lang-option-pill {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #FFFFFF;
+  border: 1.5px solid #E2E8F0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  font-family: inherit;
+}
+
+body.theme-sage .lang-option-pill {
+  background: #F7FAF9 !important;
+  border-color: #D4E2DE !important;
+}
+
+body.theme-warm .lang-option-pill {
+  background: #FAF8F5 !important;
+  border-color: #E5DFD6 !important;
+}
+
+body.theme-midnight .lang-option-pill,
+body.theme-dark .lang-option-pill,
+body.theme-glass .lang-option-pill {
+  background: rgba(15, 23, 42, 0.7) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.lang-option-pill:hover {
+  transform: translateY(-2px);
+  border-color: #0D9488;
+}
+
+.lang-option-pill.selected {
+  border-color: #0D9488 !important;
+  background: #F0FDFA !important;
+  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.2) !important;
+}
+
+body.theme-midnight .lang-option-pill.selected,
+body.theme-dark .lang-option-pill.selected,
+body.theme-glass .lang-option-pill.selected {
+  background: rgba(13, 148, 136, 0.22) !important;
+  border-color: #2DD4BF !important;
+}
+
+.lang-flag {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.lang-text-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.lang-primary {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0F172A;
+}
+
+body.theme-midnight .lang-primary,
+body.theme-dark .lang-primary,
+body.theme-glass .lang-primary {
+  color: #F8FAFC !important;
+}
+
+.lang-secondary {
+  font-size: 11px;
+  color: #64748B;
+  font-weight: 500;
+}
+
+body.theme-midnight .lang-secondary,
+body.theme-dark .lang-secondary,
+body.theme-glass .lang-secondary {
+  color: #94A3B8 !important;
+}
+
+/* --------------------------------------------------------------------------
+   GLOBAL FONT FAMILY CLASSES
+   -------------------------------------------------------------------------- */
+body.font-kantumruy,
+body.font-kantumruy button,
+body.font-kantumruy input,
+body.font-kantumruy select,
+body.font-kantumruy textarea {
+  font-family: 'Kantumruy Pro', sans-serif !important;
+}
+
+body.font-noto,
+body.font-noto button,
+body.font-noto input,
+body.font-noto select,
+body.font-noto textarea {
+  font-family: 'Noto Sans Khmer', sans-serif !important;
+}
+
+body.font-koh-santepheap,
+body.font-koh-santepheap button,
+body.font-koh-santepheap input,
+body.font-koh-santepheap select,
+body.font-koh-santepheap textarea {
+  font-family: 'Koh Santepheap', serif, sans-serif !important;
+}
+
+body.font-battambang,
+body.font-battambang button,
+body.font-battambang input,
+body.font-battambang select,
+body.font-battambang textarea {
+  font-family: 'Battambang', sans-serif !important;
+}
+
+body.font-siemreap,
+body.font-siemreap button,
+body.font-siemreap input,
+body.font-siemreap select,
+body.font-siemreap textarea {
+  font-family: 'Siemreap', cursive, sans-serif !important;
+}
+
+/* --------------------------------------------------------------------------
+   GLOBAL FONT SIZE SCALING
+   -------------------------------------------------------------------------- */
+body.font-size-small {
+  zoom: 0.92;
+}
+
+body.font-size-normal {
+  zoom: 1;
+}
+
+body.font-size-large {
+  zoom: 1.08;
+}
+
+body.font-size-xlarge {
+  zoom: 1.16;
+}
+
+/* Ensure Modal is above everything */
 #theme-modal-overlay {
   z-index: 99999 !important;
 }
