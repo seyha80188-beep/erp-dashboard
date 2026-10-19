@@ -290,13 +290,35 @@ const state = {
     try {
       const raw = JSON.parse(localStorage.getItem('yem_custom_expenses') || '[]');
       // Auto-clean stale demo expense from 2026-10-19 ($16 / 65,600)
-      const cleaned = raw.filter(e => !(e.date === '2026-10-19' && (e.amountUsd === 16 || e.amountKhr === 65600)));
-      if (cleaned.length !== raw.length) {
-        localStorage.setItem('yem_custom_expenses', JSON.stringify(cleaned));
+      let list = raw.filter(e => !(e.date === '2026-10-19' && (e.amountUsd === 16 || e.amountKhr === 65600)));
+      const hasToday = list.some(e => e.date === '2026-10-19');
+      if (!hasToday) {
+        list.unshift({
+          date: '2026-10-19',
+          month: '2026-10',
+          description: 'កាហ្វេ & សាំងម៉ូតូ',
+          category: 'ចាំបាច់',
+          paymentMethod: 'ABA Bank',
+          amountUsd: 1.95,
+          amountKhr: 8000,
+          note: 'បញ្ចូលផ្ទាល់ក្នុងកម្មវិធី (In-App Logger)',
+          isPersonal: true
+        });
+        localStorage.setItem('yem_custom_expenses', JSON.stringify(list));
       }
-      return cleaned;
+      return list;
     } catch (err) {
-      return [];
+      return [{
+        date: '2026-10-19',
+        month: '2026-10',
+        description: 'កាហ្វេ & សាំងម៉ូតូ',
+        category: 'ចាំបាច់',
+        paymentMethod: 'ABA Bank',
+        amountUsd: 1.95,
+        amountKhr: 8000,
+        note: 'បញ្ចូលផ្ទាល់ក្នុងកម្មវិធី (In-App Logger)',
+        isPersonal: true
+      }];
     }
   })(),
   customOrders: JSON.parse(localStorage.getItem('yem_custom_orders') || '[]'),
@@ -710,6 +732,30 @@ async function fetchSheetData() {
         mergedExpenses.push(e);
       }
     });
+    // Ensure today 2026-10-19 expense ($1.95 / 8,000 ៛ "កាហ្វេ & សាំងម៉ូតូ") is present
+    const hasOct19Exp = mergedExpenses.some(e => e.date === '2026-10-19');
+    if (!hasOct19Exp) {
+      const oct19Exp = {
+        date: '2026-10-19',
+        month: '2026-10',
+        description: 'កាហ្វេ & សាំងម៉ូតូ',
+        category: 'ចាំបាច់',
+        paymentMethod: 'ABA Bank',
+        amountUsd: 1.95,
+        amountKhr: 8000,
+        note: 'បញ្ចូលផ្ទាល់ក្នុងកម្មវិធី (In-App Logger)',
+        isPersonal: true
+      };
+      mergedExpenses.unshift(oct19Exp);
+      if (!state.customExpenses) state.customExpenses = [];
+      if (!state.customExpenses.some(e => e.date === '2026-10-19')) {
+        state.customExpenses.unshift(oct19Exp);
+        try {
+          localStorage.setItem('yem_custom_expenses', JSON.stringify(state.customExpenses));
+        } catch (e) {}
+      }
+    }
+
     // Ensure yesterday 2026-10-18 expense ($16.00 / 65,600 ៛) is present
     const hasOct18Exp = mergedExpenses.some(e => e.date === '2026-10-18');
     if (!hasOct18Exp) {
