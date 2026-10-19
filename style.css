@@ -2765,24 +2765,34 @@ body {
 
   /* Mobile Modal Sizing & Full View without Text Clipping */
   .modal-overlay {
-    padding: 8px 6px !important;
+    padding: 10px 8px !important;
+    overflow-x: hidden !important;
+    touch-action: pan-y !important;
+    overscroll-behavior-x: none !important;
   }
 
   .expense-modal-card,
   .order-modal-card {
-    width: 98% !important;
-    max-width: 100% !important;
-    max-height: 94vh !important;
-    padding: 20px 14px !important;
-    border-radius: 22px !important;
+    width: min(92vw, 420px) !important;
+    max-width: 420px !important;
+    max-height: 86vh !important;
+    padding: 16px 14px !important;
+    border-radius: 18px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    touch-action: pan-y !important;
+    overscroll-behavior-x: none !important;
+    overscroll-behavior-y: contain !important;
+    box-sizing: border-box !important;
+    margin: auto !important;
   }
 
   .modal-title {
-    font-size: 17px !important;
+    font-size: 15.5px !important;
   }
 
   .modal-subtitle {
-    font-size: 12px !important;
+    font-size: 11.5px !important;
   }
 }
 
@@ -3840,7 +3850,11 @@ body.theme-light .header-curr-pill.active {
   display: none;
   align-items: center;
   justify-content: center;
-  padding: 10px 8px;
+  padding: 12px 10px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  touch-action: pan-y;
+  overscroll-behavior-x: none;
   animation: fadeIn 0.25s ease;
 }
 
@@ -3853,86 +3867,90 @@ body.theme-vet .modal-overlay {
 }
 
 .expense-modal-card {
-  width: 98%;
-  max-width: 560px;
-  max-height: 94vh;
+  width: min(92vw, 440px);
+  max-width: 440px;
+  max-height: 86vh;
   overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
   -webkit-overflow-scrolling: touch;
   background: linear-gradient(180deg, #0F234D 0%, #08132B 100%);
-  border: 2px solid rgba(0, 180, 216, 0.65);
-  border-radius: 26px;
-  padding: 24px 20px;
+  border: 1.5px solid rgba(0, 180, 216, 0.65);
+  border-radius: 20px;
+  padding: 16px 14px;
+  box-sizing: border-box;
   box-shadow: 
-    0 0 45px rgba(0, 180, 216, 0.5),
-    0 0 90px rgba(0, 119, 182, 0.35),
-    0 0 140px rgba(0, 180, 216, 0.2),
-    0 25px 65px rgba(0, 0, 0, 0.92);
+    0 0 35px rgba(0, 180, 216, 0.4),
+    0 0 70px rgba(0, 119, 182, 0.25),
+    0 20px 50px rgba(0, 0, 0, 0.92);
   color: #FFFFFF;
   position: relative;
+  margin: auto;
 }
 
 body.theme-vet .expense-modal-card {
   background: linear-gradient(180deg, #1E293B 0%, #0F172A 100%) !important;
-  border: 2px solid rgba(255, 102, 0, 0.75) !important;
+  border: 1.5px solid rgba(255, 102, 0, 0.75) !important;
   box-shadow: 
-    0 0 50px rgba(255, 102, 0, 0.55),
-    0 0 100px rgba(234, 88, 12, 0.4),
-    0 0 160px rgba(255, 102, 0, 0.22),
-    0 25px 65px rgba(0, 0, 0, 0.95) !important;
+    0 0 40px rgba(255, 102, 0, 0.45),
+    0 0 80px rgba(234, 88, 12, 0.3),
+    0 20px 50px rgba(0, 0, 0, 0.95) !important;
 }
 
 body.theme-glass .expense-modal-card {
   background: rgba(15, 23, 42, 0.92) !important;
   backdrop-filter: blur(35px) saturate(200%) !important;
   -webkit-backdrop-filter: blur(35px) saturate(200%) !important;
-  border: 2px solid rgba(0, 180, 216, 0.7) !important;
+  border: 1.5px solid rgba(0, 180, 216, 0.7) !important;
   box-shadow: 
-    0 0 45px rgba(0, 180, 216, 0.5),
-    0 0 90px rgba(0, 119, 182, 0.35),
-    0 25px 70px rgba(0, 0, 0, 0.9) !important;
+    0 0 35px rgba(0, 180, 216, 0.4),
+    0 0 70px rgba(0, 119, 182, 0.25),
+    0 20px 50px rgba(0, 0, 0, 0.9) !important;
 }
 
 .modal-header-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 18px;
-  padding-bottom: 14px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-  gap: 12px;
+  gap: 10px;
 }
 
 .expense-icon-circle {
-  width: 52px;
-  height: 52px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: linear-gradient(135deg, #00B4D8 0%, #0077B6 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 20px rgba(0, 180, 216, 0.65);
-  border: 2px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 16px rgba(0, 180, 216, 0.5);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
   flex-shrink: 0;
 }
 
 .expense-icon-circle svg {
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
   color: #FFFFFF;
 }
 
 .modal-title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   color: #FFFFFF;
   line-height: 1.25;
 }
 
 .modal-subtitle {
-  font-size: 12.5px;
+  font-size: 11.5px;
   color: rgba(255, 255, 255, 0.8);
   line-height: 1.35;
-  margin-top: 3px;
+  margin-top: 2px;
   display: block;
 }
 
@@ -3940,9 +3958,9 @@ body.theme-glass .expense-modal-card {
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: #FFFFFF;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -3961,10 +3979,12 @@ body.theme-glass .expense-modal-card {
 .expense-today-banner {
   background: linear-gradient(135deg, rgba(0, 180, 216, 0.15) 0%, rgba(14, 31, 68, 0.9) 100%);
   border: 1px solid rgba(0, 180, 216, 0.35);
-  border-radius: 14px;
-  padding: 12px 14px;
-  margin-bottom: 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .pulse-today-dot {
@@ -4007,25 +4027,29 @@ body.theme-glass .expense-modal-card {
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-bottom: 14px;
+  gap: 5px;
+  margin-bottom: 11px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .form-group label {
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.95);
 }
 
 .form-input, .form-select {
   width: 100%;
-  padding: 13px 16px; /* រង្វង់បំពេញធំទូលាយ ងាយស្រួលចុចលើទូរស័ព្ទ */
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
   border: 1.5px solid rgba(255, 255, 255, 0.18);
-  border-radius: 10px;
+  border-radius: 9px;
   background: rgba(6, 14, 34, 0.9);
   color: #FFFFFF;
   font-family: inherit;
-  font-size: 16px; /* 16px prevents iOS Safari auto-zoom while focused */
+  font-size: 15px;
   outline: none;
   transition: all var(--transition-fast);
 }
@@ -4038,8 +4062,10 @@ body.theme-glass .expense-modal-card {
 .quick-chips-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 6px;
+  gap: 5px;
+  margin-top: 5px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .quick-chip {
