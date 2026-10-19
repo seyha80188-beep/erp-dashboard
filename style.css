@@ -5672,25 +5672,25 @@ body.theme-vet .dash-quick-sub {
    THEME ADAPTATIONS (Teal vs VET vs Dark vs Glass)
    ========================================================================== */
 
-/* 1. TEAL THEME OVERRIDES (Midnight Teal Luxury - Eye-Care Night Aqua) */
+/* 1. TEAL THEME OVERRIDES (Luxury Pearl White - សរថ្លៃ ស្រទន់មិនឈឺភ្នែក iOS Fintech Style) */
 body.theme-teal {
-  background: #08111E !important;
+  background: #F8FAFC !important;
   background-image: 
-    radial-gradient(circle at 18% 18%, rgba(13, 148, 136, 0.14) 0%, transparent 45%),
-    radial-gradient(circle at 82% 38%, rgba(6, 182, 212, 0.09) 0%, transparent 50%) !important;
-  color: #F8FAFC !important;
+    radial-gradient(circle at 15% 15%, rgba(13, 148, 136, 0.06) 0%, transparent 40%),
+    radial-gradient(circle at 85% 35%, rgba(6, 182, 212, 0.05) 0%, transparent 45%) !important;
+  color: #0F172A !important;
 }
 
 body.theme-teal .main-wrapper,
 body.theme-teal .content-area {
-  background: transparent !important;
-  color: #F8FAFC !important;
+  background: #F8FAFC !important;
+  color: #0F172A !important;
 }
 
 body.theme-teal .top-header {
-  background: rgba(8, 17, 30, 0.92) !important;
-  border-bottom: 1px solid rgba(45, 212, 191, 0.18) !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04) !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
 }
@@ -5699,206 +5699,224 @@ body.theme-teal .header-user-pill,
 body.theme-teal .header-pill-btn,
 body.theme-teal .header-date-badge,
 body.theme-teal .top-date-card {
-  background: rgba(13, 26, 46, 0.88) !important;
-  border: 1px solid rgba(45, 212, 191, 0.25) !important;
-  color: #F1F5F9 !important;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.22) !important;
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  color: #0F172A !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04) !important;
 }
 
 body.theme-teal .header-username-khmer,
 body.theme-teal .user-khmer-title {
-  color: #FFFFFF !important;
+  color: #0F172A !important;
+  font-weight: 700 !important;
 }
 
 body.theme-teal .header-username-en,
 body.theme-teal .user-en-sub {
-  color: #94A3B8 !important;
+  color: #64748B !important;
 }
 
 body.theme-teal .date-khmer-badge,
 body.theme-teal .header-date-khmer {
-  color: #2DD4BF !important;
+  color: #0D9488 !important;
+  font-weight: 700 !important;
 }
 
 body.theme-teal .date-en-badge,
 body.theme-teal .header-date-en {
-  color: #94A3B8 !important;
+  color: #64748B !important;
 }
 
-/* Master Hero Card in Teal Theme (Eye-Care Luxury Teal Gradient) */
+/* Master Hero Card in Teal Theme (Satin Luxury Teal Gradient) */
 body.theme-teal .minimal-hero-card {
-  background: linear-gradient(135deg, #094F5E 0%, #0D6E6E 52%, #108A7C 100%) !important;
-  border: 1px solid rgba(94, 234, 212, 0.35) !important;
-  box-shadow: 0 16px 36px rgba(9, 79, 94, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.25) !important;
+  background: linear-gradient(135deg, #0D9488 0%, #14B8A6 45%, #06B6D4 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 14px 34px rgba(13, 148, 136, 0.28), 0 4px 12px rgba(13, 148, 136, 0.15), inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
   color: #FFFFFF !important;
 }
 
 body.theme-teal .hero-card-title {
   color: rgba(255, 255, 255, 0.95) !important;
+  font-weight: 600 !important;
 }
 
 body.theme-teal .hero-eye-btn {
-  background: rgba(255, 255, 255, 0.18) !important;
-  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  background: rgba(255, 255, 255, 0.22) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
   color: #FFFFFF !important;
 }
 
 body.theme-teal .hero-balance-khr {
   color: #FFFFFF !important;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.2) !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
 }
 
 body.theme-teal .hero-balance-usd {
   color: rgba(255, 255, 255, 0.92) !important;
 }
 
-/* Daily Expense Badge Inside Hero (Soft Rose Coral - No Chromatic Vibration on Cyan) */
+/* Daily Expense Badge Inside Hero (Luxury Pearl Pill - Crisp Red Figures, No Chromatic Vibration) */
 body.theme-teal .hero-expense-row {
-  background: rgba(220, 38, 38, 0.22) !important;
-  border: 1px solid rgba(254, 202, 202, 0.38) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(254, 202, 202, 0.9) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
   backdrop-filter: blur(8px) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
 }
 
 body.theme-teal .hero-expense-label {
-  color: #FFA39E !important;
+  color: #475569 !important;
+  font-weight: 700 !important;
 }
 
 body.theme-teal .hero-expense-label svg {
-  color: #F87171 !important;
+  color: #EF4444 !important;
 }
 
 body.theme-teal .hero-expense-val-khr {
-  color: #FFE4E6 !important;
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.2) !important;
+  color: #DC2626 !important;
+  font-weight: 800 !important;
+  text-shadow: none !important;
 }
 
 body.theme-teal .hero-expense-val-usd {
-  color: #FCA5A5 !important;
+  color: #EF4444 !important;
+  font-weight: 700 !important;
 }
 
 /* Hero Time Filter Capsule */
 body.theme-teal .hero-filter-capsule {
-  background: rgba(0, 0, 0, 0.22) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  background: rgba(255, 255, 255, 0.22) !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
 }
 
 body.theme-teal .hero-filter-btn {
-  color: rgba(255, 255, 255, 0.88) !important;
+  color: rgba(255, 255, 255, 0.92) !important;
 }
 
 body.theme-teal .hero-filter-btn.active {
   background: #FFFFFF !important;
-  color: #094F5E !important;
-  font-weight: 700 !important;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2) !important;
+  color: #0D9488 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
 }
 
-/* Hero Day Picker Row (Frosted Glass - Eliminates Pitch-Black Box) */
+/* Hero Day Picker Row (Frosted Pearl Glass - No Pitch-Black Hole) */
 body.theme-teal .hero-day-picker-bar {
-  background: rgba(0, 0, 0, 0.25) !important;
-  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  background: rgba(255, 255, 255, 0.22) !important;
+  border: 1px solid rgba(255, 255, 255, 0.38) !important;
   backdrop-filter: blur(12px) !important;
-  color: rgba(255, 255, 255, 0.9) !important;
+  color: #FFFFFF !important;
+  border-radius: 12px !important;
 }
 
 body.theme-teal .hero-native-date {
-  background: rgba(255, 255, 255, 0.16) !important;
-  border: 1px solid rgba(255, 255, 255, 0.32) !important;
+  background: rgba(255, 255, 255, 0.32) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
   color: #FFFFFF !important;
+  font-weight: 700 !important;
   border-radius: 8px !important;
 }
 
 body.theme-teal .hero-mini-tag {
-  background: rgba(255, 255, 255, 0.15) !important;
-  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
   color: #FFFFFF !important;
 }
 
 body.theme-teal .hero-mini-tag.active {
   background: #FFFFFF !important;
   border-color: #FFFFFF !important;
-  color: #094F5E !important;
-  font-weight: 700 !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+  color: #0D9488 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
 }
 
 /* Hero Dual Quick Action Buttons */
 body.theme-teal .hero-action-pill.telegram-pill {
   background: #FFFFFF !important;
   color: #0F172A !important;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08) !important;
 }
 
 body.theme-teal .hero-action-pill.expense-pill {
-  background: #FFE5D9 !important;
-  color: #9A3412 !important;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2) !important;
+  background: #FFF1F2 !important;
+  color: #9F1239 !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06) !important;
 }
 
-/* Segmented Control (A1 vs B2 Switcher) */
+/* Segmented Control (A1 vs B2 Switcher - Apple Luxury Light Style, No Black Box) */
 body.theme-teal .fintech-segmented-wrapper {
-  border-top-color: rgba(45, 212, 191, 0.16) !important;
+  border-top-color: #E2E8F0 !important;
 }
 
 body.theme-teal .fintech-segmented-control {
-  background: rgba(13, 26, 46, 0.88) !important;
-  border: 1px solid rgba(45, 212, 191, 0.24) !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+  background: #F1F5F9 !important;
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 14px !important;
+  padding: 4px !important;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.04) !important;
 }
 
 body.theme-teal .segmented-tab-btn {
-  color: #94A3B8 !important;
+  color: #64748B !important;
+  font-weight: 600 !important;
 }
 
 body.theme-teal .segmented-tab-btn.active {
-  background: linear-gradient(135deg, #0D9488 0%, #06B6D4 100%) !important;
-  color: #FFFFFF !important;
-  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.45) !important;
+  background: #FFFFFF !important;
+  color: #0D9488 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08) !important;
 }
 
 body.theme-teal .segmented-tab-btn.active svg {
-  color: #FFFFFF !important;
+  color: #0D9488 !important;
 }
 
-/* Minimal 2x2 KPI Cards (Soft Dark Aqua Glass) */
+/* Minimal 2x2 KPI Cards (Pure Pearl White Luxury) */
 body.theme-teal .minimal-kpi-card {
-  background: rgba(13, 26, 46, 0.78) !important;
-  border: 1px solid rgba(45, 212, 191, 0.2) !important;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22) !important;
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 20px !important;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04) !important;
 }
 
 body.theme-teal .kpi-title-khmer,
 body.theme-teal .kpi-value-text {
-  color: #F8FAFC !important;
+  color: #0F172A !important;
+  font-weight: 800 !important;
 }
 
 body.theme-teal .kpi-title-en {
-  color: #94A3B8 !important;
+  color: #64748B !important;
 }
 
 /* Panels, Filter Bars & Metric Cards */
 body.theme-teal .panel-card,
 body.theme-teal .filter-bar,
 body.theme-teal .metric-card {
-  background: rgba(13, 26, 46, 0.78) !important;
-  border: 1px solid rgba(45, 212, 191, 0.2) !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.22) !important;
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 20px !important;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04) !important;
 }
 
 body.theme-teal .card-title,
 body.theme-teal h2,
 body.theme-teal h3,
 body.theme-teal .metric-label {
-  color: #F8FAFC !important;
+  color: #0F172A !important;
+  font-weight: 700 !important;
 }
 
 body.theme-teal .card-subtitle,
 body.theme-teal .filter-label {
-  color: #94A3B8 !important;
+  color: #64748B !important;
 }
 
-/* Month Dropdowns, Range Selectors & Form Inputs (No Pitch-Black Clash) */
+/* Month Dropdowns, Range Selectors & Form Inputs (Pearl White, No Pitch-Black Clash) */
 body.theme-teal select,
 body.theme-teal .form-select,
 body.theme-teal .form-input,
@@ -5906,113 +5924,118 @@ body.theme-teal #sales-month-filter,
 body.theme-teal #expense-month-filter,
 body.theme-teal .date-picker-input,
 body.theme-teal .scope-date-input {
-  background: rgba(18, 36, 64, 0.88) !important;
-  border: 1px solid rgba(45, 212, 191, 0.32) !important;
-  color: #F8FAFC !important;
+  background: #FFFFFF !important;
+  border: 1.5px solid #CBD5E1 !important;
+  color: #0F172A !important;
+  font-weight: 600 !important;
   border-radius: 10px !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03) !important;
 }
 
 /* Filter Pills & Capsules */
 body.theme-teal .filter-pill {
-  background: rgba(255, 255, 255, 0.08) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
-  color: #94A3B8 !important;
+  background: #F1F5F9 !important;
+  border: 1px solid #E2E8F0 !important;
+  color: #64748B !important;
 }
 
 body.theme-teal .filter-pill.active {
   background: linear-gradient(135deg, #0D9488 0%, #06B6D4 100%) !important;
   color: #FFFFFF !important;
   border-color: transparent !important;
-  box-shadow: 0 2px 10px rgba(13, 148, 136, 0.4) !important;
+  box-shadow: 0 3px 10px rgba(13, 148, 136, 0.25) !important;
 }
 
 /* Tracker Scope Panel (B2 - តាមថ្ងៃ / ចន្លោះ ២-៣ថ្ងៃ / តាមខែ / តាមឆ្នាំ) */
 body.theme-teal .tracker-scope-panel {
-  background: linear-gradient(145deg, rgba(14, 28, 50, 0.88) 0%, rgba(9, 18, 34, 0.95) 100%) !important;
-  border: 1px solid rgba(45, 212, 191, 0.26) !important;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3) !important;
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04) !important;
 }
 
 body.theme-teal .tracker-mode-capsule {
-  background: rgba(7, 15, 28, 0.8) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background: #F1F5F9 !important;
+  border: 1px solid #E2E8F0 !important;
 }
 
 body.theme-teal .tracker-mode-btn {
-  color: #94A3B8 !important;
+  color: #64748B !important;
 }
 
 body.theme-teal .tracker-mode-btn.active {
   background: #0D9488 !important;
   color: #FFFFFF !important;
-  box-shadow: 0 2px 8px rgba(13, 148, 136, 0.4) !important;
+  box-shadow: 0 2px 8px rgba(13, 148, 136, 0.25) !important;
 }
 
 /* Data Tables & Lists */
 body.theme-teal .data-table thead th,
 body.theme-teal .summary-table thead th {
-  background: rgba(18, 36, 64, 0.88) !important;
-  color: #2DD4BF !important;
-  border-bottom: 1px solid rgba(45, 212, 191, 0.25) !important;
+  background: #F8FAFC !important;
+  color: #0F172A !important;
+  border-bottom: 2px solid #E2E8F0 !important;
+  font-weight: 700 !important;
 }
 
 body.theme-teal .data-table tbody td,
 body.theme-teal .summary-table tbody td {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
-  color: #E2E8F0 !important;
+  border-bottom: 1px solid #F1F5F9 !important;
+  color: #1E293B !important;
 }
 
 body.theme-teal .data-table tbody tr:hover,
 body.theme-teal .summary-table tbody tr:hover {
-  background: rgba(45, 212, 191, 0.06) !important;
+  background: #F8FAFC !important;
 }
 
 body.theme-teal .transaction-item {
-  background: rgba(13, 26, 46, 0.7) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  color: #F8FAFC !important;
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  color: #0F172A !important;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.02) !important;
 }
 
 body.theme-teal .transaction-desc {
-  color: #F8FAFC !important;
+  color: #0F172A !important;
+  font-weight: 700 !important;
 }
 
 body.theme-teal .transaction-meta {
-  color: #94A3B8 !important;
+  color: #64748B !important;
 }
 
 /* Theme Switcher Modal */
 body.theme-teal .theme-modal-card {
-  background: rgba(13, 26, 46, 0.98) !important;
-  border: 1px solid rgba(45, 212, 191, 0.3) !important;
-  color: #F8FAFC !important;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6) !important;
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  color: #0F172A !important;
+  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.14) !important;
 }
 
 body.theme-teal .theme-option-card {
-  background: rgba(18, 36, 64, 0.6) !important;
-  border-color: rgba(255, 255, 255, 0.12) !important;
+  background: #F8FAFC !important;
+  border-color: #E2E8F0 !important;
 }
 
 body.theme-teal .theme-option-card.selected {
-  background: rgba(13, 148, 136, 0.22) !important;
-  border-color: #2DD4BF !important;
+  background: #F0FDFA !important;
+  border-color: #0D9488 !important;
 }
 
 body.theme-teal .theme-name {
-  color: #F8FAFC !important;
+  color: #0F172A !important;
+  font-weight: 700 !important;
 }
 
 body.theme-teal .theme-desc {
-  color: #94A3B8 !important;
+  color: #64748B !important;
 }
 
 /* Bottom Navigation Bar */
 body.theme-teal .acleda-bottom-nav {
-  background: rgba(8, 17, 30, 0.94) !important;
-  border-top: 1px solid rgba(45, 212, 191, 0.18) !important;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.35) !important;
+  background: rgba(255, 255, 255, 0.94) !important;
+  border-top: 1px solid #E2E8F0 !important;
+  box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.05) !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
 }
@@ -6022,12 +6045,13 @@ body.theme-teal .acleda-bottom-btn {
 }
 
 body.theme-teal .acleda-bottom-btn.active {
-  color: #2DD4BF !important;
+  color: #0D9488 !important;
+  font-weight: 700 !important;
 }
 
 body.theme-teal .quick-add-plus-circle.orders-circle {
   background: linear-gradient(135deg, #0D9488 0%, #06B6D4 100%) !important;
-  box-shadow: 0 4px 16px rgba(13, 148, 136, 0.5) !important;
+  box-shadow: 0 4px 16px rgba(13, 148, 136, 0.35) !important;
 }
 
 /* 2. VET THEME OVERRIDES FOR NEW COMPONENTS */
@@ -6168,14 +6192,14 @@ body.theme-glass .minimal-hero-card {
 }
 
 body.theme-teal .dashboard-theme-chip {
-  background: rgba(13, 26, 46, 0.88);
-  border-color: rgba(45, 212, 191, 0.28);
-  color: #2DD4BF;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.22);
+  background: #FFFFFF;
+  border-color: #CBD5E1;
+  color: #0D9488;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
 }
 
 body.theme-teal .dashboard-theme-chip svg {
-  color: #2DD4BF;
+  color: #0D9488;
 }
 
 body.theme-vet .dashboard-theme-chip {
