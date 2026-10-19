@@ -2198,12 +2198,12 @@ function renderDashboardModule() {
       </div>
     ` : ''}
 
-      <!-- Dual Action Pills: ✈️ ការកុម្ម៉ង់តាមតេឡេក្រាម & 👛 ចំណាយប្រចាំថ្ងៃ -->
+      <!-- Dual Action Pills: 🛍️ ការបញ្ជាទិញ (Google Form) & 👛 ចំណាយប្រចាំថ្ងៃ -->
       <div class="hero-action-row">
-        <button type="button" class="hero-action-pill telegram-pill" onclick="openOrderModal()">
-          <div class="hero-action-icon telegram-icon"><i data-lucide="send"></i></div>
-          <span>${lang === 'en' ? 'Telegram Orders' : 'ការកុម្ម៉ង់តាមតេឡេក្រាម'}</span>
-        </button>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSd_hP30dqB-F5gCV44AuxcftgmoDjo5zzkN-NSMiK-1rDEqPQ/viewform" target="_blank" rel="noopener noreferrer" class="hero-action-pill telegram-pill" title="${lang === 'en' ? 'Place Order (Google Form)' : 'ចូលទៅបញ្ជាទិញទំនិញតាម Google Form'}">
+          <div class="hero-action-icon telegram-icon"><i data-lucide="shopping-bag"></i></div>
+          <span>${lang === 'en' ? 'Place Order (Form)' : 'ការបញ្ជាទិញ (Form)'}</span>
+        </a>
 
         <button type="button" class="hero-action-pill expense-pill" onclick="openExpenseModal()">
           <div class="hero-action-icon expense-icon"><i data-lucide="wallet"></i></div>
@@ -3686,10 +3686,15 @@ window.handleBottomTabClick = function(tabKey) {
     state.dashboardSection = 'personal';
     navigateToModule('dashboard');
   } else if (tabKey === 'orders') {
+    window.openGoogleOrderForm();
     navigateToModule('orders');
   } else {
     navigateToModule(tabKey);
   }
+};
+
+window.openGoogleOrderForm = function() {
+  window.open('https://docs.google.com/forms/d/e/1FAIpQLSd_hP30dqB-F5gCV44AuxcftgmoDjo5zzkN-NSMiK-1rDEqPQ/viewform', '_blank');
 };
 
 /**
@@ -5426,6 +5431,10 @@ function renderOrdersModule() {
         </div>
       </div>
       <div class="orders-banner-action-wrap" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSd_hP30dqB-F5gCV44AuxcftgmoDjo5zzkN-NSMiK-1rDEqPQ/viewform" target="_blank" rel="noopener noreferrer" class="btn-large-paste-orders" style="background:linear-gradient(135deg, #10B981, #059669); color:#FFFFFF; text-decoration:none; display:inline-flex; align-items:center; gap:8px; box-shadow:0 0 16px rgba(16,185,129,0.4);">
+          <i data-lucide="shopping-bag"></i>
+          <span>✦ បញ្ជាទិញទំនិញ (Google Form)</span>
+        </a>
         <button type="button" class="btn-large-paste-orders" onclick="openOrderModal()">
           <i data-lucide="clipboard-paste"></i>
           <span>✦ Paste បញ្ចូលការកម្ម៉ង់ពី Telegram</span>
