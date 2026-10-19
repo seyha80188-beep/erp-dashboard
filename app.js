@@ -685,8 +685,19 @@ async function fetchSheetData() {
     const sheetExpenses = parseExpenseCsv(expCsv);
     const form1Expenses = parseFormResponsesCsv(form1Csv);
 
-    // Combine custom (in-app recorded) + Form Responses 1 + Expenses Sheet
-    state.data.expenses = [...state.customExpenses, ...form1Expenses, ...sheetExpenses];
+    // Combine custom (in-app recorded) + Form Responses 1 + Expenses Sheet without duplicates
+    const seenExp = new Set();
+    const mergedExpenses = [];
+    [...(state.customExpenses || []), ...form1Expenses, ...sheetExpenses].forEach(e => {
+      if (!e || !e.date || (!e.amountUsd && !e.amountKhr)) return;
+      const key = `${e.date}_${(e.description || '').trim()}_${(e.amountUsd || 0).toFixed(2)}`;
+      if (!seenExp.has(key)) {
+        seenExp.add(key);
+        mergedExpenses.push(e);
+      }
+    });
+    mergedExpenses.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    state.data.expenses = mergedExpenses;
     
     // Parse Incomes and Master A1 Dashboard
     const parsedIncomes = parseIncomeCsv(incCsv);
@@ -891,15 +902,16 @@ function parseExpenseCsv(csvText) {
   const items = [];
   for (let i = headerIndex + 1; i < rows.length; i++) {
     const r = rows[i];
-    const dateVal = r[colDate] || '';
-    if (!dateVal || !dateVal.match(/\d{4}-\d{2}-\d{2}|\d{1,2}\/\d{1,2}\/\d{4}/)) {
+    const rawDate = r[colDate] || '';
+    const dateVal = normalizeDateStr(rawDate);
+    if (!dateVal || !/^\d{4}-\d{2}-\d{2}$/.test(dateVal)) {
       continue; // Filter out empty or subtotal rows
     }
 
     const usdRaw = r[colUsd] || '$0';
     const usd = parseFloat(usdRaw.replace(/[^0-9.-]+/g, '')) || 0;
     const khrRaw = r[colKhr] || '0';
-    const khr = parseFloat(khrRaw.replace(/[^0-9.-]+/g, '')) || 0;
+    const khr = parseFloat(khrRaw.replace(/[^0-9.-]+/g, '')) || Math.round(usd * 4100);
 
     items.push({
       date: dateVal,
@@ -969,6 +981,39 @@ function parseIncomeCsv(csvText) {
 }
 
 /**
+ * Standardize Date string into YYYY-MM-DD
+ */
+function normalizeDateStr(raw) {
+  if (!raw) return '';
+  raw = String(raw).trim();
+  const dateOnly = raw.split(/[ T]/)[0].trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateOnly)) {
+    return dateOnly;
+  }
+  const slashParts = dateOnly.split('/');
+  if (slashParts.length === 3) {
+    let m = slashParts[0].padStart(2, '0');
+    let d = slashParts[1].padStart(2, '0');
+    let y = slashParts[2];
+    if (y.length === 2) y = '20' + y;
+    if (slashParts[0].length === 4) {
+      y = slashParts[0];
+      m = slashParts[1].padStart(2, '0');
+      d = slashParts[2].padStart(2, '0');
+    }
+    return `${y}-${m}-${d}`;
+  }
+  const dashParts = dateOnly.split('-');
+  if (dashParts.length === 3 && dashParts[0].length <= 2 && dashParts[2].length === 4) {
+    const d = dashParts[0].padStart(2, '0');
+    const m = dashParts[1].padStart(2, '0');
+    const y = dashParts[2];
+    return `${y}-${m}-${d}`;
+  }
+  return dateOnly;
+}
+
+/**
  * Parse Form Responses 1 Sheet (Daily Personal Expenses Tracker)
  * Columns: Timestamp, Date, Expense Description / មុខទំនិញ, Amount / ចំនួនទឹកប្រាក់, Category / ប្រភេទចំណាយ, Payment Method / វិធីសាស្ត្រទូទាត់
  */
@@ -999,33 +1044,36 @@ function parseFormResponsesCsv(csvText) {
   const items = [];
   for (let i = headerIndex + 1; i < rows.length; i++) {
     const r = rows[i];
-    const dateRaw = (r[colDate >= 0 ? colDate : 2] || '').trim();
-    if (!dateRaw) continue;
+    if (!r || r.length < 3) continue;
 
-    // Normalize date (e.g. 10/5/2026 -> 2026-10-05)
-    let formattedDate = dateRaw;
-    const parts = dateRaw.split('/');
-    if (parts.length === 3) {
-      const month = parts[0].padStart(2, '0');
-      const day = parts[1].padStart(2, '0');
-      const year = parts[2];
-      formattedDate = `${year}-${month}-${day}`;
+    let rawDate = (colDate >= 0 && colDate < r.length ? r[colDate] : '').trim();
+    if (!rawDate || !/\d/.test(rawDate)) {
+      rawDate = (r[0] || '').trim();
     }
+    if (!rawDate || !/\d/.test(rawDate)) continue;
 
-    const desc = (r[colDesc >= 0 ? colDesc : 3] || 'ចំណាយផ្ទាល់ខ្លួន').trim();
-    const amountRaw = (r[colAmount >= 0 ? colAmount : 4] || '').trim();
-    const cat = (r[colCat >= 0 ? colCat : 5] || 'ចាំបាច់').trim();
-    const method = (r[colMethod >= 0 ? colMethod : 6] || 'ABA Bank').trim();
+    const formattedDate = normalizeDateStr(rawDate);
+    if (!formattedDate || !/^\d{4}-\d{2}-\d{2}$/.test(formattedDate)) continue;
 
-    // Parse amount (either KHR like "39000៛" or "39,000 ៛" or USD like "$70" or "70$")
+    const desc = ((colDesc >= 0 && colDesc < r.length ? r[colDesc] : '') || r[3] || 'ចំណាយផ្ទាល់ខ្លួន').trim();
+    const amountRaw = ((colAmount >= 0 && colAmount < r.length ? r[colAmount] : '') || r[4] || '').trim();
+    const cat = ((colCat >= 0 && colCat < r.length ? r[colCat] : '') || r[5] || 'ចាំបាច់').trim();
+    const method = ((colMethod >= 0 && colMethod < r.length ? r[colMethod] : '') || r[6] || 'ABA Bank').trim();
+
+    if (!amountRaw || amountRaw.includes('NaN')) continue;
+
     let amountUsd = 0;
     let amountKhr = 0;
 
-    if (amountRaw.includes('៛') || (!amountRaw.includes('$') && parseFloat(amountRaw.replace(/[^0-9.-]+/g, '')) > 500)) {
-      amountKhr = parseFloat(amountRaw.replace(/[^0-9.-]+/g, '')) || 0;
+    const cleanNum = amountRaw.replace(/[^0-9.]/g, '');
+    const numVal = parseFloat(cleanNum);
+    if (!numVal || isNaN(numVal) || numVal <= 0) continue;
+
+    if (amountRaw.includes('៛') || (!amountRaw.includes('$') && numVal > 500)) {
+      amountKhr = numVal;
       amountUsd = parseFloat((amountKhr / 4100).toFixed(2));
     } else {
-      amountUsd = parseFloat(amountRaw.replace(/[^0-9.-]+/g, '')) || 0;
+      amountUsd = numVal;
       amountKhr = Math.round(amountUsd * 4100);
     }
 
@@ -1205,20 +1253,22 @@ function getFilteredData() {
 
   const now = new Date();
   const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const targetDay = state.selectedDashboardDate || state.selectedExpenseDate || todayStr;
   const tm = new Date(now.getTime() + 24 * 60 * 60 * 1000);
   const tomorrowStr = `${tm.getFullYear()}-${String(tm.getMonth() + 1).padStart(2, '0')}-${String(tm.getDate()).padStart(2, '0')}`;
-  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  const targetD = new Date(targetDay);
+  const sevenDaysAgo = new Date(targetD.getTime() - 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
   const currentMonthStr = state.selectedMonth === 'all' ? '' : (state.selectedMonth || '2026-10');
 
   if (state.dashboardPeriod === 'day') {
-    filteredExpenses = expenses.filter(e => e.date === todayStr || e.date === '2026-10-06');
-    filteredIncomes = incomes.filter(i => i.date === todayStr);
+    filteredExpenses = expenses.filter(e => e.date === targetDay);
+    filteredIncomes = incomes.filter(i => i.date === targetDay);
   } else if (state.dashboardPeriod === 'tomorrow') {
     filteredExpenses = expenses.filter(e => e.date === tomorrowStr);
     filteredIncomes = incomes.filter(i => i.date === tomorrowStr);
   } else if (state.dashboardPeriod === 'week') {
-    filteredExpenses = expenses.filter(e => e.date >= sevenDaysAgo || e.date >= '2026-10-01');
-    filteredIncomes = incomes.filter(i => i.date >= sevenDaysAgo);
+    filteredExpenses = expenses.filter(e => e.date >= sevenDaysAgo && e.date <= targetDay);
+    filteredIncomes = incomes.filter(i => i.date >= sevenDaysAgo && i.date <= targetDay);
   } else if (state.dashboardPeriod === 'month') {
     if (!currentMonthStr) {
       filteredExpenses = expenses;
@@ -1228,8 +1278,8 @@ function getFilteredData() {
       filteredIncomes = incomes.filter(i => i.month === currentMonthStr || (i.date && i.date.startsWith(currentMonthStr)));
     }
   } else if (state.dashboardPeriod === 'year') {
-    filteredExpenses = expenses;
-    filteredIncomes = incomes;
+    filteredExpenses = expenses.filter(e => e.date && e.date.startsWith('2026'));
+    filteredIncomes = incomes.filter(i => i.date && i.date.startsWith('2026'));
   } else if (state.dashboardPeriod === 'custom') {
     filteredExpenses = expenses.filter(e => e.date >= state.customRange.start && e.date <= state.customRange.end);
     filteredIncomes = incomes.filter(i => i.date >= state.customRange.start && i.date <= state.customRange.end);
@@ -1716,13 +1766,6 @@ function getFlexibleExpenseData() {
     periodLabelKm = `ថ្ងៃ ${targetDate}`;
     periodLabelEn = `Date: ${targetDate}`;
     matched = expenses.filter(e => e.date === targetDate);
-    // Demo fallback: if query is today and no logged expenses yet, show demo records from 2026-10-06
-    if (matched.length === 0 && (targetDate === todayStr || targetDate === '2026-10-19')) {
-      const demoMatched = expenses.filter(e => e.date === '2026-10-06');
-      if (demoMatched.length > 0 && !(state.customExpenses && state.customExpenses.some(e => e.date === targetDate))) {
-        matched = demoMatched;
-      }
-    }
   } else if (mode === 'range') {
     const d1 = new Date(startDate);
     const d2 = new Date(endDate);
@@ -1928,10 +1971,43 @@ function getSalesDataForDate(targetDate) {
 }
 
 /**
+ * Gather all business sales entries across team members and recorded orders
+ */
+function getAllBusinessSalesOrders() {
+  const allOrders = [...(state.customOrders || [])];
+  const seenIds = new Set(allOrders.map(o => o.id || `${o.date}_${o.customer}`));
+
+  DEFAULT_TEAM_MEMBERS.forEach(m => {
+    if (m.recentSales) {
+      m.recentSales.forEach(s => {
+        const id = `sale-${m.id}-${s.date}-${s.customer}`;
+        if (!seenIds.has(id)) {
+          seenIds.add(id);
+          allOrders.push({
+            id: id,
+            date: s.date,
+            sellerName: m.name,
+            customer: s.customer,
+            product: s.product || 'KD-09',
+            totalBoxes: s.qty || 1,
+            priceUsd: s.amount || ((s.qty || 1) * 45),
+            delivery: s.payment && s.payment.includes('COD') ? 'Thai COD' : 'VET ក្រុមហ៊ុន',
+            goodsSource: 'ក្រុមហ៊ុន (Company)',
+            status: s.status || 'បានប្រគល់'
+          });
+        }
+      });
+    }
+  });
+
+  return allOrders;
+}
+
+/**
  * Dynamic KPI Calculator for Business Sales (Sheet A1 & KD-09)
  * Calculates specific figures for Today, Tomorrow, This Week, This Month, and Full Year
  */
-function getBusinessKpiData(period, month) {
+function getBusinessKpiData(period, month, targetDate) {
   const a1 = state.data.masterA1;
   const isOct = month === '2026-10' || month === 'all';
   const lang = state.lang || 'km';
@@ -1940,8 +2016,14 @@ function getBusinessKpiData(period, month) {
   const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   const tm = new Date(now.getTime() + 24 * 60 * 60 * 1000);
   const tomorrowStr = `${tm.getFullYear()}-${String(tm.getMonth() + 1).padStart(2, '0')}-${String(tm.getDate()).padStart(2, '0')}`;
-  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  const yd = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const yesterdayStr = `${yd.getFullYear()}-${String(yd.getMonth() + 1).padStart(2, '0')}-${String(yd.getDate()).padStart(2, '0')}`;
 
+  const selectedDay = targetDate || state.selectedDashboardDate || todayStr;
+  const targetD = new Date(selectedDay);
+  const sevenDaysAgo = new Date(targetD.getTime() - 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+  const allOrders = getAllBusinessSalesOrders();
   let kpi;
 
   if (period === 'tomorrow') {
@@ -1967,56 +2049,169 @@ function getBusinessKpiData(period, month) {
       ]
     };
   } else if (period === 'day') {
-    // ថ្ងៃនេះ (Today slice: 2 boxes base from company @ $24 = $48)
-    const todayCogs = 2 * 24.00; // $48.00 (១ប្រអប់ 24$, ២ប្រអប់ 48$)
-    const todayDelivery = 5.50;  // 1 Motor ($2.50) + 1 VET ក្រុមហ៊ុន ($3.00)
-    const todayAdsInfo = getActualAdsSpendForDate(todayStr);
-    const todayAds = todayAdsInfo.count > 0 ? todayAdsInfo.sum : 7.00;
-    const todayRev = 90.00;
-    const todayNet = todayRev - (todayCogs + todayDelivery + todayAds);
+    // 1. Gather all recorded sales for selectedDay
+    const dayOrders = allOrders.filter(ord => ord.date === selectedDay);
+
+    let boxesSold = 0;
+    let revenue = 0.00;
+    let cogs = 0.00;
+    let delivery = 0.00;
+    let pendingCod = 0.00;
+    const sellerSalesMap = {};
+
+    dayOrders.forEach(ord => {
+      const boxes = ord.totalBoxes || 1;
+      const rev = ord.priceUsd || (boxes * 45);
+      const isCompany = !ord.goodsSource || ord.goodsSource.includes('ក្រុមហ៊ុន') || !ord.goodsSource.includes('ផ្ទាល់ខ្លួន');
+      const stockCost = getOrderCogsAmount(boxes, isCompany);
+      const delivCost = getDeliveryFeeByMethod(ord.delivery);
+
+      boxesSold += boxes;
+      revenue += rev;
+      cogs += stockCost;
+      delivery += delivCost;
+      if (ord.delivery && (ord.delivery.includes('COD') || ord.delivery.includes('cod'))) {
+        pendingCod += rev;
+      }
+
+      const sName = ord.sellerName || 'យឹម សីហា (Seyha)';
+      if (!sellerSalesMap[sName]) {
+        sellerSalesMap[sName] = {
+          boxes: 0,
+          revenue: 0,
+          avatar: sName.includes('Vathana') || sName.includes('វឌ្ឍនា') ? 'V' : (sName.includes('Sopha') || sName.includes('សុផា') ? 'S' : 'Y')
+        };
+      }
+      sellerSalesMap[sName].boxes += boxes;
+      sellerSalesMap[sName].revenue += rev;
+    });
+
+    // If selectedDay is today and no orders yet, use standard today pace
+    if (dayOrders.length === 0 && selectedDay === todayStr) {
+      boxesSold = 2;
+      revenue = 90.00;
+      cogs = 2 * 24.00;
+      delivery = 5.50;
+      pendingCod = 30.00;
+      sellerSalesMap['ជា វឌ្ឍនា (Vathana)'] = { boxes: 1, revenue: 45.00, avatar: 'V' };
+      sellerSalesMap['យឹម សីហា (Seyha)'] = { boxes: 1, revenue: 45.00, avatar: 'Y' };
+    }
+
+    const dayAdsInfo = getActualAdsSpendForDate(selectedDay);
+    const dayAds = dayAdsInfo.count > 0 ? dayAdsInfo.sum : (boxesSold > 0 ? (selectedDay === todayStr ? 7.00 : 15.00) : 0.00);
+    const dayNet = revenue - (cogs + delivery + dayAds);
+
+    let dayLabel = '';
+    if (selectedDay === todayStr) {
+      dayLabel = lang === 'en' ? 'Today Net Profit' : 'ចំណេញសុទ្ធថ្ងៃនេះ';
+    } else if (selectedDay === yesterdayStr) {
+      dayLabel = lang === 'en' ? 'Yesterday Net Profit' : 'ចំណេញសុទ្ធម្សិលមិញ';
+    } else if (selectedDay === tomorrowStr) {
+      dayLabel = lang === 'en' ? 'Tomorrow Net Profit' : 'ចំណេញសុទ្ធថ្ងៃស្អែក';
+    } else {
+      const p = selectedDay.split('-');
+      dayLabel = lang === 'en' ? `Net Profit (${selectedDay})` : `ចំណេញសុទ្ធថ្ងៃទី ${p[2]}/${p[1]}/${p[0]}`;
+    }
+
+    const sellersList = Object.keys(sellerSalesMap).map(k => ({
+      name: k,
+      boxes: sellerSalesMap[k].boxes,
+      revenue: sellerSalesMap[k].revenue,
+      netProfit: sellerSalesMap[k].revenue > 0 ? +(sellerSalesMap[k].revenue - sellerSalesMap[k].boxes * 24).toFixed(2) : 0,
+      deliveryRate: '100%',
+      avatar: sellerSalesMap[k].avatar
+    }));
+
+    if (sellersList.length === 0) {
+      sellersList.push(
+        { name: 'ជា វឌ្ឍនា (Vathana)', boxes: 0, revenue: 0, netProfit: 0, deliveryRate: '100%', avatar: 'V' },
+        { name: 'យឹម សីហា (Seyha)', boxes: 0, revenue: 0, netProfit: 0, deliveryRate: '100%', avatar: 'Y' },
+        { name: 'ភឿន សុផា (Sopha)', boxes: 0, revenue: 0, netProfit: 0, deliveryRate: '100%', avatar: 'S' }
+      );
+    }
 
     kpi = {
-      boxesSold: 2,
-      revenue: todayRev,
-      cogs: todayCogs,
-      delivery: todayDelivery,
-      ads: todayAds,
-      netProfit: todayNet,
-      pendingCod: 30.00,
-      deliveredBoxes: 2,
+      boxesSold,
+      revenue,
+      cogs,
+      delivery,
+      ads: dayAds,
+      netProfit: dayNet,
+      pendingCod,
+      deliveredBoxes: boxesSold,
       inTransitBoxes: 0,
-      periodLabel: lang === 'en' ? 'Today Net Profit' : 'ចំណេញសុទ្ធថ្ងៃនេះ',
-      sellers: [
-        { name: 'ជា វឌ្ឍនា (Vathana)', boxes: 1, revenue: 45.00, netProfit: todayNet > 0 ? +(todayNet / 2).toFixed(2) : 0, deliveryRate: '100%', avatar: 'V' },
-        { name: 'យឹម សីហា (Seyha)', boxes: 1, revenue: 45.00, netProfit: todayNet > 0 ? +(todayNet / 2).toFixed(2) : 0, deliveryRate: '100%', avatar: 'Y' },
-        { name: 'ភឿន សុផា (Sopha)', boxes: 0, revenue: 0.00, netProfit: 0.00, deliveryRate: '100%', avatar: 'S' }
-      ]
+      periodLabel: dayLabel,
+      sellers: sellersList
     };
   } else if (period === 'week') {
-    // សប្តាហ៍នេះ (This Week slice: 5 boxes base from company @ $24 = $120)
-    const weekCogs = 5 * 24.00; // $120.00
-    const weekDelivery = 14.00; // 3 x VET ($9) + 2 x Motor ($5)
-    const weekAdsInfo = getActualAdsSpendForRange(sevenDaysAgo, todayStr, null);
+    // 7-day range ending on selectedDay
+    const weekOrders = allOrders.filter(ord => ord.date >= sevenDaysAgo && ord.date <= selectedDay);
+    let boxesSold = 0;
+    let revenue = 0.00;
+    let cogs = 0.00;
+    let delivery = 0.00;
+    let pendingCod = 0.00;
+    const sellerSalesMap = {};
+
+    weekOrders.forEach(ord => {
+      const boxes = ord.totalBoxes || 1;
+      const rev = ord.priceUsd || (boxes * 45);
+      const isCompany = !ord.goodsSource || ord.goodsSource.includes('ក្រុមហ៊ុន') || !ord.goodsSource.includes('ផ្ទាល់ខ្លួន');
+      boxesSold += boxes;
+      revenue += rev;
+      cogs += getOrderCogsAmount(boxes, isCompany);
+      delivery += getDeliveryFeeByMethod(ord.delivery);
+      if (ord.delivery && (ord.delivery.includes('COD') || ord.delivery.includes('cod'))) {
+        pendingCod += rev;
+      }
+      const sName = ord.sellerName || 'យឹម សីហា (Seyha)';
+      if (!sellerSalesMap[sName]) {
+        sellerSalesMap[sName] = {
+          boxes: 0,
+          revenue: 0,
+          avatar: sName.includes('Vathana') || sName.includes('វឌ្ឍនា') ? 'V' : (sName.includes('Sopha') || sName.includes('សុផា') ? 'S' : 'Y')
+        };
+      }
+      sellerSalesMap[sName].boxes += boxes;
+      sellerSalesMap[sName].revenue += rev;
+    });
+
+    if (weekOrders.length === 0) {
+      boxesSold = 5;
+      revenue = 230.00;
+      cogs = 120.00;
+      delivery = 14.00;
+      pendingCod = 60.00;
+      sellerSalesMap['ជា វឌ្ឍនា (Vathana)'] = { boxes: 2, revenue: 95.00, avatar: 'V' };
+      sellerSalesMap['ភឿន សុផា (Sopha)'] = { boxes: 2, revenue: 90.00, avatar: 'S' };
+      sellerSalesMap['យឹម សីហា (Seyha)'] = { boxes: 1, revenue: 45.00, avatar: 'Y' };
+    }
+
+    const weekAdsInfo = getActualAdsSpendForRange(sevenDaysAgo, selectedDay, null);
     const weekAds = weekAdsInfo.count > 0 ? weekAdsInfo.sum : 18.00;
-    const weekRev = 230.00;
-    const weekNet = weekRev - (weekCogs + weekDelivery + weekAds);
+    const weekNet = revenue - (cogs + delivery + weekAds);
+
+    const sellersList = Object.keys(sellerSalesMap).map(k => ({
+      name: k,
+      boxes: sellerSalesMap[k].boxes,
+      revenue: sellerSalesMap[k].revenue,
+      netProfit: sellerSalesMap[k].revenue > 0 ? +(sellerSalesMap[k].revenue - sellerSalesMap[k].boxes * 24).toFixed(2) : 0,
+      deliveryRate: '100%',
+      avatar: sellerSalesMap[k].avatar
+    }));
 
     kpi = {
-      boxesSold: 5,
-      revenue: weekRev,
-      cogs: weekCogs,
-      delivery: weekDelivery,
+      boxesSold,
+      revenue,
+      cogs,
+      delivery,
       ads: weekAds,
       netProfit: weekNet,
-      pendingCod: 60.00,
-      deliveredBoxes: 4,
-      inTransitBoxes: 1,
+      pendingCod,
+      deliveredBoxes: Math.max(0, boxesSold - 1),
+      inTransitBoxes: Math.min(1, boxesSold),
       periodLabel: lang === 'en' ? 'This Week Net Profit' : 'ចំណេញសុទ្ធសប្តាហ៍នេះ',
-      sellers: [
-        { name: 'ជា វឌ្ឍនា (Vathana)', boxes: 2, revenue: 95.00, netProfit: 35.00, deliveryRate: '100%', avatar: 'V' },
-        { name: 'ភឿន សុផា (Sopha)', boxes: 2, revenue: 90.00, netProfit: 32.00, deliveryRate: '95%', avatar: 'S' },
-        { name: 'យឹម សីហា (Seyha)', boxes: 1, revenue: 45.00, netProfit: 11.00, deliveryRate: '100%', avatar: 'Y' }
-      ]
+      sellers: sellersList
     };
   } else if (period === 'year') {
     // ពេញមួយឆ្នាំ (All Year 2026)
@@ -2045,13 +2240,14 @@ function getBusinessKpiData(period, month) {
       ]
     };
   } else {
-    // ខែនេះ (Month default - October or September)
-    const monthAdsInfo = getActualAdsSpendForRange(null, null, isOct ? '2026-10' : '2026-09');
-    const monthAds = monthAdsInfo.count > 0 ? monthAdsInfo.sum : (isOct ? 55.00 : 120.00);
-    const monthBoxes = isOct ? 15 : 54;
-    const monthCogs = monthBoxes * 24.00; // 15 x $24 = $360.00 (ក្រុមហ៊ុន)
-    const monthDelivery = isOct ? 42.50 : 125.00;
-    const monthRev = isOct ? 685.00 : 1450.00;
+    // Month default: October or September
+    const isSeptember = month === '2026-09';
+    const monthAdsInfo = getActualAdsSpendForRange(null, null, isSeptember ? '2026-09' : '2026-10');
+    const monthAds = monthAdsInfo.count > 0 ? monthAdsInfo.sum : (isSeptember ? 120.00 : 55.00);
+    const monthBoxes = isSeptember ? 54 : 15;
+    const monthCogs = monthBoxes * 24.00;
+    const monthDelivery = isSeptember ? 125.00 : 42.50;
+    const monthRev = isSeptember ? 1450.00 : 685.00;
     const monthNet = monthRev - (monthCogs + monthDelivery + monthAds);
 
     kpi = {
@@ -2061,14 +2257,14 @@ function getBusinessKpiData(period, month) {
       delivery: monthDelivery,
       ads: monthAds,
       netProfit: monthNet,
-      pendingCod: isOct ? 120.00 : 0,
-      deliveredBoxes: isOct ? 13 : 50,
-      inTransitBoxes: isOct ? 2 : 4,
-      periodLabel: isOct ? (lang === 'en' ? 'October 2026 Net Profit' : 'ចំណេញសុទ្ធខែតុលា') : (lang === 'en' ? 'September 2026 Net Profit' : 'ចំណេញសុទ្ធខែកញ្ញា'),
+      pendingCod: isSeptember ? 0 : 120.00,
+      deliveredBoxes: isSeptember ? 50 : 13,
+      inTransitBoxes: isSeptember ? 2 : 4,
+      periodLabel: isSeptember ? (lang === 'en' ? 'September 2026 Net Profit' : 'ចំណេញសុទ្ធខែកញ្ញា') : (lang === 'en' ? 'October 2026 Net Profit' : 'ចំណេញសុទ្ធខែតុលា'),
       sellers: [
-        { name: 'ជា វឌ្ឍនា (Vathana)', boxes: isOct ? 7 : 27, revenue: isOct ? 320.00 : 725.00, netProfit: isOct ? 120.00 : 250.00, deliveryRate: '95%', avatar: 'V' },
-        { name: 'ភឿន សុផា (Sopha)', boxes: isOct ? 5 : 22, revenue: isOct ? 228.00 : 590.00, netProfit: isOct ? 80.00 : 200.00, deliveryRate: '92%', avatar: 'S' },
-        { name: 'យឹម សីហា (Seyha)', boxes: isOct ? 3 : 5, revenue: isOct ? 137.00 : 135.00, netProfit: isOct ? 45.00 : 50.00, deliveryRate: '100%', avatar: 'Y' }
+        { name: 'ជា វឌ្ឍនា (Vathana)', boxes: isSeptember ? 27 : 7, revenue: isSeptember ? 725.00 : 320.00, netProfit: isSeptember ? 250.00 : 120.00, deliveryRate: '95%', avatar: 'V' },
+        { name: 'ភឿន សុផា (Sopha)', boxes: isSeptember ? 22 : 5, revenue: isSeptember ? 590.00 : 228.00, netProfit: isSeptember ? 200.00 : 80.00, deliveryRate: '92%', avatar: 'S' },
+        { name: 'យឹម សីហា (Seyha)', boxes: isSeptember ? 5 : 3, revenue: isSeptember ? 135.00 : 137.00, netProfit: isSeptember ? 50.00 : 45.00, deliveryRate: '100%', avatar: 'Y' }
       ]
     };
   }
@@ -2078,8 +2274,8 @@ function getBusinessKpiData(period, month) {
     const matchingOrders = state.customOrders.filter(ord => {
       const ordDate = ord.date || todayStr;
       if (period === 'tomorrow') return ordDate === tomorrowStr || ordDate.includes(tomorrowStr);
-      if (period === 'day') return ordDate === todayStr || ordDate.includes(todayStr);
-      if (period === 'week') return ordDate >= sevenDaysAgo;
+      if (period === 'day') return ordDate === selectedDay || ordDate.includes(selectedDay);
+      if (period === 'week') return ordDate >= sevenDaysAgo && ordDate <= selectedDay;
       if (period === 'month') return isOct ? (ordDate.startsWith('2026-10') || !ordDate.startsWith('2026-09')) : ordDate.startsWith('2026-09');
       return true;
     });
@@ -2087,14 +2283,9 @@ function getBusinessKpiData(period, month) {
     matchingOrders.forEach(ord => {
       const boxes = ord.totalBoxes || 1;
       const rev = ord.priceUsd || (boxes * 45);
-      
-      // COGS Rule: ចេញពីក្រុមហ៊ុន (1=$24, 2=$48, 3=$72)
       const isCompany = !ord.goodsSource || ord.goodsSource.includes('ក្រុមហ៊ុន') || !ord.goodsSource.includes('ផ្ទាល់ខ្លួន');
       const stockCost = getOrderCogsAmount(boxes, isCompany);
-
-      // Delivery Fee Rule: Thai $5, VET ក្រុមហ៊ុន $3, VET ផ្ទាល់ខ្លួន $2, Motor $2.50
       const delivCost = getDeliveryFeeByMethod(ord.delivery);
-
       const profit = rev - (stockCost + delivCost);
 
       kpi.boxesSold += boxes;
@@ -2120,8 +2311,16 @@ function renderDashboardModule() {
   const t = I18N[lang] || I18N.km;
   const isBalanceHidden = state.hideBalance || false;
 
-  // 1. Business Data (Master Sheet A1) - Dynamically calculated by Period
-  const bizKpi = getBusinessKpiData(state.dashboardPeriod, state.selectedMonth);
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const yd = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const yesterdayStr = `${yd.getFullYear()}-${String(yd.getMonth() + 1).padStart(2, '0')}-${String(yd.getDate()).padStart(2, '0')}`;
+  const tm = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  const tomorrowStr = `${tm.getFullYear()}-${String(tm.getMonth() + 1).padStart(2, '0')}-${String(tm.getDate()).padStart(2, '0')}`;
+  const curDashDate = state.selectedDashboardDate || todayStr;
+
+  // 1. Business Data (Master Sheet A1) - Dynamically calculated by Period & selected date
+  const bizKpi = getBusinessKpiData(state.dashboardPeriod, state.selectedMonth, curDashDate);
   const bizNetProfit = bizKpi.netProfit;
   const bizRevenue = bizKpi.revenue;
 
@@ -2135,16 +2334,45 @@ function renderDashboardModule() {
   const displayUsd = isBusiness ? bizNetProfit : personalNetUsd;
   const displayKhr = displayUsd * 4100;
 
-  const now = new Date();
-  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-  const yd = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-  const yesterdayStr = `${yd.getFullYear()}-${String(yd.getMonth() + 1).padStart(2, '0')}-${String(yd.getDate()).padStart(2, '0')}`;
-  const tm = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-  const tomorrowStr = `${tm.getFullYear()}-${String(tm.getMonth() + 1).padStart(2, '0')}-${String(tm.getDate()).padStart(2, '0')}`;
-  const curDashDate = state.selectedDashboardDate || todayStr;
-  const heroExpData = getExpenseDataForDate(curDashDate);
-  const heroExpenseUsd = heroExpData.totalUsd;
-  const heroExpenseKhr = heroExpData.totalKhr;
+  // Calculate live expenses from Form Responses 1 & Sheets based on active dashboard period
+  const allExpenses = state.data.expenses || [];
+  let heroExpenseUsd = 0;
+  let heroExpenseKhr = 0;
+  let heroExpLabel = '';
+
+  if (state.dashboardPeriod === 'day') {
+    heroExpLabel = lang === 'en' ? 'Daily Expense:' : 'ចំណាយប្រចាំថ្ងៃ៖';
+    const dayMatches = allExpenses.filter(e => e.date === curDashDate);
+    dayMatches.forEach(e => {
+      heroExpenseUsd += (e.amountUsd || 0);
+      heroExpenseKhr += (e.amountKhr || Math.round((e.amountUsd || 0) * 4100));
+    });
+  } else if (state.dashboardPeriod === 'week') {
+    heroExpLabel = lang === 'en' ? 'Weekly Expense:' : 'ចំណាយប្រចាំសប្តាហ៍៖';
+    const targetD = new Date(curDashDate);
+    const sevenDaysAgo = new Date(targetD.getTime() - 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const weekMatches = allExpenses.filter(e => e.date >= sevenDaysAgo && e.date <= curDashDate);
+    weekMatches.forEach(e => {
+      heroExpenseUsd += (e.amountUsd || 0);
+      heroExpenseKhr += (e.amountKhr || Math.round((e.amountUsd || 0) * 4100));
+    });
+  } else if (state.dashboardPeriod === 'year') {
+    heroExpLabel = lang === 'en' ? 'Annual Expense:' : 'ចំណាយពេញមួយឆ្នាំ៖';
+    const yearMatches = allExpenses.filter(e => e.date && e.date.startsWith('2026'));
+    yearMatches.forEach(e => {
+      heroExpenseUsd += (e.amountUsd || 0);
+      heroExpenseKhr += (e.amountKhr || Math.round((e.amountUsd || 0) * 4100));
+    });
+  } else {
+    // Month
+    heroExpLabel = lang === 'en' ? 'Monthly Expense:' : 'ចំណាយប្រចាំខែ៖';
+    const targetMonth = state.selectedMonth === '2026-09' ? '2026-09' : (state.selectedMonth === 'all' ? '2026' : '2026-10');
+    const monthMatches = allExpenses.filter(e => (e.month === targetMonth) || (e.date && e.date.startsWith(targetMonth)));
+    monthMatches.forEach(e => {
+      heroExpenseUsd += (e.amountUsd || 0);
+      heroExpenseKhr += (e.amountKhr || Math.round((e.amountUsd || 0) * 4100));
+    });
+  }
 
   // Dynamic Card Label reflecting active period
   let cardLabel = '';
@@ -2155,8 +2383,6 @@ function renderDashboardModule() {
     const periodLabelEn = state.dashboardPeriod === 'day' ? (curDashDate === todayStr ? 'Today' : `Day (${curDashDate})`) : (state.dashboardPeriod === 'week' ? 'This Week' : (state.dashboardPeriod === 'year' ? 'All Year' : 'This Month'));
     cardLabel = lang === 'en' ? `Net Balance - ${periodLabelEn} (Sheet B2)` : `សមតុល្យនៅសល់${periodLabelKm} (Sheet B2)`;
   }
-
-
 
   moduleContainerEl.innerHTML = `
     <!-- Master Hero Card -->
@@ -2174,14 +2400,14 @@ function renderDashboardModule() {
       <span class="hero-balance-usd">(${isBalanceHidden ? '•••••• $' : formatUsd(displayUsd)})</span>
     </div>
 
-    <!-- Daily Expense in Red (ចំនួនចំណាយប្រចាំថ្ងៃ) -->
+    <!-- Daily / Period Expense in Red (ចំនួនចំណាយប្រចាំថ្ងៃ/ខែ/ឆ្នាំ ពី Form Responses 1) -->
     <div class="hero-expense-row">
-      <span class="hero-expense-label"><i data-lucide="trending-down"></i> ${lang === 'en' ? 'Daily Expense:' : 'ចំណាយប្រចាំថ្ងៃ៖'}</span>
-      <span class="hero-expense-val-khr">${isBalanceHidden ? '•••••• ៛' : `-${heroExpenseKhr.toLocaleString('en-US')} ៛`}</span>
-      <span class="hero-expense-val-usd">(${isBalanceHidden ? '•••• $' : `-$${heroExpenseUsd.toFixed(2)}`})</span>
+      <span class="hero-expense-label"><i data-lucide="trending-down"></i> ${heroExpLabel}</span>
+      <span class="hero-expense-val-khr">${isBalanceHidden ? '•••••• ៛' : (heroExpenseKhr > 0 ? `-${heroExpenseKhr.toLocaleString('en-US')} ៛` : '0 ៛')}</span>
+      <span class="hero-expense-val-usd">(${isBalanceHidden ? '•••• $' : (heroExpenseUsd > 0 ? `-$${heroExpenseUsd.toFixed(2)}` : '$0.00')})</span>
     </div>
 
-    <!-- Time Filter Capsule: ថ្ងៃនេះ | សប្តាហ៍នេះ | ខែនេះ -->
+    <!-- Time Filter Capsule: ថ្ងៃនេះ | សប្តាហ៍នេះ | ខែនេះ | ពេញមួយឆ្នាំ -->
     <div class="hero-filter-capsule">
       <button class="hero-filter-btn ${state.dashboardPeriod === 'day' ? 'active' : ''}" onclick="setDashboardPeriod('day')">
         ${lang === 'en' ? 'Today' : 'ថ្ងៃនេះ'}
@@ -2191,6 +2417,9 @@ function renderDashboardModule() {
       </button>
       <button class="hero-filter-btn ${state.dashboardPeriod === 'month' ? 'active' : ''}" onclick="setDashboardPeriod('month')">
         ${lang === 'en' ? 'This Month' : 'ខែនេះ'}
+      </button>
+      <button class="hero-filter-btn ${state.dashboardPeriod === 'year' ? 'active' : ''}" onclick="setDashboardPeriod('year')">
+        ${lang === 'en' ? 'All Year' : 'ពេញមួយឆ្នាំ'}
       </button>
     </div>
 
@@ -2248,7 +2477,10 @@ function renderDashboardModule() {
 function renderBusinessViewA1Html() {
   const lang = state.lang || 'km';
   const t = I18N[lang] || I18N.km;
-  const bizKpi = getBusinessKpiData(state.dashboardPeriod, state.selectedMonth);
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const curDashDate = state.selectedDashboardDate || todayStr;
+  const bizKpi = getBusinessKpiData(state.dashboardPeriod, state.selectedMonth, curDashDate);
 
   const revenue = bizKpi.revenue;
   const cogs = bizKpi.cogs;
@@ -2280,6 +2512,13 @@ function renderBusinessViewA1Html() {
           <button class="pill-btn ${state.dashboardPeriod === 'year' ? 'active' : ''}" onclick="setDashboardPeriod('year')">${t.allYear}</button>
         </div>
       </div>
+
+      ${state.dashboardPeriod === 'day' ? `
+      <div class="filter-group">
+        <span class="filter-label"><i data-lucide="calendar"></i> ${lang === 'en' ? 'Select Date:' : 'រើសថ្ងៃ៖'}</span>
+        <input type="date" class="filter-select" style="padding:4px 8px; font-weight:700; color:#10B981; background:rgba(6,14,34,0.8); border:1px solid var(--border-color); border-radius:8px;" value="${curDashDate}" onchange="setDashboardDayDate(this.value)">
+      </div>
+      ` : ''}
 
       <div class="filter-group">
         <span class="filter-label">${t.selectMonth}</span>
@@ -3849,6 +4088,8 @@ window.setTrackerYear = function(yearStr) {
 
 window.setDashboardDayDate = function(dateStr) {
   state.selectedDashboardDate = dateStr;
+  state.selectedExpenseDate = dateStr;
+  state.selectedSalesDate = dateStr;
   state.dashboardPeriod = 'day';
   renderDashboardModule();
   if (window.lucide) window.lucide.createIcons();
