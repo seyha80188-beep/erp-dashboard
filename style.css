@@ -5669,140 +5669,265 @@ body.theme-vet .dash-quick-sub {
 }
 
 /* ==========================================================================
-   THEME ADAPTATIONS (Teal vs VET vs Dark vs Glass)
+   3 EYE-FRIENDLY COLOR THEMES (Exact Matches from Image Specifications)
+   1. Modern Emerald & Sage (BG: #E8F0EE, Cards: #F7FAF9)
+   2. Luxury Warm Alabaster & Gold (BG: #EFECE6, Cards: #FAF8F5)
+   3. Midnight Teal Glass (BG: #0F172A, Cards: #1E293B)
    ========================================================================== */
 
-/* 1. TEAL THEME OVERRIDES (Luxury Pearl White - សរថ្លៃ ស្រទន់មិនឈឺភ្នែក iOS Fintech Style) */
+/* --------------------------------------------------------------------------
+   THEME 1: Modern Emerald & Sage (BG: #E8F0EE | Cards: #F7FAF9)
+   -------------------------------------------------------------------------- */
+body.theme-sage,
 body.theme-teal {
-  background: #F8FAFC !important;
+  background: #E8F0EE !important;
   background-image: 
-    radial-gradient(circle at 15% 15%, rgba(13, 148, 136, 0.06) 0%, transparent 40%),
-    radial-gradient(circle at 85% 35%, rgba(6, 182, 212, 0.05) 0%, transparent 45%) !important;
-  color: #0F172A !important;
+    radial-gradient(circle at 15% 15%, rgba(15, 118, 110, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 85% 35%, rgba(45, 212, 191, 0.06) 0%, transparent 50%) !important;
+  color: #134E4A !important;
 }
 
+body.theme-sage .main-wrapper,
+body.theme-sage .content-area,
 body.theme-teal .main-wrapper,
 body.theme-teal .content-area {
-  background: #F8FAFC !important;
-  color: #0F172A !important;
+  background: #E8F0EE !important;
+  color: #134E4A !important;
 }
 
+body.theme-sage .top-header,
 body.theme-teal .top-header {
-  background: rgba(255, 255, 255, 0.92) !important;
-  border-bottom: 1px solid #E2E8F0 !important;
-  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04) !important;
+  background: rgba(232, 240, 238, 0.94) !important;
+  border-bottom: 1px solid #D4E2DE !important;
+  box-shadow: 0 2px 12px rgba(15, 118, 110, 0.05) !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
 }
 
+body.theme-sage .header-user-pill,
+body.theme-sage .header-pill-btn,
+body.theme-sage .header-date-badge,
+body.theme-sage .top-date-card,
 body.theme-teal .header-user-pill,
 body.theme-teal .header-pill-btn,
 body.theme-teal .header-date-badge,
 body.theme-teal .top-date-card {
-  background: #FFFFFF !important;
-  border: 1px solid #E2E8F0 !important;
-  color: #0F172A !important;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04) !important;
+  background: #F7FAF9 !important;
+  border: 1px solid #D4E2DE !important;
+  color: #134E4A !important;
+  box-shadow: 0 2px 8px rgba(15, 118, 110, 0.04) !important;
 }
 
+body.theme-sage .header-username-khmer,
+body.theme-sage .user-khmer-title,
 body.theme-teal .header-username-khmer,
 body.theme-teal .user-khmer-title {
-  color: #0F172A !important;
+  color: #042F2E !important;
   font-weight: 700 !important;
 }
 
+body.theme-sage .header-username-en,
+body.theme-sage .user-en-sub,
 body.theme-teal .header-username-en,
 body.theme-teal .user-en-sub {
-  color: #64748B !important;
+  color: #4B7268 !important;
 }
 
+body.theme-sage .date-khmer-badge,
+body.theme-sage .header-date-khmer,
 body.theme-teal .date-khmer-badge,
 body.theme-teal .header-date-khmer {
-  color: #0D9488 !important;
+  color: #0F766E !important;
   font-weight: 700 !important;
 }
 
+body.theme-sage .date-en-badge,
+body.theme-sage .header-date-en,
 body.theme-teal .date-en-badge,
 body.theme-teal .header-date-en {
-  color: #64748B !important;
+  color: #4B7268 !important;
 }
 
-/* Master Hero Card in Teal Theme (Satin Luxury Teal Gradient) */
-body.theme-teal .minimal-hero-card {
-  background: linear-gradient(135deg, #0D9488 0%, #14B8A6 45%, #06B6D4 100%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.25) !important;
-  border-radius: 24px !important;
-  box-shadow: 0 14px 34px rgba(13, 148, 136, 0.28), 0 4px 12px rgba(13, 148, 136, 0.15), inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
+body.theme-sage .dashboard-theme-chip,
+body.theme-teal .dashboard-theme-chip {
+  background: #F7FAF9 !important;
+  border-color: #D4E2DE !important;
+  color: #0F766E !important;
+  box-shadow: 0 2px 8px rgba(15, 118, 110, 0.04) !important;
+}
+
+body.theme-sage .dashboard-theme-chip svg,
+body.theme-teal .dashboard-theme-chip svg {
+  color: #0F766E !important;
+}
+
+/* Sidebar for Modern Emerald & Sage */
+body.theme-sage .sidebar,
+body.theme-teal .sidebar {
+  background: #F7FAF9 !important;
+  border-right: 1px solid #D4E2DE !important;
+  box-shadow: 4px 0 24px rgba(15, 118, 110, 0.08) !important;
+  color: #134E4A !important;
+}
+
+body.theme-sage .sidebar-header,
+body.theme-teal .sidebar-header {
+  border-bottom: 1px solid #D4E2DE !important;
+}
+
+body.theme-sage .brand-title,
+body.theme-teal .brand-title {
+  color: #042F2E !important;
+}
+
+body.theme-sage .brand-subtitle,
+body.theme-teal .brand-subtitle {
+  color: #0F766E !important;
+  font-weight: 600 !important;
+}
+
+body.theme-sage .mobile-close-btn,
+body.theme-teal .mobile-close-btn {
+  color: #042F2E !important;
+}
+
+body.theme-sage .module-btn,
+body.theme-teal .module-btn {
+  color: #2D554C !important;
+}
+
+body.theme-sage .module-btn svg,
+body.theme-teal .module-btn svg {
+  color: #4B7268 !important;
+}
+
+body.theme-sage .module-btn:hover,
+body.theme-teal .module-btn:hover {
+  background-color: #E8F0EE !important;
+  color: #042F2E !important;
+}
+
+body.theme-sage .module-item.active .module-btn,
+body.theme-teal .module-item.active .module-btn {
+  background: linear-gradient(135deg, #0F766E 0%, #14B8A6 100%) !important;
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 14px rgba(15, 118, 110, 0.35) !important;
+}
+
+body.theme-sage .module-item.active .module-btn svg,
+body.theme-teal .module-item.active .module-btn svg {
+  stroke: #FFFFFF !important;
   color: #FFFFFF !important;
 }
 
+body.theme-sage .sidebar-footer,
+body.theme-teal .sidebar-footer {
+  background: #E8F0EE !important;
+  border-top: 1px solid #D4E2DE !important;
+}
+
+body.theme-sage .sidebar-footer .user-name,
+body.theme-teal .sidebar-footer .user-name {
+  color: #042F2E !important;
+  font-weight: 700 !important;
+}
+
+body.theme-sage .sidebar-footer .user-role,
+body.theme-teal .sidebar-footer .user-role {
+  color: #4B7268 !important;
+}
+
+body.theme-sage .logout-icon-btn,
+body.theme-teal .logout-icon-btn {
+  color: #4B7268 !important;
+}
+
+/* Master Hero Card for Theme 1 (Vibrant Emerald & Mint Gradient) */
+body.theme-sage .minimal-hero-card,
+body.theme-teal .minimal-hero-card {
+  background: linear-gradient(135deg, #0F766E 0%, #14B8A6 60%, #2DD4BF 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 14px 34px rgba(15, 118, 110, 0.28), 0 4px 12px rgba(15, 118, 110, 0.15), inset 0 1px 2px rgba(255, 255, 255, 0.45) !important;
+  color: #FFFFFF !important;
+}
+
+body.theme-sage .hero-card-title,
 body.theme-teal .hero-card-title {
   color: rgba(255, 255, 255, 0.95) !important;
   font-weight: 600 !important;
 }
 
+body.theme-sage .hero-eye-btn,
 body.theme-teal .hero-eye-btn {
   background: rgba(255, 255, 255, 0.22) !important;
   border: 1px solid rgba(255, 255, 255, 0.4) !important;
   color: #FFFFFF !important;
 }
 
+body.theme-sage .hero-balance-khr,
 body.theme-teal .hero-balance-khr {
   color: #FFFFFF !important;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
 }
 
+body.theme-sage .hero-balance-usd,
 body.theme-teal .hero-balance-usd {
   color: rgba(255, 255, 255, 0.92) !important;
 }
 
-/* Daily Expense Badge Inside Hero (Luxury Pearl Pill - Crisp Red Figures, No Chromatic Vibration) */
+body.theme-sage .hero-expense-row,
 body.theme-teal .hero-expense-row {
-  background: rgba(255, 255, 255, 0.95) !important;
+  background: rgba(247, 250, 249, 0.95) !important;
   border: 1px solid rgba(254, 202, 202, 0.9) !important;
   border-radius: 10px !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
-  backdrop-filter: blur(8px) !important;
 }
 
+body.theme-sage .hero-expense-label,
 body.theme-teal .hero-expense-label {
   color: #475569 !important;
   font-weight: 700 !important;
 }
 
+body.theme-sage .hero-expense-label svg,
 body.theme-teal .hero-expense-label svg {
   color: #EF4444 !important;
 }
 
+body.theme-sage .hero-expense-val-khr,
 body.theme-teal .hero-expense-val-khr {
   color: #DC2626 !important;
   font-weight: 800 !important;
-  text-shadow: none !important;
 }
 
+body.theme-sage .hero-expense-val-usd,
 body.theme-teal .hero-expense-val-usd {
   color: #EF4444 !important;
   font-weight: 700 !important;
 }
 
-/* Hero Time Filter Capsule */
+body.theme-sage .hero-filter-capsule,
 body.theme-teal .hero-filter-capsule {
   background: rgba(255, 255, 255, 0.22) !important;
   border: 1px solid rgba(255, 255, 255, 0.35) !important;
 }
 
+body.theme-sage .hero-filter-btn,
 body.theme-teal .hero-filter-btn {
   color: rgba(255, 255, 255, 0.92) !important;
 }
 
+body.theme-sage .hero-filter-btn.active,
 body.theme-teal .hero-filter-btn.active {
   background: #FFFFFF !important;
-  color: #0D9488 !important;
+  color: #0F766E !important;
   font-weight: 800 !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
 }
 
-/* Hero Day Picker Row (Frosted Pearl Glass - No Pitch-Black Hole) */
+body.theme-sage .hero-day-picker-bar,
 body.theme-teal .hero-day-picker-bar {
   background: rgba(255, 255, 255, 0.22) !important;
   border: 1px solid rgba(255, 255, 255, 0.38) !important;
@@ -5811,6 +5936,7 @@ body.theme-teal .hero-day-picker-bar {
   border-radius: 12px !important;
 }
 
+body.theme-sage .hero-native-date,
 body.theme-teal .hero-native-date {
   background: rgba(255, 255, 255, 0.32) !important;
   border: 1px solid rgba(255, 255, 255, 0.5) !important;
@@ -5819,617 +5945,1493 @@ body.theme-teal .hero-native-date {
   border-radius: 8px !important;
 }
 
+body.theme-sage .hero-mini-tag,
 body.theme-teal .hero-mini-tag {
   background: rgba(255, 255, 255, 0.2) !important;
   border: 1px solid rgba(255, 255, 255, 0.35) !important;
   color: #FFFFFF !important;
 }
 
+body.theme-sage .hero-mini-tag.active,
 body.theme-teal .hero-mini-tag.active {
   background: #FFFFFF !important;
   border-color: #FFFFFF !important;
-  color: #0D9488 !important;
+  color: #0F766E !important;
   font-weight: 800 !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
 }
 
-/* Hero Dual Quick Action Buttons */
+body.theme-sage .hero-action-pill.telegram-pill,
 body.theme-teal .hero-action-pill.telegram-pill {
   background: #FFFFFF !important;
-  color: #0F172A !important;
+  color: #042F2E !important;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08) !important;
 }
 
+body.theme-sage .hero-action-pill.expense-pill,
 body.theme-teal .hero-action-pill.expense-pill {
   background: #FFF1F2 !important;
   color: #9F1239 !important;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06) !important;
 }
 
-/* Segmented Control (A1 vs B2 Switcher - Apple Luxury Light Style, No Black Box) */
+/* Segmented Control for Sage */
+body.theme-sage .fintech-segmented-wrapper,
 body.theme-teal .fintech-segmented-wrapper {
-  border-top-color: #E2E8F0 !important;
+  border-top-color: #D4E2DE !important;
 }
 
+body.theme-sage .fintech-segmented-control,
 body.theme-teal .fintech-segmented-control {
-  background: #F1F5F9 !important;
-  border: 1px solid #E2E8F0 !important;
+  background: #DCE7E4 !important;
+  border: 1px solid #D4E2DE !important;
   border-radius: 14px !important;
   padding: 4px !important;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.04) !important;
 }
 
+body.theme-sage .segmented-tab-btn,
 body.theme-teal .segmented-tab-btn {
-  color: #64748B !important;
+  color: #4B7268 !important;
   font-weight: 600 !important;
 }
 
+body.theme-sage .segmented-tab-btn.active,
 body.theme-teal .segmented-tab-btn.active {
-  background: #FFFFFF !important;
-  color: #0D9488 !important;
+  background: #F7FAF9 !important;
+  color: #0F766E !important;
   font-weight: 800 !important;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 3px 10px rgba(15, 118, 110, 0.12) !important;
 }
 
+body.theme-sage .segmented-tab-btn.active svg,
 body.theme-teal .segmented-tab-btn.active svg {
-  color: #0D9488 !important;
+  color: #0F766E !important;
 }
 
-/* Minimal 2x2 KPI Cards (Pure Pearl White Luxury) */
-body.theme-teal .minimal-kpi-card {
-  background: #FFFFFF !important;
-  border: 1px solid #E2E8F0 !important;
-  border-radius: 20px !important;
-  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04) !important;
-}
-
-body.theme-teal .kpi-title-khmer,
-body.theme-teal .kpi-value-text {
-  color: #0F172A !important;
-  font-weight: 800 !important;
-}
-
-body.theme-teal .kpi-title-en {
-  color: #64748B !important;
-}
-
-/* Panels, Filter Bars & Metric Cards */
+/* KPI Cards, Panels & Metric Cards for Sage */
+body.theme-sage .minimal-kpi-card,
+body.theme-teal .minimal-kpi-card,
+body.theme-sage .panel-card,
 body.theme-teal .panel-card,
+body.theme-sage .filter-bar,
 body.theme-teal .filter-bar,
+body.theme-sage .metric-card,
 body.theme-teal .metric-card {
-  background: #FFFFFF !important;
-  border: 1px solid #E2E8F0 !important;
+  background: #F7FAF9 !important;
+  border: 1px solid #D4E2DE !important;
   border-radius: 20px !important;
-  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04) !important;
+  box-shadow: 0 4px 18px rgba(15, 118, 110, 0.05) !important;
 }
 
+body.theme-sage .kpi-title-khmer,
+body.theme-teal .kpi-title-khmer,
+body.theme-sage .kpi-value-text,
+body.theme-teal .kpi-value-text,
+body.theme-sage .card-title,
 body.theme-teal .card-title,
+body.theme-sage h2,
 body.theme-teal h2,
+body.theme-sage h3,
 body.theme-teal h3,
+body.theme-sage .metric-label,
 body.theme-teal .metric-label {
-  color: #0F172A !important;
+  color: #042F2E !important;
   font-weight: 700 !important;
 }
 
+body.theme-sage .kpi-title-en,
+body.theme-teal .kpi-title-en,
+body.theme-sage .card-subtitle,
 body.theme-teal .card-subtitle,
+body.theme-sage .filter-label,
 body.theme-teal .filter-label {
-  color: #64748B !important;
+  color: #4B7268 !important;
 }
 
-/* Month Dropdowns, Range Selectors & Form Inputs (Pearl White, No Pitch-Black Clash) */
+body.theme-sage select,
 body.theme-teal select,
+body.theme-sage .form-select,
 body.theme-teal .form-select,
+body.theme-sage .form-input,
 body.theme-teal .form-input,
+body.theme-sage #sales-month-filter,
 body.theme-teal #sales-month-filter,
+body.theme-sage #expense-month-filter,
 body.theme-teal #expense-month-filter,
+body.theme-sage .date-picker-input,
 body.theme-teal .date-picker-input,
-body.theme-teal .scope-date-input {
-  background: #FFFFFF !important;
-  border: 1.5px solid #CBD5E1 !important;
-  color: #0F172A !important;
+body.theme-sage .scope-date-input,
+body.theme-teal .scope-date-input,
+body.theme-sage .tracker-native-date,
+body.theme-teal .tracker-native-date {
+  background: #F7FAF9 !important;
+  border: 1.5px solid #CCDCD7 !important;
+  color: #042F2E !important;
   font-weight: 600 !important;
   border-radius: 10px !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03) !important;
+  color-scheme: light !important;
 }
 
-/* Filter Pills & Capsules */
+body.theme-sage .filter-pill,
 body.theme-teal .filter-pill {
-  background: #F1F5F9 !important;
-  border: 1px solid #E2E8F0 !important;
-  color: #64748B !important;
+  background: #DCE7E4 !important;
+  border: 1px solid #D4E2DE !important;
+  color: #4B7268 !important;
 }
 
+body.theme-sage .filter-pill.active,
 body.theme-teal .filter-pill.active {
-  background: linear-gradient(135deg, #0D9488 0%, #06B6D4 100%) !important;
+  background: linear-gradient(135deg, #0F766E 0%, #14B8A6 100%) !important;
   color: #FFFFFF !important;
   border-color: transparent !important;
-  box-shadow: 0 3px 10px rgba(13, 148, 136, 0.25) !important;
 }
 
-/* Tracker Scope Panel (B2 - តាមថ្ងៃ / ចន្លោះ ២-៣ថ្ងៃ / តាមខែ / តាមឆ្នាំ) */
+body.theme-sage .tracker-scope-panel,
 body.theme-teal .tracker-scope-panel {
-  background: #FFFFFF !important;
-  border: 1px solid #E2E8F0 !important;
-  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04) !important;
+  background: #F7FAF9 !important;
+  border: 1px solid #D4E2DE !important;
 }
 
+body.theme-sage .tracker-mode-capsule,
 body.theme-teal .tracker-mode-capsule {
-  background: #F1F5F9 !important;
-  border: 1px solid #E2E8F0 !important;
+  background: #DCE7E4 !important;
+  border: 1px solid #D4E2DE !important;
 }
 
+body.theme-sage .tracker-mode-btn,
 body.theme-teal .tracker-mode-btn {
-  color: #64748B !important;
+  color: #4B7268 !important;
 }
 
+body.theme-sage .tracker-mode-btn.active,
 body.theme-teal .tracker-mode-btn.active {
-  background: #0D9488 !important;
-  color: #FFFFFF !important;
-  box-shadow: 0 2px 8px rgba(13, 148, 136, 0.25) !important;
-}
-
-/* Data Tables & Lists */
-body.theme-teal .data-table thead th,
-body.theme-teal .summary-table thead th {
-  background: #F8FAFC !important;
-  color: #0F172A !important;
-  border-bottom: 2px solid #E2E8F0 !important;
-  font-weight: 700 !important;
-}
-
-body.theme-teal .data-table tbody td,
-body.theme-teal .summary-table tbody td {
-  border-bottom: 1px solid #F1F5F9 !important;
-  color: #1E293B !important;
-}
-
-body.theme-teal .data-table tbody tr:hover,
-body.theme-teal .summary-table tbody tr:hover {
-  background: #F8FAFC !important;
-}
-
-body.theme-teal .transaction-item {
-  background: #FFFFFF !important;
-  border: 1px solid #E2E8F0 !important;
-  color: #0F172A !important;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.02) !important;
-}
-
-body.theme-teal .transaction-desc {
-  color: #0F172A !important;
-  font-weight: 700 !important;
-}
-
-body.theme-teal .transaction-meta {
-  color: #64748B !important;
-}
-
-/* Theme Switcher Modal */
-body.theme-teal .theme-modal-card {
-  background: #FFFFFF !important;
-  border: 1px solid #E2E8F0 !important;
-  color: #0F172A !important;
-  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.14) !important;
-}
-
-body.theme-teal .theme-option-card {
-  background: #F8FAFC !important;
-  border-color: #E2E8F0 !important;
-}
-
-body.theme-teal .theme-option-card.selected {
-  background: #F0FDFA !important;
-  border-color: #0D9488 !important;
-}
-
-body.theme-teal .theme-name {
-  color: #0F172A !important;
-  font-weight: 700 !important;
-}
-
-body.theme-teal .theme-desc {
-  color: #64748B !important;
-}
-
-/* Bottom Navigation Bar */
-body.theme-teal .acleda-bottom-nav {
-  background: rgba(255, 255, 255, 0.94) !important;
-  border-top: 1px solid #E2E8F0 !important;
-  box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.05) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
-}
-
-body.theme-teal .acleda-bottom-btn {
-  color: #64748B !important;
-}
-
-body.theme-teal .acleda-bottom-btn.active {
-  color: #0D9488 !important;
-  font-weight: 700 !important;
-}
-
-body.theme-teal .quick-add-plus-circle.orders-circle {
-  background: linear-gradient(135deg, #0D9488 0%, #06B6D4 100%) !important;
-  box-shadow: 0 4px 16px rgba(13, 148, 136, 0.35) !important;
-}
-
-/* Sidebar Overrides for Luxury Pearl White */
-body.theme-teal .sidebar {
-  background: #FFFFFF !important;
-  border-right: 1px solid #E2E8F0 !important;
-  box-shadow: 4px 0 24px rgba(15, 23, 42, 0.08) !important;
-  color: #0F172A !important;
-}
-
-body.theme-teal .sidebar-header {
-  border-bottom: 1px solid #E2E8F0 !important;
-}
-
-body.theme-teal .brand-title {
-  color: #0F172A !important;
-}
-
-body.theme-teal .brand-subtitle {
-  color: #0D9488 !important;
-  font-weight: 600 !important;
-}
-
-body.theme-teal .mobile-close-btn {
-  color: #0F172A !important;
-}
-
-body.theme-teal .module-btn {
-  color: #334155 !important;
-}
-
-body.theme-teal .module-btn svg {
-  color: #64748B !important;
-}
-
-body.theme-teal .module-btn:hover {
-  background-color: #F1F5F9 !important;
-  color: #0F172A !important;
-}
-
-body.theme-teal .module-item.active .module-btn {
-  background: linear-gradient(135deg, #0D9488 0%, #06B6D4 100%) !important;
-  color: #FFFFFF !important;
-  font-weight: 700 !important;
-  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.35) !important;
-}
-
-body.theme-teal .module-item.active .module-btn svg {
-  stroke: #FFFFFF !important;
+  background: #0F766E !important;
   color: #FFFFFF !important;
 }
 
-body.theme-teal .sidebar-footer {
-  background: #F8FAFC !important;
-  border-top: 1px solid #E2E8F0 !important;
-}
-
-body.theme-teal .sidebar-footer .user-name {
-  color: #0F172A !important;
-  font-weight: 700 !important;
-}
-
-body.theme-teal .sidebar-footer .user-role {
-  color: #64748B !important;
-}
-
-body.theme-teal .logout-icon-btn {
-  color: #64748B !important;
-}
-
-/* B2 Lower Section Overrides (Daily Tracker Cards & Scope Panel) */
-body.theme-teal .tracker-native-date,
-body.theme-teal .scope-date-input,
-body.theme-teal .tracker-native-date:focus {
-  background: #FFFFFF !important;
-  border: 1.5px solid #CBD5E1 !important;
-  color: #0F172A !important;
-  color-scheme: light !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
-}
-
-body.theme-teal .tracker-ctl-label,
-body.theme-teal .tracker-head-sub,
-body.theme-teal .stat-lbl,
-body.theme-teal .stat-sub {
-  color: #64748B !important;
-}
-
+body.theme-sage .daily-tracker-card,
 body.theme-teal .daily-tracker-card {
-  background: #FFFFFF !important;
-  border: 1px solid #E2E8F0 !important;
+  background: #F7FAF9 !important;
+  border: 1px solid #D4E2DE !important;
   border-radius: 20px !important;
-  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04) !important;
 }
 
+body.theme-sage .daily-tracker-card.expense-card,
 body.theme-teal .daily-tracker-card.expense-card {
   border-left: 4px solid #EF4444 !important;
 }
 
+body.theme-sage .daily-tracker-card.sales-card,
 body.theme-teal .daily-tracker-card.sales-card {
   border-left: 4px solid #10B981 !important;
 }
 
+body.theme-sage .tracker-head-title,
 body.theme-teal .tracker-head-title {
-  color: #0F172A !important;
+  color: #042F2E !important;
   font-weight: 700 !important;
 }
 
-body.theme-teal .tracker-action-btn.btn-log-exp {
-  background: #FFF1F2 !important;
-  color: #DC2626 !important;
-  border: 1px solid #FECDD3 !important;
-  font-weight: 700 !important;
-}
-
-body.theme-teal .tracker-action-btn.btn-log-order {
-  background: #ECFDF5 !important;
-  color: #059669 !important;
-  border: 1px solid #A7F3D0 !important;
-  font-weight: 700 !important;
-}
-
+body.theme-sage .tracker-amount-hero.expense-amt,
 body.theme-teal .tracker-amount-hero.expense-amt {
   color: #DC2626 !important;
   font-weight: 800 !important;
 }
 
+body.theme-sage .tracker-amount-hero.sales-amt,
 body.theme-teal .tracker-amount-hero.sales-amt {
-  color: #0F172A !important;
+  color: #042F2E !important;
   font-weight: 800 !important;
 }
 
+body.theme-sage .tracker-amount-hero.profit-amt.pos,
 body.theme-teal .tracker-amount-hero.profit-amt.pos {
   color: #059669 !important;
   font-weight: 800 !important;
 }
 
-body.theme-teal .tracker-count-badge {
-  background: #F1F5F9 !important;
-  border: 1px solid #E2E8F0 !important;
-  color: #475569 !important;
-}
-
-body.theme-teal .tracker-fast-add {
-  color: #0D9488 !important;
-  font-weight: 700 !important;
-}
-
-body.theme-teal .tracker-item-chip {
-  background: #F8FAFC !important;
-  border: 1px solid #E2E8F0 !important;
-  color: #334155 !important;
-}
-
-body.theme-teal .tracker-item-chip .chip-amt {
-  color: #DC2626 !important;
-  font-weight: 700 !important;
-}
-
+body.theme-sage .sales-mini-pill,
 body.theme-teal .sales-mini-pill {
-  background: #F8FAFC !important;
-  border: 1px solid #E2E8F0 !important;
-  color: #334155 !important;
+  background: #E8F0EE !important;
+  border: 1px solid #D4E2DE !important;
+  color: #2D554C !important;
 }
 
-body.theme-teal .sales-mini-pill.boxes {
-  background: #F0FDFA !important;
-  border-color: #CCFBF1 !important;
-  color: #0F766E !important;
-}
-
-body.theme-teal .sales-mini-pill.cogs {
-  background: #FFFBEB !important;
-  border-color: #FEF3C7 !important;
-  color: #B45309 !important;
-}
-
-body.theme-teal .sales-mini-pill.deliv {
-  background: #EFF6FF !important;
-  border-color: #DBEAFE !important;
-  color: #1D4ED8 !important;
-}
-
-body.theme-teal .sales-mini-pill.ads {
-  background: #FFF1F2 !important;
-  border-color: #FFE4E6 !important;
-  color: #BE123C !important;
-}
-
-/* Overspending Alert Card */
+body.theme-sage .overspending-alert-card,
 body.theme-teal .overspending-alert-card {
   background: #FFF1F2 !important;
   border: 1px solid #FECDD3 !important;
-  border-radius: 16px !important;
-  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.08) !important;
 }
 
-body.theme-teal .overspending-alert-card > div > div > div:first-child {
-  color: #9F1239 !important;
+body.theme-sage .acleda-bottom-nav,
+body.theme-teal .acleda-bottom-nav {
+  background: rgba(232, 240, 238, 0.95) !important;
+  border-top: 1px solid #D4E2DE !important;
+  box-shadow: 0 -4px 20px rgba(15, 118, 110, 0.05) !important;
+}
+
+body.theme-sage .acleda-bottom-btn,
+body.theme-teal .acleda-bottom-btn {
+  color: #4B7268 !important;
+}
+
+body.theme-sage .acleda-bottom-btn.active,
+body.theme-teal .acleda-bottom-btn.active {
+  color: #0F766E !important;
   font-weight: 700 !important;
 }
 
-body.theme-teal .overspending-alert-card > div > div > div:last-child {
-  color: #BE123C !important;
+body.theme-sage .quick-add-plus-circle.orders-circle,
+body.theme-teal .quick-add-plus-circle.orders-circle {
+  background: linear-gradient(135deg, #0F766E 0%, #14B8A6 100%) !important;
+  box-shadow: 0 4px 16px rgba(15, 118, 110, 0.35) !important;
 }
 
-/* 2. VET THEME OVERRIDES FOR NEW COMPONENTS */
-body.theme-vet .top-date-card,
-body.theme-vet .header-date-badge {
-  background: #FFFFFF !important;
-  border: 1.5px solid #FED7AA !important;
-  box-shadow: 0 2px 10px rgba(234, 88, 12, 0.08) !important;
+/* --------------------------------------------------------------------------
+   THEME 2: Luxury Warm Alabaster & Gold (BG: #EFECE6 | Cards: #FAF8F5)
+   -------------------------------------------------------------------------- */
+body.theme-warm,
+body.theme-vet {
+  background: #EFECE6 !important;
+  background-image: 
+    radial-gradient(circle at 15% 15%, rgba(180, 83, 9, 0.06) 0%, transparent 45%),
+    radial-gradient(circle at 85% 35%, rgba(217, 119, 6, 0.05) 0%, transparent 50%) !important;
+  color: #292524 !important;
 }
 
+body.theme-warm .main-wrapper,
+body.theme-warm .content-area,
+body.theme-vet .main-wrapper,
+body.theme-vet .content-area {
+  background: #EFECE6 !important;
+  color: #292524 !important;
+}
+
+body.theme-warm .top-header,
+body.theme-vet .top-header {
+  background: rgba(239, 236, 230, 0.94) !important;
+  border-bottom: 1px solid #E5DFD6 !important;
+  box-shadow: 0 2px 12px rgba(41, 37, 36, 0.04) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+}
+
+body.theme-warm .header-user-pill,
+body.theme-warm .header-pill-btn,
+body.theme-warm .header-date-badge,
+body.theme-warm .top-date-card,
+body.theme-vet .header-user-pill,
+body.theme-vet .header-pill-btn,
+body.theme-vet .header-date-badge,
+body.theme-vet .top-date-card {
+  background: #FAF8F5 !important;
+  border: 1px solid #E5DFD6 !important;
+  color: #292524 !important;
+  box-shadow: 0 2px 8px rgba(41, 37, 36, 0.04) !important;
+}
+
+body.theme-warm .header-username-khmer,
+body.theme-warm .user-khmer-title,
+body.theme-vet .header-username-khmer,
+body.theme-vet .user-khmer-title {
+  color: #1C1917 !important;
+  font-weight: 700 !important;
+}
+
+body.theme-warm .header-username-en,
+body.theme-warm .user-en-sub,
+body.theme-vet .header-username-en,
+body.theme-vet .user-en-sub {
+  color: #78716C !important;
+}
+
+body.theme-warm .date-khmer-badge,
+body.theme-warm .header-date-khmer,
 body.theme-vet .date-khmer-badge,
 body.theme-vet .header-date-khmer {
-  color: #C2410C !important;
+  color: #B45309 !important;
+  font-weight: 700 !important;
 }
 
-body.theme-vet .minimal-hero-card {
-  background: linear-gradient(135deg, #FF6600 0%, #EA580C 55%, #F97316 100%) !important;
-  box-shadow: 0 14px 34px rgba(234, 88, 12, 0.3) !important;
+body.theme-warm .date-en-badge,
+body.theme-warm .header-date-en,
+body.theme-vet .date-en-badge,
+body.theme-vet .header-date-en {
+  color: #78716C !important;
 }
 
-body.theme-vet .hero-filter-btn.active {
-  color: #C2410C !important;
+body.theme-warm .dashboard-theme-chip,
+body.theme-vet .dashboard-theme-chip {
+  background: #FAF8F5 !important;
+  border-color: #E5DFD6 !important;
+  color: #B45309 !important;
+  box-shadow: 0 2px 8px rgba(41, 37, 36, 0.04) !important;
 }
 
-body.theme-vet .theme-modal-card {
-  background: #FFFFFF !important;
-  border-color: #FED7AA !important;
-  color: #0F172A !important;
+body.theme-warm .dashboard-theme-chip svg,
+body.theme-vet .dashboard-theme-chip svg {
+  color: #B45309 !important;
 }
 
-body.theme-vet .theme-option-card {
-  background: #FFF7ED !important;
-  border-color: #FED7AA !important;
+/* Sidebar for Luxury Warm Alabaster */
+body.theme-warm .sidebar,
+body.theme-vet .sidebar {
+  background: #FAF8F5 !important;
+  border-right: 1px solid #E5DFD6 !important;
+  box-shadow: 4px 0 24px rgba(41, 37, 36, 0.08) !important;
+  color: #292524 !important;
 }
 
-body.theme-vet .theme-option-card.selected {
-  background: #FFEDD5 !important;
-  border-color: #EA580C !important;
+body.theme-warm .sidebar-header,
+body.theme-vet .sidebar-header {
+  border-bottom: 1px solid #E5DFD6 !important;
 }
 
-body.theme-vet .theme-name {
-  color: #0F172A !important;
+body.theme-warm .brand-title,
+body.theme-vet .brand-title {
+  color: #1C1917 !important;
 }
 
-body.theme-vet .theme-desc {
-  color: #64748B !important;
+body.theme-warm .brand-subtitle,
+body.theme-vet .brand-subtitle {
+  color: #B45309 !important;
+  font-weight: 600 !important;
 }
 
-/* 3. DARK / GLASS OVERRIDES FOR NEW COMPONENTS */
-body.theme-dark .minimal-hero-card {
-  background: linear-gradient(135deg, #0B1936 0%, #071228 55%, #0A1B3A 100%) !important;
-  border: 1.5px solid rgba(0, 180, 216, 0.3) !important;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45) !important;
+body.theme-warm .mobile-close-btn,
+body.theme-vet .mobile-close-btn {
+  color: #1C1917 !important;
 }
 
-body.theme-dark .minimal-kpi-card,
-body.theme-glass .minimal-kpi-card {
-  background: linear-gradient(135deg, rgba(14, 30, 65, 0.85) 0%, rgba(8, 18, 42, 0.95) 100%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+body.theme-warm .module-btn,
+body.theme-vet .module-btn {
+  color: #44403C !important;
 }
 
-body.theme-dark .kpi-title-khmer,
-body.theme-glass .kpi-title-khmer,
-body.theme-dark .kpi-value-text,
-body.theme-glass .kpi-value-text {
+body.theme-warm .module-btn svg,
+body.theme-vet .module-btn svg {
+  color: #78716C !important;
+}
+
+body.theme-warm .module-btn:hover,
+body.theme-vet .module-btn:hover {
+  background-color: #EFECE6 !important;
+  color: #1C1917 !important;
+}
+
+body.theme-warm .module-item.active .module-btn,
+body.theme-vet .module-item.active .module-btn {
+  background: linear-gradient(135deg, #B45309 0%, #D97706 100%) !important;
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 14px rgba(180, 83, 9, 0.35) !important;
+}
+
+body.theme-warm .module-item.active .module-btn svg,
+body.theme-vet .module-item.active .module-btn svg {
+  stroke: #FFFFFF !important;
   color: #FFFFFF !important;
 }
 
-body.theme-dark .kpi-title-en,
-body.theme-glass .kpi-title-en {
+body.theme-warm .sidebar-footer,
+body.theme-vet .sidebar-footer {
+  background: #EFECE6 !important;
+  border-top: 1px solid #E5DFD6 !important;
+}
+
+body.theme-warm .sidebar-footer .user-name,
+body.theme-vet .sidebar-footer .user-name {
+  color: #1C1917 !important;
+  font-weight: 700 !important;
+}
+
+body.theme-warm .sidebar-footer .user-role,
+body.theme-vet .sidebar-footer .user-role {
+  color: #78716C !important;
+}
+
+body.theme-warm .logout-icon-btn,
+body.theme-vet .logout-icon-btn {
+  color: #78716C !important;
+}
+
+/* Master Hero Card for Theme 2 (Deep Forest Teal & Gold) */
+body.theme-warm .minimal-hero-card,
+body.theme-vet .minimal-hero-card {
+  background: linear-gradient(135deg, #164E3F 0%, #246B56 55%, #348B70 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 14px 34px rgba(22, 78, 63, 0.28), 0 4px 12px rgba(22, 78, 63, 0.15), inset 0 1px 2px rgba(255, 255, 255, 0.45) !important;
+  color: #FFFFFF !important;
+}
+
+body.theme-warm .hero-card-title,
+body.theme-vet .hero-card-title {
+  color: rgba(255, 255, 255, 0.95) !important;
+  font-weight: 600 !important;
+}
+
+body.theme-warm .hero-eye-btn,
+body.theme-vet .hero-eye-btn {
+  background: rgba(255, 255, 255, 0.22) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  color: #FFFFFF !important;
+}
+
+body.theme-warm .hero-balance-khr,
+body.theme-vet .hero-balance-khr {
+  color: #FFFFFF !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+}
+
+body.theme-warm .hero-balance-usd,
+body.theme-vet .hero-balance-usd {
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+
+body.theme-warm .hero-expense-row,
+body.theme-vet .hero-expense-row {
+  background: rgba(250, 248, 245, 0.95) !important;
+  border: 1px solid rgba(254, 202, 202, 0.9) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+body.theme-warm .hero-expense-label,
+body.theme-vet .hero-expense-label {
+  color: #57534E !important;
+  font-weight: 700 !important;
+}
+
+body.theme-warm .hero-expense-label svg,
+body.theme-vet .hero-expense-label svg {
+  color: #EF4444 !important;
+}
+
+body.theme-warm .hero-expense-val-khr,
+body.theme-vet .hero-expense-val-khr {
+  color: #DC2626 !important;
+  font-weight: 800 !important;
+}
+
+body.theme-warm .hero-expense-val-usd,
+body.theme-vet .hero-expense-val-usd {
+  color: #EF4444 !important;
+  font-weight: 700 !important;
+}
+
+body.theme-warm .hero-filter-capsule,
+body.theme-vet .hero-filter-capsule {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+}
+
+body.theme-warm .hero-filter-btn,
+body.theme-vet .hero-filter-btn {
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+
+body.theme-warm .hero-filter-btn.active,
+body.theme-vet .hero-filter-btn.active {
+  background: #FFFFFF !important;
+  color: #164E3F !important;
+  font-weight: 800 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+}
+
+body.theme-warm .hero-day-picker-bar,
+body.theme-vet .hero-day-picker-bar {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  backdrop-filter: blur(12px) !important;
+  color: #FFFFFF !important;
+  border-radius: 12px !important;
+}
+
+body.theme-warm .hero-native-date,
+body.theme-vet .hero-native-date {
+  background: rgba(255, 255, 255, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+  border-radius: 8px !important;
+}
+
+body.theme-warm .hero-mini-tag,
+body.theme-vet .hero-mini-tag {
+  background: rgba(255, 255, 255, 0.18) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: #FFFFFF !important;
+}
+
+body.theme-warm .hero-mini-tag.active,
+body.theme-vet .hero-mini-tag.active {
+  background: #FFFFFF !important;
+  border-color: #FFFFFF !important;
+  color: #164E3F !important;
+  font-weight: 800 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+}
+
+body.theme-warm .hero-action-pill.telegram-pill,
+body.theme-vet .hero-action-pill.telegram-pill {
+  background: #FFFFFF !important;
+  color: #1C1917 !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08) !important;
+}
+
+body.theme-warm .hero-action-pill.expense-pill,
+body.theme-vet .hero-action-pill.expense-pill {
+  background: #FFF1F2 !important;
+  color: #9F1239 !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Segmented Control for Warm */
+body.theme-warm .fintech-segmented-wrapper,
+body.theme-vet .fintech-segmented-wrapper {
+  border-top-color: #E5DFD6 !important;
+}
+
+body.theme-warm .fintech-segmented-control,
+body.theme-vet .fintech-segmented-control {
+  background: #E5DFD6 !important;
+  border: 1px solid #DCD5C9 !important;
+  border-radius: 14px !important;
+  padding: 4px !important;
+}
+
+body.theme-warm .segmented-tab-btn,
+body.theme-vet .segmented-tab-btn {
+  color: #78716C !important;
+  font-weight: 600 !important;
+}
+
+body.theme-warm .segmented-tab-btn.active,
+body.theme-vet .segmented-tab-btn.active {
+  background: #FAF8F5 !important;
+  color: #B45309 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 3px 10px rgba(180, 83, 9, 0.12) !important;
+}
+
+body.theme-warm .segmented-tab-btn.active svg,
+body.theme-vet .segmented-tab-btn.active svg {
+  color: #B45309 !important;
+}
+
+/* KPI Cards, Panels & Metric Cards for Warm */
+body.theme-warm .minimal-kpi-card,
+body.theme-vet .minimal-kpi-card,
+body.theme-warm .panel-card,
+body.theme-vet .panel-card,
+body.theme-warm .filter-bar,
+body.theme-vet .filter-bar,
+body.theme-warm .metric-card,
+body.theme-vet .metric-card {
+  background: #FAF8F5 !important;
+  border: 1px solid #E5DFD6 !important;
+  border-radius: 20px !important;
+  box-shadow: 0 4px 18px rgba(41, 37, 36, 0.04) !important;
+}
+
+body.theme-warm .kpi-title-khmer,
+body.theme-vet .kpi-title-khmer,
+body.theme-warm .kpi-value-text,
+body.theme-vet .kpi-value-text,
+body.theme-warm .card-title,
+body.theme-vet .card-title,
+body.theme-warm h2,
+body.theme-vet h2,
+body.theme-warm h3,
+body.theme-vet h3,
+body.theme-warm .metric-label,
+body.theme-vet .metric-label {
+  color: #1C1917 !important;
+  font-weight: 700 !important;
+}
+
+body.theme-warm .kpi-title-en,
+body.theme-vet .kpi-title-en,
+body.theme-warm .card-subtitle,
+body.theme-vet .card-subtitle,
+body.theme-warm .filter-label,
+body.theme-vet .filter-label {
+  color: #78716C !important;
+}
+
+body.theme-warm select,
+body.theme-vet select,
+body.theme-warm .form-select,
+body.theme-vet .form-select,
+body.theme-warm .form-input,
+body.theme-vet .form-input,
+body.theme-warm #sales-month-filter,
+body.theme-vet #sales-month-filter,
+body.theme-warm #expense-month-filter,
+body.theme-vet #expense-month-filter,
+body.theme-warm .date-picker-input,
+body.theme-vet .date-picker-input,
+body.theme-warm .scope-date-input,
+body.theme-vet .scope-date-input,
+body.theme-warm .tracker-native-date,
+body.theme-vet .tracker-native-date {
+  background: #FAF8F5 !important;
+  border: 1.5px solid #DCD5C9 !important;
+  color: #1C1917 !important;
+  font-weight: 600 !important;
+  border-radius: 10px !important;
+  color-scheme: light !important;
+}
+
+body.theme-warm .filter-pill,
+body.theme-vet .filter-pill {
+  background: #E5DFD6 !important;
+  border: 1px solid #DCD5C9 !important;
+  color: #78716C !important;
+}
+
+body.theme-warm .filter-pill.active,
+body.theme-vet .filter-pill.active {
+  background: linear-gradient(135deg, #B45309 0%, #D97706 100%) !important;
+  color: #FFFFFF !important;
+  border-color: transparent !important;
+}
+
+body.theme-warm .tracker-scope-panel,
+body.theme-vet .tracker-scope-panel {
+  background: #FAF8F5 !important;
+  border: 1px solid #E5DFD6 !important;
+}
+
+body.theme-warm .tracker-mode-capsule,
+body.theme-vet .tracker-mode-capsule {
+  background: #E5DFD6 !important;
+  border: 1px solid #DCD5C9 !important;
+}
+
+body.theme-warm .tracker-mode-btn,
+body.theme-vet .tracker-mode-btn {
+  color: #78716C !important;
+}
+
+body.theme-warm .tracker-mode-btn.active,
+body.theme-vet .tracker-mode-btn.active {
+  background: #B45309 !important;
+  color: #FFFFFF !important;
+}
+
+body.theme-warm .daily-tracker-card,
+body.theme-vet .daily-tracker-card {
+  background: #FAF8F5 !important;
+  border: 1px solid #E5DFD6 !important;
+  border-radius: 20px !important;
+}
+
+body.theme-warm .daily-tracker-card.expense-card,
+body.theme-vet .daily-tracker-card.expense-card {
+  border-left: 4px solid #EF4444 !important;
+}
+
+body.theme-warm .daily-tracker-card.sales-card,
+body.theme-vet .daily-tracker-card.sales-card {
+  border-left: 4px solid #10B981 !important;
+}
+
+body.theme-warm .tracker-head-title,
+body.theme-vet .tracker-head-title {
+  color: #1C1917 !important;
+  font-weight: 700 !important;
+}
+
+body.theme-warm .tracker-amount-hero.expense-amt,
+body.theme-vet .tracker-amount-hero.expense-amt {
+  color: #DC2626 !important;
+  font-weight: 800 !important;
+}
+
+body.theme-warm .tracker-amount-hero.sales-amt,
+body.theme-vet .tracker-amount-hero.sales-amt {
+  color: #1C1917 !important;
+  font-weight: 800 !important;
+}
+
+body.theme-warm .tracker-amount-hero.profit-amt.pos,
+body.theme-vet .tracker-amount-hero.profit-amt.pos {
+  color: #059669 !important;
+  font-weight: 800 !important;
+}
+
+body.theme-warm .sales-mini-pill,
+body.theme-vet .sales-mini-pill {
+  background: #EFECE6 !important;
+  border: 1px solid #E5DFD6 !important;
+  color: #44403C !important;
+}
+
+body.theme-warm .overspending-alert-card,
+body.theme-vet .overspending-alert-card {
+  background: #FFF1F2 !important;
+  border: 1px solid #FECDD3 !important;
+}
+
+body.theme-warm .acleda-bottom-nav,
+body.theme-vet .acleda-bottom-nav {
+  background: rgba(239, 236, 230, 0.95) !important;
+  border-top: 1px solid #E5DFD6 !important;
+  box-shadow: 0 -4px 20px rgba(41, 37, 36, 0.05) !important;
+}
+
+body.theme-warm .acleda-bottom-btn,
+body.theme-vet .acleda-bottom-btn {
+  color: #78716C !important;
+}
+
+body.theme-warm .acleda-bottom-btn.active,
+body.theme-vet .acleda-bottom-btn.active {
+  color: #B45309 !important;
+  font-weight: 700 !important;
+}
+
+body.theme-warm .quick-add-plus-circle.orders-circle,
+body.theme-vet .quick-add-plus-circle.orders-circle {
+  background: linear-gradient(135deg, #B45309 0%, #D97706 100%) !important;
+  box-shadow: 0 4px 16px rgba(180, 83, 9, 0.35) !important;
+}
+
+/* --------------------------------------------------------------------------
+   THEME 3: Midnight Teal Glass (BG: #0F172A | Cards: #1E293B)
+   -------------------------------------------------------------------------- */
+body.theme-midnight,
+body.theme-dark,
+body.theme-glass {
+  background: #0F172A !important;
+  background-image: 
+    radial-gradient(circle at 18% 18%, rgba(13, 148, 136, 0.15) 0%, transparent 45%),
+    radial-gradient(circle at 82% 38%, rgba(6, 182, 212, 0.1) 0%, transparent 50%) !important;
+  color: #F8FAFC !important;
+}
+
+body.theme-midnight .main-wrapper,
+body.theme-midnight .content-area,
+body.theme-dark .main-wrapper,
+body.theme-dark .content-area,
+body.theme-glass .main-wrapper,
+body.theme-glass .content-area {
+  background: transparent !important;
+  color: #F8FAFC !important;
+}
+
+body.theme-midnight .top-header,
+body.theme-dark .top-header,
+body.theme-glass .top-header {
+  background: rgba(15, 23, 42, 0.92) !important;
+  border-bottom: 1px solid rgba(45, 212, 191, 0.18) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+}
+
+body.theme-midnight .header-user-pill,
+body.theme-midnight .header-pill-btn,
+body.theme-midnight .header-date-badge,
+body.theme-midnight .top-date-card,
+body.theme-dark .header-user-pill,
+body.theme-dark .header-pill-btn,
+body.theme-dark .header-date-badge,
+body.theme-dark .top-date-card,
+body.theme-glass .header-user-pill,
+body.theme-glass .header-pill-btn,
+body.theme-glass .header-date-badge,
+body.theme-glass .top-date-card {
+  background: rgba(30, 41, 59, 0.9) !important;
+  border: 1px solid rgba(45, 212, 191, 0.25) !important;
+  color: #F1F5F9 !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25) !important;
+}
+
+body.theme-midnight .header-username-khmer,
+body.theme-midnight .user-khmer-title,
+body.theme-dark .header-username-khmer,
+body.theme-dark .user-khmer-title,
+body.theme-glass .header-username-khmer,
+body.theme-glass .user-khmer-title {
+  color: #FFFFFF !important;
+}
+
+body.theme-midnight .header-username-en,
+body.theme-midnight .user-en-sub,
+body.theme-dark .header-username-en,
+body.theme-dark .user-en-sub,
+body.theme-glass .header-username-en,
+body.theme-glass .user-en-sub {
   color: #94A3B8 !important;
 }
 
-body.theme-dark .badge-green,
-body.theme-glass .badge-green {
-  background: rgba(16, 185, 129, 0.2) !important;
-  color: #34D399 !important;
+body.theme-midnight .date-khmer-badge,
+body.theme-midnight .header-date-khmer,
+body.theme-dark .date-khmer-badge,
+body.theme-dark .header-date-khmer,
+body.theme-glass .date-khmer-badge,
+body.theme-glass .header-date-khmer {
+  color: #2DD4BF !important;
+  font-weight: 700 !important;
 }
 
-body.theme-dark .badge-orange,
-body.theme-glass .badge-orange {
-  background: rgba(249, 115, 22, 0.2) !important;
-  color: #FB923C !important;
+body.theme-midnight .date-en-badge,
+body.theme-midnight .header-date-en,
+body.theme-dark .date-en-badge,
+body.theme-dark .header-date-en,
+body.theme-glass .date-en-badge,
+body.theme-glass .header-date-en {
+  color: #94A3B8 !important;
 }
 
-body.theme-dark .badge-purple,
-body.theme-glass .badge-purple {
-  background: rgba(139, 92, 246, 0.2) !important;
-  color: #C084FC !important;
+body.theme-midnight .dashboard-theme-chip,
+body.theme-dark .dashboard-theme-chip,
+body.theme-glass .dashboard-theme-chip {
+  background: rgba(30, 41, 59, 0.9) !important;
+  border-color: rgba(45, 212, 191, 0.28) !important;
+  color: #2DD4BF !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.22) !important;
 }
 
-body.theme-dark .badge-yellow,
-body.theme-glass .badge-yellow {
-  background: rgba(234, 179, 8, 0.2) !important;
-  color: #FDE047 !important;
+body.theme-midnight .dashboard-theme-chip svg,
+body.theme-dark .dashboard-theme-chip svg,
+body.theme-glass .dashboard-theme-chip svg {
+  color: #2DD4BF !important;
 }
 
+/* Sidebar for Midnight Teal Glass */
+body.theme-midnight .sidebar,
+body.theme-dark .sidebar,
+body.theme-glass .sidebar {
+  background: #1E293B !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5) !important;
+  color: #F8FAFC !important;
+}
+
+body.theme-midnight .sidebar-header,
+body.theme-dark .sidebar-header,
+body.theme-glass .sidebar-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+body.theme-midnight .brand-title,
+body.theme-dark .brand-title,
+body.theme-glass .brand-title {
+  color: #FFFFFF !important;
+}
+
+body.theme-midnight .brand-subtitle,
+body.theme-dark .brand-subtitle,
+body.theme-glass .brand-subtitle {
+  color: #2DD4BF !important;
+  font-weight: 600 !important;
+}
+
+body.theme-midnight .mobile-close-btn,
+body.theme-dark .mobile-close-btn,
+body.theme-glass .mobile-close-btn {
+  color: #FFFFFF !important;
+}
+
+body.theme-midnight .module-btn,
+body.theme-dark .module-btn,
+body.theme-glass .module-btn {
+  color: #CBD5E1 !important;
+}
+
+body.theme-midnight .module-btn svg,
+body.theme-dark .module-btn svg,
+body.theme-glass .module-btn svg {
+  color: #94A3B8 !important;
+}
+
+body.theme-midnight .module-btn:hover,
+body.theme-dark .module-btn:hover,
+body.theme-glass .module-btn:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: #FFFFFF !important;
+}
+
+body.theme-midnight .module-item.active .module-btn,
+body.theme-dark .module-item.active .module-btn,
+body.theme-glass .module-item.active .module-btn {
+  background: linear-gradient(135deg, #0D9488 0%, #06B6D4 100%) !important;
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.45) !important;
+}
+
+body.theme-midnight .module-item.active .module-btn svg,
+body.theme-dark .module-item.active .module-btn svg,
+body.theme-glass .module-item.active .module-btn svg {
+  stroke: #FFFFFF !important;
+  color: #FFFFFF !important;
+}
+
+body.theme-midnight .sidebar-footer,
+body.theme-dark .sidebar-footer,
+body.theme-glass .sidebar-footer {
+  background: rgba(15, 23, 42, 0.9) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+body.theme-midnight .sidebar-footer .user-name,
+body.theme-dark .sidebar-footer .user-name,
+body.theme-glass .sidebar-footer .user-name {
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+}
+
+body.theme-midnight .sidebar-footer .user-role,
+body.theme-dark .sidebar-footer .user-role,
+body.theme-glass .sidebar-footer .user-role {
+  color: #94A3B8 !important;
+}
+
+body.theme-midnight .logout-icon-btn,
+body.theme-dark .logout-icon-btn,
+body.theme-glass .logout-icon-btn {
+  color: #94A3B8 !important;
+}
+
+/* Master Hero Card for Theme 3 (Glowing Dark Teal Glass) */
+body.theme-midnight .minimal-hero-card,
+body.theme-dark .minimal-hero-card,
 body.theme-glass .minimal-hero-card {
-  background: rgba(15, 30, 65, 0.7) !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.2) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
+  background: linear-gradient(135deg, #094F5E 0%, #0D6E6E 52%, #108A7C 100%) !important;
+  border: 1px solid rgba(94, 234, 212, 0.35) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 16px 36px rgba(9, 79, 94, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.25) !important;
+  color: #FFFFFF !important;
 }
 
-/* Dashboard Theme Chip & Palette Button */
-.dashboard-theme-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+body.theme-midnight .hero-card-title,
+body.theme-dark .hero-card-title,
+body.theme-glass .hero-card-title {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+body.theme-midnight .hero-eye-btn,
+body.theme-dark .hero-eye-btn,
+body.theme-glass .hero-eye-btn {
+  background: rgba(255, 255, 255, 0.18) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: #FFFFFF !important;
+}
+
+body.theme-midnight .hero-balance-khr,
+body.theme-dark .hero-balance-khr,
+body.theme-glass .hero-balance-khr {
+  color: #FFFFFF !important;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+body.theme-midnight .hero-balance-usd,
+body.theme-dark .hero-balance-usd,
+body.theme-glass .hero-balance-usd {
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+
+body.theme-midnight .hero-expense-row,
+body.theme-dark .hero-expense-row,
+body.theme-glass .hero-expense-row {
+  background: rgba(220, 38, 38, 0.22) !important;
+  border: 1px solid rgba(254, 202, 202, 0.38) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+body.theme-midnight .hero-expense-label,
+body.theme-dark .hero-expense-label,
+body.theme-glass .hero-expense-label {
+  color: #FFA39E !important;
+  font-weight: 700 !important;
+}
+
+body.theme-midnight .hero-expense-label svg,
+body.theme-dark .hero-expense-label svg,
+body.theme-glass .hero-expense-label svg {
+  color: #F87171 !important;
+}
+
+body.theme-midnight .hero-expense-val-khr,
+body.theme-dark .hero-expense-val-khr,
+body.theme-glass .hero-expense-val-khr {
+  color: #FFE4E6 !important;
+  font-weight: 800 !important;
+}
+
+body.theme-midnight .hero-expense-val-usd,
+body.theme-dark .hero-expense-val-usd,
+body.theme-glass .hero-expense-val-usd {
+  color: #FCA5A5 !important;
+  font-weight: 700 !important;
+}
+
+body.theme-midnight .hero-filter-capsule,
+body.theme-dark .hero-filter-capsule,
+body.theme-glass .hero-filter-capsule {
+  background: rgba(0, 0, 0, 0.22) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+body.theme-midnight .hero-filter-btn,
+body.theme-dark .hero-filter-btn,
+body.theme-glass .hero-filter-btn {
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+
+body.theme-midnight .hero-filter-btn.active,
+body.theme-dark .hero-filter-btn.active,
+body.theme-glass .hero-filter-btn.active {
+  background: #FFFFFF !important;
+  color: #094F5E !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2) !important;
+}
+
+body.theme-midnight .hero-day-picker-bar,
+body.theme-dark .hero-day-picker-bar,
+body.theme-glass .hero-day-picker-bar {
+  background: rgba(0, 0, 0, 0.25) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  backdrop-filter: blur(12px) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+  border-radius: 12px !important;
+}
+
+body.theme-midnight .hero-native-date,
+body.theme-dark .hero-native-date,
+body.theme-glass .hero-native-date {
+  background: rgba(255, 255, 255, 0.16) !important;
+  border: 1px solid rgba(255, 255, 255, 0.32) !important;
+  color: #FFFFFF !important;
+  border-radius: 8px !important;
+}
+
+body.theme-midnight .hero-mini-tag,
+body.theme-dark .hero-mini-tag,
+body.theme-glass .hero-mini-tag {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  color: #FFFFFF !important;
+}
+
+body.theme-midnight .hero-mini-tag.active,
+body.theme-dark .hero-mini-tag.active,
+body.theme-glass .hero-mini-tag.active {
+  background: #FFFFFF !important;
+  border-color: #FFFFFF !important;
+  color: #094F5E !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+body.theme-midnight .hero-action-pill.telegram-pill,
+body.theme-dark .hero-action-pill.telegram-pill,
+body.theme-glass .hero-action-pill.telegram-pill {
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2) !important;
+}
+
+body.theme-midnight .hero-action-pill.expense-pill,
+body.theme-dark .hero-action-pill.expense-pill,
+body.theme-glass .hero-action-pill.expense-pill {
+  background: #FFE5D9 !important;
+  color: #9A3412 !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Segmented Control for Midnight */
+body.theme-midnight .fintech-segmented-wrapper,
+body.theme-dark .fintech-segmented-wrapper,
+body.theme-glass .fintech-segmented-wrapper {
+  border-top-color: rgba(45, 212, 191, 0.16) !important;
+}
+
+body.theme-midnight .fintech-segmented-control,
+body.theme-dark .fintech-segmented-control,
+body.theme-glass .fintech-segmented-control {
+  background: rgba(11, 19, 36, 0.88) !important;
+  border: 1px solid rgba(45, 212, 191, 0.24) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+}
+
+body.theme-midnight .segmented-tab-btn,
+body.theme-dark .segmented-tab-btn,
+body.theme-glass .segmented-tab-btn {
+  color: #94A3B8 !important;
+}
+
+body.theme-midnight .segmented-tab-btn.active,
+body.theme-dark .segmented-tab-btn.active,
+body.theme-glass .segmented-tab-btn.active {
+  background: linear-gradient(135deg, #0D9488 0%, #06B6D4 100%) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.45) !important;
+}
+
+body.theme-midnight .segmented-tab-btn.active svg,
+body.theme-dark .segmented-tab-btn.active svg,
+body.theme-glass .segmented-tab-btn.active svg {
+  color: #FFFFFF !important;
+}
+
+/* KPI Cards, Panels & Metric Cards for Midnight */
+body.theme-midnight .minimal-kpi-card,
+body.theme-dark .minimal-kpi-card,
+body.theme-glass .minimal-kpi-card,
+body.theme-midnight .panel-card,
+body.theme-dark .panel-card,
+body.theme-glass .panel-card,
+body.theme-midnight .filter-bar,
+body.theme-dark .filter-bar,
+body.theme-glass .filter-bar,
+body.theme-midnight .metric-card,
+body.theme-dark .metric-card,
+body.theme-glass .metric-card {
+  background: #1E293B !important;
+  border: 1px solid rgba(45, 212, 191, 0.2) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+}
+
+body.theme-midnight .kpi-title-khmer,
+body.theme-dark .kpi-title-khmer,
+body.theme-glass .kpi-title-khmer,
+body.theme-midnight .kpi-value-text,
+body.theme-dark .kpi-value-text,
+body.theme-glass .kpi-value-text,
+body.theme-midnight .card-title,
+body.theme-dark .card-title,
+body.theme-glass .card-title,
+body.theme-midnight h2,
+body.theme-dark h2,
+body.theme-glass h2,
+body.theme-midnight h3,
+body.theme-dark h3,
+body.theme-glass h3,
+body.theme-midnight .metric-label,
+body.theme-dark .metric-label,
+body.theme-glass .metric-label {
+  color: #F8FAFC !important;
+  font-weight: 700 !important;
+}
+
+body.theme-midnight .kpi-title-en,
+body.theme-dark .kpi-title-en,
+body.theme-glass .kpi-title-en,
+body.theme-midnight .card-subtitle,
+body.theme-dark .card-subtitle,
+body.theme-glass .card-subtitle,
+body.theme-midnight .filter-label,
+body.theme-dark .filter-label,
+body.theme-glass .filter-label {
+  color: #94A3B8 !important;
+}
+
+body.theme-midnight select,
+body.theme-dark select,
+body.theme-glass select,
+body.theme-midnight .form-select,
+body.theme-dark .form-select,
+body.theme-glass .form-select,
+body.theme-midnight .form-input,
+body.theme-dark .form-input,
+body.theme-glass .form-input,
+body.theme-midnight #sales-month-filter,
+body.theme-dark #sales-month-filter,
+body.theme-glass #sales-month-filter,
+body.theme-midnight #expense-month-filter,
+body.theme-dark #expense-month-filter,
+body.theme-glass #expense-month-filter,
+body.theme-midnight .date-picker-input,
+body.theme-dark .date-picker-input,
+body.theme-glass .date-picker-input,
+body.theme-midnight .scope-date-input,
+body.theme-dark .scope-date-input,
+body.theme-glass .scope-date-input,
+body.theme-midnight .tracker-native-date,
+body.theme-dark .tracker-native-date,
+body.theme-glass .tracker-native-date {
+  background: rgba(18, 36, 64, 0.88) !important;
+  border: 1px solid rgba(45, 212, 191, 0.32) !important;
+  color: #F8FAFC !important;
+  border-radius: 10px !important;
+  color-scheme: dark !important;
+}
+
+body.theme-midnight .filter-pill,
+body.theme-dark .filter-pill,
+body.theme-glass .filter-pill {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: #94A3B8 !important;
+}
+
+body.theme-midnight .filter-pill.active,
+body.theme-dark .filter-pill.active,
+body.theme-glass .filter-pill.active {
+  background: linear-gradient(135deg, #0D9488 0%, #06B6D4 100%) !important;
+  color: #FFFFFF !important;
+  border-color: transparent !important;
+}
+
+body.theme-midnight .tracker-scope-panel,
+body.theme-dark .tracker-scope-panel,
+body.theme-glass .tracker-scope-panel {
+  background: #1E293B !important;
+  border: 1px solid rgba(45, 212, 191, 0.25) !important;
+}
+
+body.theme-midnight .tracker-mode-capsule,
+body.theme-dark .tracker-mode-capsule,
+body.theme-glass .tracker-mode-capsule {
+  background: rgba(11, 19, 36, 0.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+body.theme-midnight .tracker-mode-btn,
+body.theme-dark .tracker-mode-btn,
+body.theme-glass .tracker-mode-btn {
+  color: #94A3B8 !important;
+}
+
+body.theme-midnight .tracker-mode-btn.active,
+body.theme-dark .tracker-mode-btn.active,
+body.theme-glass .tracker-mode-btn.active {
+  background: #0D9488 !important;
+  color: #FFFFFF !important;
+}
+
+body.theme-midnight .daily-tracker-card,
+body.theme-dark .daily-tracker-card,
+body.theme-glass .daily-tracker-card {
+  background: #1E293B !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 20px !important;
+}
+
+body.theme-midnight .daily-tracker-card.expense-card,
+body.theme-dark .daily-tracker-card.expense-card,
+body.theme-glass .daily-tracker-card.expense-card {
+  border-left: 4px solid #EF4444 !important;
+}
+
+body.theme-midnight .daily-tracker-card.sales-card,
+body.theme-dark .daily-tracker-card.sales-card,
+body.theme-glass .daily-tracker-card.sales-card {
+  border-left: 4px solid #10B981 !important;
+}
+
+body.theme-midnight .tracker-head-title,
+body.theme-dark .tracker-head-title,
+body.theme-glass .tracker-head-title {
+  color: #F8FAFC !important;
+  font-weight: 700 !important;
+}
+
+body.theme-midnight .tracker-amount-hero.expense-amt,
+body.theme-dark .tracker-amount-hero.expense-amt,
+body.theme-glass .tracker-amount-hero.expense-amt {
+  color: #DC2626 !important;
+  font-weight: 800 !important;
+}
+
+body.theme-midnight .tracker-amount-hero.sales-amt,
+body.theme-dark .tracker-amount-hero.sales-amt,
+body.theme-glass .tracker-amount-hero.sales-amt {
+  color: #F8FAFC !important;
+  font-weight: 800 !important;
+}
+
+body.theme-midnight .tracker-amount-hero.profit-amt.pos,
+body.theme-dark .tracker-amount-hero.profit-amt.pos,
+body.theme-glass .tracker-amount-hero.profit-amt.pos {
+  color: #10B981 !important;
+  font-weight: 800 !important;
+}
+
+body.theme-midnight .sales-mini-pill,
+body.theme-dark .sales-mini-pill,
+body.theme-glass .sales-mini-pill {
+  background: rgba(15, 23, 42, 0.7) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #CBD5E1 !important;
+}
+
+body.theme-midnight .overspending-alert-card,
+body.theme-dark .overspending-alert-card,
+body.theme-glass .overspending-alert-card {
+  background: rgba(239, 68, 68, 0.16) !important;
+  border: 1px solid rgba(239, 68, 68, 0.35) !important;
+}
+
+body.theme-midnight .acleda-bottom-nav,
+body.theme-dark .acleda-bottom-nav,
+body.theme-glass .acleda-bottom-nav {
+  background: rgba(15, 23, 42, 0.94) !important;
+  border-top: 1px solid rgba(45, 212, 191, 0.18) !important;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+body.theme-midnight .acleda-bottom-btn,
+body.theme-dark .acleda-bottom-btn,
+body.theme-glass .acleda-bottom-btn {
+  color: #64748B !important;
+}
+
+body.theme-midnight .acleda-bottom-btn.active,
+body.theme-dark .acleda-bottom-btn.active,
+body.theme-glass .acleda-bottom-btn.active {
+  color: #2DD4BF !important;
+  font-weight: 700 !important;
+}
+
+body.theme-midnight .quick-add-plus-circle.orders-circle,
+body.theme-dark .quick-add-plus-circle.orders-circle,
+body.theme-glass .quick-add-plus-circle.orders-circle {
+  background: linear-gradient(135deg, #0D9488 0%, #06B6D4 100%) !important;
+  box-shadow: 0 4px 16px rgba(13, 148, 136, 0.5) !important;
+}
+
+/* --------------------------------------------------------------------------
+   THEME SWITCHER MODAL (Exact 3 Options matching user specification)
+   -------------------------------------------------------------------------- */
+.theme-modal-card {
   background: #FFFFFF;
-  border: 1.5px solid #CBD5E1;
-  border-radius: 12px;
-  padding: 8px 12px;
-  font-family: inherit;
-  font-size: 12.5px;
-  font-weight: 700;
+  border: 1px solid #E2E8F0;
+  border-radius: 24px;
+  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.15);
   color: #0F172A;
+  max-width: 440px;
+  width: 90%;
+  padding: 24px;
+}
+
+body.theme-midnight .theme-modal-card,
+body.theme-dark .theme-modal-card,
+body.theme-glass .theme-modal-card {
+  background: #1E293B !important;
+  border-color: rgba(45, 212, 191, 0.3) !important;
+  color: #F8FAFC !important;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.5) !important;
+}
+
+.theme-options-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.theme-option-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: #F8FAFC;
+  border: 1.5px solid #E2E8F0;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease;
   user-select: none;
-  -webkit-tap-highlight-color: transparent;
 }
 
-.dashboard-theme-chip:hover {
-  border-color: #38A3A5;
-  transform: translateY(-1px);
+body.theme-midnight .theme-option-card,
+body.theme-dark .theme-option-card,
+body.theme-glass .theme-option-card {
+  background: rgba(15, 23, 42, 0.7) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
-.dashboard-theme-chip:active {
-  transform: scale(0.96);
+.theme-option-card:hover {
+  transform: translateY(-2px);
+  border-color: #0D9488;
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.12);
 }
 
-.dashboard-theme-chip svg {
-  width: 16px;
-  height: 16px;
-  color: #0284C7;
+.theme-option-card.selected {
+  border-color: #0D9488 !important;
+  background: #F0FDFA !important;
+  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.2) !important;
 }
 
-body.theme-teal .dashboard-theme-chip {
-  background: #FFFFFF;
-  border-color: #CBD5E1;
-  color: #0D9488;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+body.theme-midnight .theme-option-card.selected,
+body.theme-dark .theme-option-card.selected,
+body.theme-glass .theme-option-card.selected {
+  background: rgba(13, 148, 136, 0.22) !important;
+  border-color: #2DD4BF !important;
 }
 
-body.theme-teal .dashboard-theme-chip svg {
-  color: #0D9488;
+.theme-swatch {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
-body.theme-vet .dashboard-theme-chip {
-  background: #FFF7ED;
-  border-color: #FED7AA;
-  color: #C2410C;
+.theme-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-body.theme-vet .dashboard-theme-chip svg {
-  color: #EA580C;
+.theme-name {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #0F172A;
 }
 
-body.theme-dark .dashboard-theme-chip {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
+body.theme-midnight .theme-name,
+body.theme-dark .theme-name,
+body.theme-glass .theme-name {
+  color: #F8FAFC !important;
+}
+
+.theme-desc {
+  font-size: 11.5px;
+  color: #64748B;
+  font-weight: 500;
+}
+
+body.theme-midnight .theme-desc,
+body.theme-dark .theme-desc,
+body.theme-glass .theme-desc {
+  color: #94A3B8 !important;
+}
+
+.theme-check-mark {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid #CBD5E1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.theme-option-card.selected .theme-check-mark {
+  background: #0D9488;
+  border-color: #0D9488;
   color: #FFFFFF;
 }
 
-body.theme-dark .dashboard-theme-chip svg {
-  color: #38BDF8;
-}
-
-body.theme-glass .dashboard-theme-chip {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.25);
-  color: #FFFFFF;
+.theme-check-mark svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 3;
 }
 
 /* Ensure Theme Modal Card is above everything and styled */

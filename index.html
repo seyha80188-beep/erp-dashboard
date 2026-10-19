@@ -22,7 +22,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" href="style.css?v=20261019_v22">
+  <link rel="stylesheet" href="style.css?v=20261019_v23">
 </head>
 <body>
   <!-- Mobile Pull-to-Refresh Indicator Container -->
@@ -137,10 +137,10 @@
           <span class="btn-text" id="header-btn-add-text">កត់ត្រាចំណាយ</span>
         </button>
 
-        <!-- Theme Switcher Palette: 🌊 Teal ថ្មី / 🧡 ទឹកក្រូច VET / 🌙 ងងឹត / 💎 ថ្លា -->
+        <!-- Theme Switcher Palette: 🌿 Modern Emerald & Sage / 🌾 Luxury Warm Alabaster / 🌙 Midnight Teal Glass -->
         <button id="theme-toggle-btn" class="header-pill-btn theme-palette-pill" onclick="openThemeModal()" title="ជ្រើសរើសពណ៌ និងរចនាបថ (Select Theme)">
           <i id="theme-icon" data-lucide="palette"></i>
-          <span id="theme-btn-label">🌊 Teal</span>
+          <span id="theme-btn-label">🌿 Sage</span>
         </button>
 
         <!-- Language Switcher: 🇰🇭 ខ្មែរ / 🇬🇧 ENG (Cambodian / English Flag Badge like VET Express) -->
@@ -478,50 +478,38 @@
       </div>
 
       <div class="theme-options-grid">
-        <!-- 1. Teal Mint (ទម្រង់ថ្មី ដូចរូបភាព) -->
-        <div class="theme-option-card" id="theme-opt-teal" onclick="selectTheme('teal')">
-          <div class="theme-swatch teal-swatch">
-            <i data-lucide="sparkles" style="color:#FFF; width:22px; height:22px;"></i>
+        <!-- 1. Modern Emerald & Sage -->
+        <div class="theme-option-card" id="theme-opt-sage" onclick="selectTheme('sage')">
+          <div class="theme-swatch sage-swatch" style="background: linear-gradient(135deg, #0F766E 0%, #2DD4BF 100%);">
+            <i data-lucide="leaf" style="color:#FFF; width:22px; height:22px;"></i>
           </div>
           <div class="theme-info">
-            <span class="theme-name">🌊 Teal (សរថ្លៃ Pearl White)</span>
-            <span class="theme-desc">ពណ៌សរថ្លៃ ស្រទន់ភ្នែកបែប Apple Fintech + កាតធំពណ៌ Teal</span>
+            <span class="theme-name">🌿 Modern Emerald & Sage</span>
+            <span class="theme-desc">BG: #E8F0EE | Cards: #F7FAF9 (បៃតងខ្ចីស្រទន់ភ្នែក)</span>
           </div>
           <div class="theme-check-mark"><i data-lucide="check"></i></div>
         </div>
 
-        <!-- 2. VET Orange (ដើម) -->
-        <div class="theme-option-card" id="theme-opt-vet" onclick="selectTheme('vet')">
-          <div class="theme-swatch vet-swatch">
+        <!-- 2. Luxury Warm Alabaster & Gold -->
+        <div class="theme-option-card" id="theme-opt-warm" onclick="selectTheme('warm')">
+          <div class="theme-swatch warm-swatch" style="background: linear-gradient(135deg, #B45309 0%, #EFECE6 100%);">
             <i data-lucide="sun" style="color:#FFF; width:22px; height:22px;"></i>
           </div>
           <div class="theme-info">
-            <span class="theme-name">🧡 ទឹកក្រូច VET (ដើម)</span>
-            <span class="theme-desc">រចនាបថ VET Express ផ្ទៃសរលាយទឹកក្រូចប្រណិត</span>
+            <span class="theme-name">🌾 Luxury Warm Alabaster & Gold</span>
+            <span class="theme-desc">BG: #EFECE6 | Cards: #FAF8F5 (ពងមាន់ស្រទន់ គ្មានពន្លឺចាំង)</span>
           </div>
           <div class="theme-check-mark"><i data-lucide="check"></i></div>
         </div>
 
-        <!-- 3. Solid Dark (Navy) -->
-        <div class="theme-option-card" id="theme-opt-dark" onclick="selectTheme('dark')">
-          <div class="theme-swatch dark-swatch">
+        <!-- 3. Midnight Teal Glass -->
+        <div class="theme-option-card" id="theme-opt-midnight" onclick="selectTheme('midnight')">
+          <div class="theme-swatch midnight-swatch" style="background: linear-gradient(135deg, #0F172A 0%, #2DD4BF 100%);">
             <i data-lucide="moon" style="color:#38BDF8; width:22px; height:22px;"></i>
           </div>
           <div class="theme-info">
-            <span class="theme-name">🌙 ងងឹត (Solid Dark)</span>
-            <span class="theme-desc">ពណ៌ទឹកប៊ិចក្រម៉ៅ ACLEDA / ABA កម្រិតខ្ពស់</span>
-          </div>
-          <div class="theme-check-mark"><i data-lucide="check"></i></div>
-        </div>
-
-        <!-- 4. Glassmorphism -->
-        <div class="theme-option-card" id="theme-opt-glass" onclick="selectTheme('glass')">
-          <div class="theme-swatch glass-swatch">
-            <i data-lucide="gem" style="color:#E0F2FE; width:22px; height:22px;"></i>
-          </div>
-          <div class="theme-info">
-            <span class="theme-name">💎 ថ្លា (Glassmorphism)</span>
-            <span class="theme-desc">កញ្ចក់ថ្លាពន្លឺភ្លឺផ្លេក Modern Frosted Glass</span>
+            <span class="theme-name">🌙 Midnight Teal Glass</span>
+            <span class="theme-desc">BG: #0F172A | Cards: #1E293B (ងងឹតស្រទន់ការពារភ្នែកពេលយប់)</span>
           </div>
           <div class="theme-check-mark"><i data-lucide="check"></i></div>
         </div>
@@ -556,6 +544,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=20261019_v21"></script>
+  <script src="app.js?v=20261019_v23"></script>
 </body>
 </html>

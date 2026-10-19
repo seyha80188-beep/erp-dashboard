@@ -271,9 +271,13 @@ const state = {
   planActiveTab: 'boost6',     // 'boost6' | 'boost4' | 'trip'
   hideBalance: false,
   displayCurrency: localStorage.getItem('yem_display_currency') || 'USD', // 'USD' | 'KHR'
-  overspendingAlert: JSON.parse(localStorage.getItem('yem_overspend_alert') || 'true'),
-  theme: localStorage.getItem('yem_theme') || 'teal', // 'teal' | 'vet' | 'dark' | 'glass'
-  lang: localStorage.getItem('yem_lang') || 'km',       // 'km' | 'en'
+  theme: (() => {
+    let t = localStorage.getItem('yem_theme') || 'sage';
+    if (t === 'teal' || t === 'light') return 'sage';
+    if (t === 'vet') return 'warm';
+    if (t === 'dark' || t === 'glass') return 'midnight';
+    return ['sage', 'warm', 'midnight'].includes(t) ? t : 'sage';
+  })(),
   expenseCurrency: 'KHR',      // 'KHR' | 'USD'
   isLoading: false,
   lastSyncTime: null,
@@ -390,34 +394,32 @@ async function initApp() {
 }
 
 /**
- * Apply App Theme: 💎 ថ្លា (Glass) vs 🌙 ងងឹត (Dark) vs ☀️ សរថ្លា (Light Glass)
+ * Apply App Theme: 🌿 Modern Emerald & Sage vs 🌾 Luxury Warm Alabaster vs 🌙 Midnight Teal Glass
  */
 function applyAppTheme() {
-  const theme = state.theme || 'teal';
-  document.body.classList.remove('theme-glass', 'theme-dark', 'theme-light', 'theme-vet', 'theme-teal');
-  if (theme === 'teal') {
-    document.body.classList.add('theme-teal');
-  } else if (theme === 'vet') {
-    document.body.classList.add('theme-vet');
-  } else if (theme === 'light') {
-    document.body.classList.add('theme-light');
-  } else if (theme === 'dark') {
-    document.body.classList.add('theme-dark');
-  } else {
-    document.body.classList.add('theme-glass');
-  }
+  let theme = state.theme || 'sage';
+  if (theme === 'teal' || theme === 'light') theme = 'sage';
+  else if (theme === 'vet') theme = 'warm';
+  else if (theme === 'dark' || theme === 'glass') theme = 'midnight';
+  if (!['sage', 'warm', 'midnight'].includes(theme)) theme = 'sage';
+  state.theme = theme;
+
+  document.body.classList.remove('theme-glass', 'theme-dark', 'theme-light', 'theme-vet', 'theme-teal', 'theme-sage', 'theme-warm', 'theme-midnight');
+  document.body.classList.add(`theme-${theme}`);
+  // Alias for backward compatibility
+  if (theme === 'sage') document.body.classList.add('theme-teal');
+  else if (theme === 'warm') document.body.classList.add('theme-vet');
+  else if (theme === 'midnight') document.body.classList.add('theme-dark');
 
   const themeBtnLabel = document.getElementById('theme-btn-label');
   const themeIcon = document.getElementById('theme-icon');
   if (themeBtnLabel) {
-    if (theme === 'teal') {
-      themeBtnLabel.textContent = '🌊 Teal';
-    } else if (theme === 'vet') {
-      themeBtnLabel.textContent = state.lang === 'en' ? '🧡 VET Orange' : '🧡 ទឹកក្រូច VET';
-    } else if (theme === 'dark') {
-      themeBtnLabel.textContent = state.lang === 'en' ? '🌙 Dark Navy' : '🌙 ងងឹត';
+    if (theme === 'sage') {
+      themeBtnLabel.textContent = '🌿 Sage';
+    } else if (theme === 'warm') {
+      themeBtnLabel.textContent = '🌾 Alabaster';
     } else {
-      themeBtnLabel.textContent = state.lang === 'en' ? '💎 Glass' : '💎 ថ្លា';
+      themeBtnLabel.textContent = '🌙 Midnight';
     }
   }
   if (themeIcon) {
@@ -2180,7 +2182,7 @@ function renderDashboardModule() {
     <div style="display:flex; align-items:center; gap:8px;">
       <button type="button" class="dashboard-theme-chip" onclick="openThemeModal()" title="ជ្រើសរើសពណ៌ / Theme">
         <i data-lucide="palette"></i>
-        <span>${state.theme === 'teal' ? '🌊 Teal' : (state.theme === 'vet' ? '🧡 VET' : (state.theme === 'dark' ? '🌙 Dark' : '💎 Glass'))}</span>
+        <span>${state.theme === 'sage' ? '🌿 Sage' : (state.theme === 'warm' ? '🌾 Alabaster' : '🌙 Midnight')}</span>
       </button>
 
       <div class="top-date-card" onclick="openThemeModal()" title="កាលបរិច្ឆេទ & ចុចប្តូរពណ៌ Theme">
@@ -4672,7 +4674,7 @@ window.openThemeModal = function() {
   if (overlay) {
     overlay.style.display = 'flex';
     overlay.classList.add('active');
-    ['teal', 'vet', 'dark', 'glass'].forEach(t => {
+    ['sage', 'warm', 'midnight'].forEach(t => {
       const card = document.getElementById(`theme-opt-${t}`);
       if (card) {
         if (state.theme === t) card.classList.add('selected');
@@ -4700,17 +4702,15 @@ window.selectTheme = function(themeName) {
 };
 
 /**
- * Toggle App Theme: 🌊 Teal ថ្មី ➔ 🧡 ទឹកក្រូច VET ➔ 🌙 ងងឹត ➔ 💎 ថ្លា
+ * Toggle App Theme: 🌿 Modern Emerald & Sage ➔ 🌾 Luxury Warm Alabaster & Gold ➔ 🌙 Midnight Teal Glass
  */
 window.toggleAppTheme = function() {
-  if (state.theme === 'teal') {
-    state.theme = 'vet';
-  } else if (state.theme === 'vet') {
-    state.theme = 'dark';
-  } else if (state.theme === 'dark') {
-    state.theme = 'glass';
+  if (state.theme === 'sage') {
+    state.theme = 'warm';
+  } else if (state.theme === 'warm') {
+    state.theme = 'midnight';
   } else {
-    state.theme = 'teal';
+    state.theme = 'sage';
   }
   localStorage.setItem('yem_theme', state.theme);
   applyAppTheme();
