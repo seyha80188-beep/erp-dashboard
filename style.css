@@ -4059,6 +4059,75 @@ body.theme-glass .expense-modal-card {
   box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.25);
 }
 
+/* Modal Date Picker Styling (Prevents clipped right border & adds calendar icon) */
+.modal-date-picker-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.modal-date-picker-wrap .date-field {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  display: block;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  color-scheme: dark;
+  padding-right: 38px;
+  cursor: pointer;
+  background-color: rgba(6, 14, 34, 0.9);
+}
+
+.modal-date-picker-wrap .date-calendar-icon {
+  position: absolute;
+  right: 12px;
+  pointer-events: none;
+  color: var(--primary-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-date-picker-wrap .date-calendar-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Ensure WebKit date inputs do not push or clip right borders */
+input[type="date"].form-input {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  appearance: none;
+  color-scheme: dark;
+}
+
+input[type="date"]::-webkit-date-and-time-value {
+  text-align: left;
+  line-height: 1.4;
+  margin: 0;
+  padding: 0;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
 .quick-chips-row {
   display: flex;
   flex-wrap: wrap;
