@@ -6054,6 +6054,210 @@ body.theme-teal .quick-add-plus-circle.orders-circle {
   box-shadow: 0 4px 16px rgba(13, 148, 136, 0.35) !important;
 }
 
+/* Sidebar Overrides for Luxury Pearl White */
+body.theme-teal .sidebar {
+  background: #FFFFFF !important;
+  border-right: 1px solid #E2E8F0 !important;
+  box-shadow: 4px 0 24px rgba(15, 23, 42, 0.08) !important;
+  color: #0F172A !important;
+}
+
+body.theme-teal .sidebar-header {
+  border-bottom: 1px solid #E2E8F0 !important;
+}
+
+body.theme-teal .brand-title {
+  color: #0F172A !important;
+}
+
+body.theme-teal .brand-subtitle {
+  color: #0D9488 !important;
+  font-weight: 600 !important;
+}
+
+body.theme-teal .mobile-close-btn {
+  color: #0F172A !important;
+}
+
+body.theme-teal .module-btn {
+  color: #334155 !important;
+}
+
+body.theme-teal .module-btn svg {
+  color: #64748B !important;
+}
+
+body.theme-teal .module-btn:hover {
+  background-color: #F1F5F9 !important;
+  color: #0F172A !important;
+}
+
+body.theme-teal .module-item.active .module-btn {
+  background: linear-gradient(135deg, #0D9488 0%, #06B6D4 100%) !important;
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.35) !important;
+}
+
+body.theme-teal .module-item.active .module-btn svg {
+  stroke: #FFFFFF !important;
+  color: #FFFFFF !important;
+}
+
+body.theme-teal .sidebar-footer {
+  background: #F8FAFC !important;
+  border-top: 1px solid #E2E8F0 !important;
+}
+
+body.theme-teal .sidebar-footer .user-name {
+  color: #0F172A !important;
+  font-weight: 700 !important;
+}
+
+body.theme-teal .sidebar-footer .user-role {
+  color: #64748B !important;
+}
+
+body.theme-teal .logout-icon-btn {
+  color: #64748B !important;
+}
+
+/* B2 Lower Section Overrides (Daily Tracker Cards & Scope Panel) */
+body.theme-teal .tracker-native-date,
+body.theme-teal .scope-date-input,
+body.theme-teal .tracker-native-date:focus {
+  background: #FFFFFF !important;
+  border: 1.5px solid #CBD5E1 !important;
+  color: #0F172A !important;
+  color-scheme: light !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+}
+
+body.theme-teal .tracker-ctl-label,
+body.theme-teal .tracker-head-sub,
+body.theme-teal .stat-lbl,
+body.theme-teal .stat-sub {
+  color: #64748B !important;
+}
+
+body.theme-teal .daily-tracker-card {
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 20px !important;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04) !important;
+}
+
+body.theme-teal .daily-tracker-card.expense-card {
+  border-left: 4px solid #EF4444 !important;
+}
+
+body.theme-teal .daily-tracker-card.sales-card {
+  border-left: 4px solid #10B981 !important;
+}
+
+body.theme-teal .tracker-head-title {
+  color: #0F172A !important;
+  font-weight: 700 !important;
+}
+
+body.theme-teal .tracker-action-btn.btn-log-exp {
+  background: #FFF1F2 !important;
+  color: #DC2626 !important;
+  border: 1px solid #FECDD3 !important;
+  font-weight: 700 !important;
+}
+
+body.theme-teal .tracker-action-btn.btn-log-order {
+  background: #ECFDF5 !important;
+  color: #059669 !important;
+  border: 1px solid #A7F3D0 !important;
+  font-weight: 700 !important;
+}
+
+body.theme-teal .tracker-amount-hero.expense-amt {
+  color: #DC2626 !important;
+  font-weight: 800 !important;
+}
+
+body.theme-teal .tracker-amount-hero.sales-amt {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+body.theme-teal .tracker-amount-hero.profit-amt.pos {
+  color: #059669 !important;
+  font-weight: 800 !important;
+}
+
+body.theme-teal .tracker-count-badge {
+  background: #F1F5F9 !important;
+  border: 1px solid #E2E8F0 !important;
+  color: #475569 !important;
+}
+
+body.theme-teal .tracker-fast-add {
+  color: #0D9488 !important;
+  font-weight: 700 !important;
+}
+
+body.theme-teal .tracker-item-chip {
+  background: #F8FAFC !important;
+  border: 1px solid #E2E8F0 !important;
+  color: #334155 !important;
+}
+
+body.theme-teal .tracker-item-chip .chip-amt {
+  color: #DC2626 !important;
+  font-weight: 700 !important;
+}
+
+body.theme-teal .sales-mini-pill {
+  background: #F8FAFC !important;
+  border: 1px solid #E2E8F0 !important;
+  color: #334155 !important;
+}
+
+body.theme-teal .sales-mini-pill.boxes {
+  background: #F0FDFA !important;
+  border-color: #CCFBF1 !important;
+  color: #0F766E !important;
+}
+
+body.theme-teal .sales-mini-pill.cogs {
+  background: #FFFBEB !important;
+  border-color: #FEF3C7 !important;
+  color: #B45309 !important;
+}
+
+body.theme-teal .sales-mini-pill.deliv {
+  background: #EFF6FF !important;
+  border-color: #DBEAFE !important;
+  color: #1D4ED8 !important;
+}
+
+body.theme-teal .sales-mini-pill.ads {
+  background: #FFF1F2 !important;
+  border-color: #FFE4E6 !important;
+  color: #BE123C !important;
+}
+
+/* Overspending Alert Card */
+body.theme-teal .overspending-alert-card {
+  background: #FFF1F2 !important;
+  border: 1px solid #FECDD3 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.08) !important;
+}
+
+body.theme-teal .overspending-alert-card > div > div > div:first-child {
+  color: #9F1239 !important;
+  font-weight: 700 !important;
+}
+
+body.theme-teal .overspending-alert-card > div > div > div:last-child {
+  color: #BE123C !important;
+}
+
 /* 2. VET THEME OVERRIDES FOR NEW COMPONENTS */
 body.theme-vet .top-date-card,
 body.theme-vet .header-date-badge {
