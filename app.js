@@ -2419,9 +2419,12 @@ function renderDashboardModule() {
       <span class="hero-balance-usd">(${isBalanceHidden ? '•••••• $' : formatUsd(displayUsd)})</span>
     </div>
 
-    <!-- Daily / Period Expense in Red (ចំនួនចំណាយប្រចាំថ្ងៃ/ខែ/ឆ្នាំ ពី Form Responses 1) -->
-    <div class="hero-expense-row">
-      <span class="hero-expense-label"><i data-lucide="trending-down"></i> ${heroExpLabel}</span>
+    <!-- Daily / Period Expense Capsule (ចំនួនចំណាយប្រចាំថ្ងៃ/ខែ/ឆ្នាំ ពី Form Responses 1) -->
+    <div class="hero-expense-row" onclick="openExpenseModal()" title="${lang === 'en' ? 'Click to record/view expenses' : 'ចុចដើម្បីកត់ត្រា ឬមើលចំណាយ'}" role="button">
+      <span class="hero-expense-label">
+        <span class="hero-expense-icon-bubble"><i data-lucide="trending-down"></i></span>
+        <span>${heroExpLabel}</span>
+      </span>
       <span class="hero-expense-val-khr">${isBalanceHidden ? '•••••• ៛' : (heroExpenseKhr > 0 ? `-${heroExpenseKhr.toLocaleString('en-US')} ៛` : '0 ៛')}</span>
       <span class="hero-expense-val-usd">(${isBalanceHidden ? '•••• $' : (heroExpenseUsd > 0 ? `-$${heroExpenseUsd.toFixed(2)}` : '$0.00')})</span>
     </div>

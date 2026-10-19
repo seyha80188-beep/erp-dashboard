@@ -5404,42 +5404,74 @@ body.theme-vet .dash-quick-sub {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(239, 68, 68, 0.18);
-  border: 1px solid rgba(239, 68, 68, 0.38);
-  border-radius: 9px;
-  padding: 4px 10px;
-  margin-bottom: 14px;
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.24);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 9999px;
+  padding: 3px 10px 3px 6px;
+  margin-bottom: 12px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+.hero-expense-row:hover {
+  background: rgba(0, 0, 0, 0.34);
+  border-color: rgba(255, 255, 255, 0.28);
+  transform: translateY(-1px);
+}
+
+.hero-expense-row:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .hero-expense-label {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #FCA5A5;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1;
 }
 
+.hero-expense-icon-bubble {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.22);
+  color: #FF6B6B;
+  flex-shrink: 0;
+}
+
+.hero-expense-icon-bubble svg,
 .hero-expense-label svg {
-  width: 13px;
-  height: 13px;
-  color: #EF4444;
+  width: 11px;
+  height: 11px;
+  stroke-width: 2.5;
+  color: #FF6B6B;
 }
 
 .hero-expense-val-khr {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: 15px;
-  font-weight: 800;
-  color: #EF4444;
+  font-size: 12px;
+  font-weight: 700;
+  color: #FFA2A2;
   letter-spacing: 0.2px;
+  line-height: 1;
 }
 
 .hero-expense-val-usd {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  color: #F87171;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1;
 }
 
 /* Time Filter Capsule */
@@ -5978,33 +6010,45 @@ body.theme-teal .hero-balance-usd {
 
 body.theme-sage .hero-expense-row,
 body.theme-teal .hero-expense-row {
-  background: rgba(247, 250, 249, 0.95) !important;
-  border: 1px solid rgba(254, 202, 202, 0.9) !important;
-  border-radius: 10px !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  background: rgba(0, 0, 0, 0.22) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 9999px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+body.theme-sage .hero-expense-row:hover,
+body.theme-teal .hero-expense-row:hover {
+  background: rgba(0, 0, 0, 0.32) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
 }
 
 body.theme-sage .hero-expense-label,
 body.theme-teal .hero-expense-label {
-  color: #475569 !important;
-  font-weight: 700 !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+  font-weight: 500 !important;
+}
+
+body.theme-sage .hero-expense-icon-bubble,
+body.theme-teal .hero-expense-icon-bubble {
+  background: rgba(239, 68, 68, 0.22) !important;
+  color: #FF6B6B !important;
 }
 
 body.theme-sage .hero-expense-label svg,
 body.theme-teal .hero-expense-label svg {
-  color: #EF4444 !important;
+  color: #FF6B6B !important;
 }
 
 body.theme-sage .hero-expense-val-khr,
 body.theme-teal .hero-expense-val-khr {
-  color: #DC2626 !important;
-  font-weight: 800 !important;
+  color: #FFA2A2 !important;
+  font-weight: 700 !important;
 }
 
 body.theme-sage .hero-expense-val-usd,
 body.theme-teal .hero-expense-val-usd {
-  color: #EF4444 !important;
-  font-weight: 700 !important;
+  color: rgba(255, 255, 255, 0.72) !important;
+  font-weight: 500 !important;
 }
 
 body.theme-sage .hero-filter-capsule,
@@ -6490,33 +6534,45 @@ body.theme-vet .hero-balance-usd {
 
 body.theme-warm .hero-expense-row,
 body.theme-vet .hero-expense-row {
-  background: rgba(250, 248, 245, 0.95) !important;
-  border: 1px solid rgba(254, 202, 202, 0.9) !important;
-  border-radius: 10px !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  background: rgba(0, 0, 0, 0.24) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 9999px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+body.theme-warm .hero-expense-row:hover,
+body.theme-vet .hero-expense-row:hover {
+  background: rgba(0, 0, 0, 0.34) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
 }
 
 body.theme-warm .hero-expense-label,
 body.theme-vet .hero-expense-label {
-  color: #57534E !important;
-  font-weight: 700 !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+  font-weight: 500 !important;
+}
+
+body.theme-warm .hero-expense-icon-bubble,
+body.theme-vet .hero-expense-icon-bubble {
+  background: rgba(239, 68, 68, 0.22) !important;
+  color: #FF6B6B !important;
 }
 
 body.theme-warm .hero-expense-label svg,
 body.theme-vet .hero-expense-label svg {
-  color: #EF4444 !important;
+  color: #FF6B6B !important;
 }
 
 body.theme-warm .hero-expense-val-khr,
 body.theme-vet .hero-expense-val-khr {
-  color: #DC2626 !important;
-  font-weight: 800 !important;
+  color: #FFA2A2 !important;
+  font-weight: 700 !important;
 }
 
 body.theme-warm .hero-expense-val-usd,
 body.theme-vet .hero-expense-val-usd {
-  color: #EF4444 !important;
-  font-weight: 700 !important;
+  color: rgba(255, 255, 255, 0.72) !important;
+  font-weight: 500 !important;
 }
 
 body.theme-warm .hero-filter-capsule,
@@ -7038,36 +7094,53 @@ body.theme-glass .hero-balance-usd {
 body.theme-midnight .hero-expense-row,
 body.theme-dark .hero-expense-row,
 body.theme-glass .hero-expense-row {
-  background: rgba(220, 38, 38, 0.22) !important;
-  border: 1px solid rgba(254, 202, 202, 0.38) !important;
-  backdrop-filter: blur(8px) !important;
+  background: rgba(0, 0, 0, 0.28) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: 9999px !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+body.theme-midnight .hero-expense-row:hover,
+body.theme-dark .hero-expense-row:hover,
+body.theme-glass .hero-expense-row:hover {
+  background: rgba(0, 0, 0, 0.38) !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
 }
 
 body.theme-midnight .hero-expense-label,
 body.theme-dark .hero-expense-label,
 body.theme-glass .hero-expense-label {
-  color: #FFA39E !important;
-  font-weight: 700 !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-weight: 500 !important;
+}
+
+body.theme-midnight .hero-expense-icon-bubble,
+body.theme-dark .hero-expense-icon-bubble,
+body.theme-glass .hero-expense-icon-bubble {
+  background: rgba(239, 68, 68, 0.22) !important;
+  color: #FF6B6B !important;
 }
 
 body.theme-midnight .hero-expense-label svg,
 body.theme-dark .hero-expense-label svg,
 body.theme-glass .hero-expense-label svg {
-  color: #F87171 !important;
+  color: #FF6B6B !important;
 }
 
 body.theme-midnight .hero-expense-val-khr,
 body.theme-dark .hero-expense-val-khr,
 body.theme-glass .hero-expense-val-khr {
-  color: #FFE4E6 !important;
-  font-weight: 800 !important;
+  color: #FFA2A2 !important;
+  font-weight: 700 !important;
 }
 
 body.theme-midnight .hero-expense-val-usd,
 body.theme-dark .hero-expense-val-usd,
 body.theme-glass .hero-expense-val-usd {
-  color: #FCA5A5 !important;
-  font-weight: 700 !important;
+  color: rgba(255, 255, 255, 0.72) !important;
+  font-weight: 500 !important;
 }
 
 body.theme-midnight .hero-filter-capsule,
