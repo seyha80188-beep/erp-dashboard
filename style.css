@@ -4078,7 +4078,9 @@ body.theme-glass .expense-modal-card {
   -moz-appearance: none;
   appearance: none;
   color-scheme: dark;
+  padding-left: 38px;
   padding-right: 38px;
+  text-align: center;
   cursor: pointer;
   background-color: rgba(6, 14, 34, 0.9);
 }
@@ -4110,7 +4112,7 @@ input[type="date"].form-input {
 }
 
 input[type="date"]::-webkit-date-and-time-value {
-  text-align: left;
+  text-align: center;
   line-height: 1.4;
   margin: 0;
   padding: 0;

@@ -22,7 +22,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Battambang:wght@400;700&family=Kantumruy+Pro:ital,wght@0,300..700;1,300..700&family=Koh+Santepheap:wght@300;400;700&family=Noto+Sans+Khmer:wght@300;400;500;600;700&family=Siemreap&display=swap" rel="stylesheet">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" href="style.css?v=20261019_v27">
+  <link rel="stylesheet" href="style.css?v=20261019_v28">
 </head>
 <body>
   <!-- Mobile Pull-to-Refresh Indicator Container -->
@@ -240,20 +240,7 @@
           <div id="exp-today-items-list" class="expense-today-mini-list"></div>
         </div>
 
-        <!-- 1. ប្រភេទចំណាយ (Category - 6 Jars System) -->
-        <div class="form-group">
-          <label for="exp-input-cat" id="lbl-exp-cat">ប្រភេទចំណាយ (Category)</label>
-          <select id="exp-input-cat" class="form-select">
-            <option value="តម្រូវការចាំបាច់ (55%)">១. តម្រូវការចាំបាច់ (55%)</option>
-            <option value="វិនិយោគបង្កើនទ្រព្យ (10%)">២. វិនិយោគបង្កើនទ្រព្យ (10%)</option>
-            <option value="សន្សំបន្ទាន់ & រយៈវែង (10%)">៣. សន្សំបន្ទាន់ & រយៈវែង (10%)</option>
-            <option value="អភិវឌ្ឍន៍ខ្លួនឯង (10%)">៤. អភិវឌ្ឍន៍ខ្លួនឯង (10%)</option>
-            <option value="រង្វាន់លើកទឹកចិត្តខ្លួនឯង (10%)">៥. រង្វាន់លើកទឹកចិត្តខ្លួនឯង (10%)</option>
-            <option value="សប្បុរសធម៌ & ជូនម៉ែឪ (5%)">៦. សប្បុរសធម៌ & ជូនម៉ែឪ (5%)</option>
-          </select>
-        </div>
-
-        <!-- 2. កាលបរិច្ឆេទ (Date) -->
+        <!-- 1. កាលបរិច្ឆេទ (Date) -->
         <div class="form-group">
           <label for="exp-input-date" id="lbl-exp-date">កាលបរិច្ឆេទ (Date)</label>
           <div class="modal-date-picker-wrap">
@@ -262,12 +249,11 @@
           </div>
         </div>
 
-        <!-- 3. មុខទំនិញ / ការពិពណ៌នា (Expense Description) -->
+        <!-- 2. មុខទំនិញ / ការពិពណ៌នា (Expense Description) -->
         <div class="form-group">
           <label for="exp-input-desc" id="lbl-exp-desc">មុខទំនិញ / ការពិពណ៌នា (Expense Description)</label>
-          <input type="text" id="exp-input-desc" class="form-input" placeholder="ឧ. អាហារថ្ងៃត្រង់, កាហ្វេ, សាំង, ទឹកភ្លើង..." required autocomplete="off">
-          <!-- Quick Suggestion Chips (អាហារ៣ពេល, ផ្ញើទៅអ្នកផ្ទះ, បញ្ចូលកាត, etc.) -->
-          <div class="quick-chips-row">
+          <!-- Quick Suggestion Chips (ដាក់នៅខាងលើប្រអប់បំពេញ) -->
+          <div class="quick-chips-row" style="margin-top:2px; margin-bottom:8px;">
             <button type="button" class="quick-chip" onclick="setExpenseDescPreset('ប៊ូស Facebook Ads (Ads Spend)', 'តម្រូវការចាំបាច់ (55%)')" style="background:rgba(245, 158, 11, 0.2); color:#FBBF24; border-color:rgba(245, 158, 11, 0.4); font-weight:700;">📢 ប៊ូស Ads</button>
             <button type="button" class="quick-chip" onclick="setExpenseDescPreset('អាហារពេលព្រឹក')">🥣 អាហារពេលព្រឹក</button>
             <button type="button" class="quick-chip" onclick="setExpenseDescPreset('អាហារថ្ងៃត្រង់')">🍛 អាហារថ្ងៃត្រង់</button>
@@ -279,9 +265,10 @@
             <button type="button" class="quick-chip" onclick="setExpenseDescPreset('បង់ថ្លៃបន្ទប់')">🏠 ថ្លៃបន្ទប់</button>
             <button type="button" class="quick-chip" onclick="setExpenseDescPreset('ទឹក, ភ្លើង')">💡 ទឹកភ្លើង</button>
           </div>
+          <input type="text" id="exp-input-desc" class="form-input" placeholder="ឧ. អាហារថ្ងៃត្រង់, កាហ្វេ, សាំង, ទឹកភ្លើង..." required autocomplete="off">
         </div>
 
-        <!-- 4. ចំនួនទឹកប្រាក់ (Amount) & Currency Toggle -->
+        <!-- 3. ចំនួនទឹកប្រាក់ (Amount) & Currency Toggle -->
         <div class="form-group">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
             <label for="exp-input-amount" id="lbl-exp-amount">ចំនួនទឹកប្រាក់ (Amount)</label>
@@ -295,6 +282,19 @@
             <input type="number" step="any" id="exp-input-amount" class="form-input amount-field" placeholder="0" required oninput="onExpenseAmountInput(this.value)">
           </div>
           <div class="converted-hint" id="curr-converted-hint">ស្មើនឹង៖ $0.00 USD (អត្រា 1$ = 4,100 ៛)</div>
+        </div>
+
+        <!-- 4. ប្រភេទចំណាយ (Category - 6 Jars System) -->
+        <div class="form-group">
+          <label for="exp-input-cat" id="lbl-exp-cat">ប្រភេទចំណាយ (Category)</label>
+          <select id="exp-input-cat" class="form-select">
+            <option value="តម្រូវការចាំបាច់ (55%)">១. តម្រូវការចាំបាច់ (55%)</option>
+            <option value="វិនិយោគបង្កើនទ្រព្យ (10%)">២. វិនិយោគបង្កើនទ្រព្យ (10%)</option>
+            <option value="សន្សំបន្ទាន់ & រយៈវែង (10%)">៣. សន្សំបន្ទាន់ & រយៈវែង (10%)</option>
+            <option value="អភិវឌ្ឍន៍ខ្លួនឯង (10%)">៤. អភិវឌ្ឍន៍ខ្លួនឯង (10%)</option>
+            <option value="រង្វាន់លើកទឹកចិត្តខ្លួនឯង (10%)">៥. រង្វាន់លើកទឹកចិត្តខ្លួនឯង (10%)</option>
+            <option value="សប្បុរសធម៌ & ជូនម៉ែឪ (5%)">៦. សប្បុរសធម៌ & ជូនម៉ែឪ (5%)</option>
+          </select>
         </div>
 
         <!-- 5. វិធីសាស្ត្រទូទាត់ (Payment Method) -->
@@ -839,6 +839,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=20261019_v31"></script>
+  <script src="app.js?v=20261019_v32"></script>
 </body>
 </html>
