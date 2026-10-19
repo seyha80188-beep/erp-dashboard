@@ -411,7 +411,7 @@ function applyAppTheme() {
   const themeIcon = document.getElementById('theme-icon');
   if (themeBtnLabel) {
     if (theme === 'teal') {
-      themeBtnLabel.textContent = state.lang === 'en' ? '🌊 Teal Mint' : '🌊 Teal ថ្មី';
+      themeBtnLabel.textContent = '🌊 Teal';
     } else if (theme === 'vet') {
       themeBtnLabel.textContent = state.lang === 'en' ? '🧡 VET Orange' : '🧡 ទឹកក្រូច VET';
     } else if (theme === 'dark') {
