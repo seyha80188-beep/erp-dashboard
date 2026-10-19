@@ -22,7 +22,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Battambang:wght@400;700&family=Kantumruy+Pro:ital,wght@0,300..700;1,300..700&family=Koh+Santepheap:wght@300;400;700&family=Noto+Sans+Khmer:wght@300;400;500;600;700&family=Siemreap&display=swap" rel="stylesheet">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" href="style.css?v=20261019_v29">
+  <link rel="stylesheet" href="style.css?v=20261019_v30">
 </head>
 <body>
   <!-- Mobile Pull-to-Refresh Indicator Container -->
@@ -185,12 +185,12 @@
       </button>
 
       <!-- [3] ការបញ្ជាទិញ / បញ្ចូលការកម្ម៉ង់ (Orders Form) -->
-      <a href="https://docs.google.com/forms/d/e/1FAIpQLSd_hP30dqB-F5gCV44AuxcftgmoDjo5zzkN-NSMiK-1rDEqPQ/viewform" target="_blank" rel="noopener noreferrer" class="acleda-bottom-btn quick-add-nav-btn orders-nav-btn" id="tab-nav-orders" title="ការបញ្ជាទិញ (Order Form)">
+      <button type="button" class="acleda-bottom-btn quick-add-nav-btn orders-nav-btn" id="tab-nav-orders" onclick="openOrderModal('form')" title="ការបញ្ជាទិញ (Order Form)">
         <div class="quick-add-plus-circle orders-circle">
           <i data-lucide="shopping-bag"></i>
         </div>
         <span id="nav-orders-text">ការបញ្ជាទិញ</span>
-      </a>
+      </button>
 
       <!-- [4] ចំណាយ B2 (Expenses) -->
       <button class="acleda-bottom-btn" id="tab-nav-expenses" onclick="handleBottomTabClick('cash-flow')">
@@ -388,19 +388,20 @@
   </div>
 
   <!-- Modal សម្រាប់បញ្ចូលការកម្ម៉ង់ពី Telegram (Smart Order Paste & Sheet Sync) -->
+  <!-- Modal សម្រាប់បញ្ជាទិញទំនិញ & បញ្ចូលការកម្ម៉ង់ (Direct In-App Orders & Smart Sync) -->
   <div id="order-modal-overlay" class="modal-overlay" style="display: none;" onclick="if(event.target === this) closeOrderModal()">
     <div class="order-modal-card">
       <div class="modal-header-row">
         <div style="display:flex; align-items:center; gap:14px; flex:1; min-width:0;">
           <div class="expense-icon-circle" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); box-shadow: 0 0 20px rgba(16, 185, 129, 0.65);">
-            <i data-lucide="clipboard-paste"></i>
+            <i data-lucide="shopping-bag"></i>
           </div>
           <div style="flex:1; min-width:0;">
             <h3 class="modal-title" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-              <span>✦ បញ្ចូលការកម្ម៉ង់ទំនិញ (Smart Order Paste)</span>
-              <span class="order-tag green">Sync ចូល Sheet ផ្ទាល់</span>
+              <span>ការបញ្ជាទិញទំនិញ (Orders Management)</span>
+              <span class="order-tag green">Auto-Sync Sheet A1</span>
             </h3>
-            <span class="modal-subtitle">ចម្លង (Copy) ពី Telegram / Chat យកមក Paste នៅទីនេះ ប្រព័ន្ធនឹងញែកទិន្នន័យស្វ័យប្រវត្តិ</span>
+            <span class="modal-subtitle">បំពេញទម្រង់កុម្ម៉ង់ផ្ទាល់ ឬ Paste ពី Telegram ចូល Google Sheet & Dashboard អូតូ</span>
           </div>
         </div>
         <button type="button" class="modal-close-icon-btn" onclick="closeOrderModal()" aria-label="បិទ">
@@ -408,41 +409,282 @@
         </button>
       </div>
 
-      <!-- Direct Google Form Order Link Banner -->
-      <div style="background:linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(5,150,105,0.2) 100%); border:1px solid rgba(16,185,129,0.35); border-radius:12px; padding:11px 16px; margin-bottom:12px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
-        <div style="display:flex; align-items:center; gap:10px;">
-          <div style="width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg, #10B981, #059669); display:flex; align-items:center; justify-content:center; color:#FFFFFF; box-shadow:0 0 12px rgba(16,185,129,0.4);">
-            <i data-lucide="shopping-bag" style="width:18px; height:18px;"></i>
-          </div>
-          <div>
-            <div style="font-weight:700; font-size:13px; color:#10B981;">ទម្រង់បញ្ជាទិញទំនិញ (Google Form)</div>
-            <div style="font-size:11.5px; color:var(--text-muted);">ចុចបើកដើម្បីចូលទៅបញ្ជាទិញទំនិញអនឡាញផ្ទាល់</div>
-          </div>
-        </div>
-        <a href="https://docs.google.com/forms/d/e/1FAIpQLSd_hP30dqB-F5gCV44AuxcftgmoDjo5zzkN-NSMiK-1rDEqPQ/viewform" target="_blank" rel="noopener noreferrer" style="background:linear-gradient(135deg, #10B981, #059669); color:#FFFFFF; font-weight:700; font-size:12px; padding:7px 14px; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 12px rgba(16,185,129,0.35);">
-          <i data-lucide="external-link" style="width:14px; height:14px;"></i>
-          <span>បើកការកម្ម៉ង់</span>
-        </a>
-      </div>
-
-      <!-- Quick Instruction Chips -->
-      <div style="background:rgba(0,180,216,0.1); border:1px solid rgba(0,180,216,0.25); border-radius:10px; padding:10px 14px; margin-bottom:14px; font-size:12px; color:var(--text-muted); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <i data-lucide="sparkles" style="color:var(--primary-accent); width:16px; height:16px;"></i>
-          <span>អាច Paste ទាំងទម្រង់ <strong>🔔 មានការកុម្មង់...</strong> (Telegram) ឬទម្រង់អត្ថបទសាមញ្ញ <strong>ឈ្មោះ/លេខ/ទីតាំង...</strong></span>
-        </div>
-        <button type="button" class="quick-chip" onclick="pasteSampleOrderTelegram()" style="background:rgba(0,180,216,0.2); color:#00B4D8; border-color:rgba(0,180,216,0.4); font-size:11px;">
-          📋 សាកល្បងគំរូ Telegram
+      <!-- Mode Selector Tabs: [1] បំពេញការកុម្ម៉ង់ថ្មី | [2] Paste ពី Telegram -->
+      <div class="order-modal-tabs">
+        <button type="button" class="order-tab-btn active" id="order-tab-btn-form" onclick="switchOrderModalTab('form')">
+          <i data-lucide="file-plus-2"></i>
+          <span>បំពេញការកុម្ម៉ង់ថ្មី (New Order)</span>
+        </button>
+        <button type="button" class="order-tab-btn" id="order-tab-btn-paste" onclick="switchOrderModalTab('paste')">
+          <i data-lucide="clipboard-paste"></i>
+          <span>Paste ពី Telegram</span>
         </button>
       </div>
 
-      <!-- Textarea for Pasting -->
-      <div class="form-group">
-        <label for="order-paste-input" style="font-size:13px; font-weight:600; color:#FFFFFF; margin-bottom:6px; display:flex; justify-content:space-between;">
-          <span>ប្រអប់ទម្លាក់ទិន្នន័យ (Paste Order Text Here)</span>
-          <span id="order-parsed-count-badge" style="color:#10B981; font-weight:700;">0 ការកម្ម៉ង់</span>
-        </label>
-        <textarea id="order-paste-input" class="order-paste-textarea" placeholder="Paste ព័ត៌មានកម្ម៉ង់ពី Telegram នៅទីនេះ...
+      <!-- ========================================================
+           TAB 1: ទម្រង់បញ្ជាទិញទំនិញថ្មី (Direct In-App Order Form)
+           ======================================================== -->
+      <form id="direct-order-form" onsubmit="handleDirectOrderSubmit(event)">
+        <!-- 1. កាលបរិច្ឆេទ (Date) -->
+        <div class="form-group">
+          <label for="ord-input-date">កាលបរិច្ឆេទ (Date) *</label>
+          <div class="modal-date-picker-wrap">
+            <input type="date" id="ord-input-date" class="form-input date-field" required>
+            <span class="date-calendar-icon"><i data-lucide="calendar"></i></span>
+          </div>
+        </div>
+
+        <!-- 2. ថ្នាក់ដឹកនាំ (Team) & ឈ្មោះអ្នកលក់ (Seller) -->
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:12px;">
+          <div>
+            <label for="ord-input-team" style="font-size:12.5px; font-weight:600; color:#FFFFFF; margin-bottom:5px; display:block;">ថ្នាក់ដឹកនាំ (Team) *</label>
+            <select id="ord-input-team" class="form-select" required>
+              <option value="Bech_Nora" selected>Bech_Nora</option>
+              <option value="Vann_Sitha">Vann_Sitha</option>
+              <option value="Vann_Thida">Vann_Thida</option>
+              <option value="V_Thida_Emmi">V_Thida_Emmi</option>
+              <option value="Chhorn_Dara">Chhorn_Dara</option>
+              <option value="Meng_Samoeuk">Meng_Samoeuk</option>
+              <option value="Chhoun_Vireak">Chhoun_Vireak</option>
+              <option value="La_Thida">La_Thida</option>
+              <option value="Nhem_Somrith">Nhem_Somrith</option>
+              <option value="N_Somrith_Emmi">N_Somrith_Emmi</option>
+              <option value="Yat_Virakyuth">Yat_Virakyuth</option>
+              <option value="Sarun_Chhayhor">Sarun_Chhayhor</option>
+              <option value="S_Chhayhor_Emmi">S_Chhayhor_Emmi</option>
+              <option value="Hong_Heng_Oeurn">Hong_Heng_Oeurn</option>
+              <option value="Heng_Oeun_Emmi">Heng_Oeun_Emmi</option>
+              <option value="Kru_Ta">Kru_Ta</option>
+              <option value="Long_Vuthy">Long_Vuthy</option>
+              <option value="L_Vuthy_Emmi">L_Vuthy_Emmi</option>
+              <option value="Sorn_Sabda">Sorn_Sabda</option>
+              <option value="Teng_Toeun">Teng_Toeun</option>
+              <option value="Vann_Theary">Vann_Theary</option>
+              <option value="T_Toeun_Emmi">T_Toeun_Emmi</option>
+            </select>
+          </div>
+          <div>
+            <label for="ord-input-seller" style="font-size:12.5px; font-weight:600; color:#FFFFFF; margin-bottom:5px; display:block;">ឈ្មោះអ្នកលក់ *</label>
+            <input type="text" id="ord-input-seller" class="form-input" value="យឹម សីហា" placeholder="ឈ្មោះអ្នកលក់..." required>
+          </div>
+        </div>
+
+        <!-- 3. លេខអ្នកលក់ (Seller No) -->
+        <div class="form-group">
+          <label for="ord-input-seller-phone">លេខអ្នកលក់ (Seller No)</label>
+          <input type="tel" id="ord-input-seller-phone" class="form-input" value="0968180188" placeholder="096 818 0188">
+        </div>
+
+        <!-- 4. ផលិតផល & ចំនួនប្រអប់ (Products & Quantities) -->
+        <div class="form-group">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <label style="font-size:12.5px; font-weight:600; color:#FFFFFF; margin:0;">ជ្រើសរើសផលិតផល (Products) *</label>
+            <span id="ord-total-boxes-badge" style="font-size:12px; font-weight:700; color:#10B981;">សរុប៖ 1 ប្រអប់</span>
+          </div>
+
+          <!-- Quick Fill Chips -->
+          <div class="quick-chips-row" style="margin-bottom:10px;">
+            <button type="button" class="quick-chip" onclick="setDirectOrderPreset('KD-09', 1, 50)" style="background:rgba(16,185,129,0.2); color:#10B981; border-color:rgba(16,185,129,0.4); font-weight:700;">⚡ KD-09 1 ប្រអប់ ($50)</button>
+            <button type="button" class="quick-chip" onclick="setDirectOrderPreset('KD-09', 2, 90)" style="background:rgba(16,185,129,0.2); color:#10B981; border-color:rgba(16,185,129,0.4); font-weight:700;">⚡ KD-09 2 ប្រអប់ ($90)</button>
+            <button type="button" class="quick-chip" onclick="setDirectOrderPreset('KD-09', 3, 135)">⚡ 3 ប្រអប់ ($135)</button>
+            <button type="button" class="quick-chip" onclick="setDirectOrderPreset('Pro D.O', 1, 50)">⚡ Pro D.O 1 ($50)</button>
+          </div>
+
+          <!-- Products Stepper Card -->
+          <div class="order-product-card">
+            <!-- 1. Kidney Pro -->
+            <div class="order-product-row">
+              <div class="order-product-info">
+                <span class="order-prod-name">Kidney Pro (KD-09)</span>
+                <span class="order-prod-sub">ថ្នាំក្រលៀន ស្តង់ដារក្រុមហ៊ុន</span>
+              </div>
+              <div class="order-stepper-wrap">
+                <button type="button" class="stepper-btn" onclick="stepOrderProduct('Kidney Pro', -1)">-</button>
+                <span class="stepper-val" id="ord-qty-kidney">1</span>
+                <button type="button" class="stepper-btn" onclick="stepOrderProduct('Kidney Pro', 1)">+</button>
+              </div>
+            </div>
+
+            <!-- 2. Pro D.O -->
+            <div class="order-product-row">
+              <div class="order-product-info">
+                <span class="order-prod-name">Pro D.O</span>
+                <span class="order-prod-sub">ផលិតផលជំនួយសុខភាព</span>
+              </div>
+              <div class="order-stepper-wrap">
+                <button type="button" class="stepper-btn" onclick="stepOrderProduct('Pro D.O', -1)">-</button>
+                <span class="stepper-val" id="ord-qty-prodo">0</span>
+                <button type="button" class="stepper-btn" onclick="stepOrderProduct('Pro D.O', 1)">+</button>
+              </div>
+            </div>
+
+            <!-- 3. Emmi -->
+            <div class="order-product-row">
+              <div class="order-product-info">
+                <span class="order-prod-name">Emmi (អេមមី)</span>
+                <span class="order-prod-sub">ផលិតផលសម្រស់ & សុខភាព</span>
+              </div>
+              <div class="order-stepper-wrap">
+                <button type="button" class="stepper-btn" onclick="stepOrderProduct('Emmi', -1)">-</button>
+                <span class="stepper-val" id="ord-qty-emmi">0</span>
+                <button type="button" class="stepper-btn" onclick="stepOrderProduct('Emmi', 1)">+</button>
+              </div>
+            </div>
+
+            <!-- 4. S.G Pro -->
+            <div class="order-product-row">
+              <div class="order-product-info">
+                <span class="order-prod-name">S.G Pro</span>
+                <span class="order-prod-sub">ផលិតផលស្តង់ដារ</span>
+              </div>
+              <div class="order-stepper-wrap">
+                <button type="button" class="stepper-btn" onclick="stepOrderProduct('S.G Pro', -1)">-</button>
+                <span class="stepper-val" id="ord-qty-sgpro">0</span>
+                <button type="button" class="stepper-btn" onclick="stepOrderProduct('S.G Pro', 1)">+</button>
+              </div>
+            </div>
+
+            <!-- 5. Yong Liang Plus -->
+            <div class="order-product-row">
+              <div class="order-product-info">
+                <span class="order-prod-name">Yong Liang Plus</span>
+                <span class="order-prod-sub">យ៉ុងលាំង ផ្លឹស</span>
+              </div>
+              <div class="order-stepper-wrap">
+                <button type="button" class="stepper-btn" onclick="stepOrderProduct('Yong Liang Plus', -1)">-</button>
+                <span class="stepper-val" id="ord-qty-ylplus">0</span>
+                <button type="button" class="stepper-btn" onclick="stepOrderProduct('Yong Liang Plus', 1)">+</button>
+              </div>
+            </div>
+
+            <!-- 6. Yong Liang -->
+            <div class="order-product-row">
+              <div class="order-product-info">
+                <span class="order-prod-name">Yong Liang</span>
+                <span class="order-prod-sub">យ៉ុងលាំង ស្តង់ដារ</span>
+              </div>
+              <div class="order-stepper-wrap">
+                <button type="button" class="stepper-btn" onclick="stepOrderProduct('Yong Liang', -1)">-</button>
+                <span class="stepper-val" id="ord-qty-yongliang">0</span>
+                <button type="button" class="stepper-btn" onclick="stepOrderProduct('Yong Liang', 1)">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. តម្លៃលក់សរុប (Price $ USD) -->
+        <div class="form-group">
+          <label for="ord-input-price">តម្លៃលក់សរុប (Price $ USD) *</label>
+          <div class="amount-input-wrap">
+            <span class="currency-prefix">$</span>
+            <input type="number" step="any" id="ord-input-price" class="form-input amount-field" value="50" placeholder="50" required oninput="onDirectOrderPriceInput(this.value)">
+          </div>
+          <div class="converted-hint" id="ord-price-khr-hint">ស្មើនឹង៖ 205,000 ៛ KHR (អត្រា 1$ = 4,100 ៛)</div>
+        </div>
+
+        <!-- 6. ព័ត៌មានអតិថិជន (Customer Information) -->
+        <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:12px 14px; margin-bottom:12px;">
+          <h4 style="font-size:12.5px; font-weight:700; color:#00B4D8; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+            <i data-lucide="user" style="width:14px; height:14px;"></i>
+            <span>ព័ត៌មានអតិថិជន & ការដឹកជញ្ជូន</span>
+          </h4>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+            <div>
+              <label for="ord-input-rec-name" style="font-size:12px; font-weight:600; color:#FFFFFF; margin-bottom:4px; display:block;">ឈ្មោះអ្នកទទួល</label>
+              <input type="text" id="ord-input-rec-name" class="form-input" placeholder="ឈ្មោះអតិថិជន...">
+            </div>
+            <div>
+              <label for="ord-input-rec-phone" style="font-size:12px; font-weight:600; color:#FFFFFF; margin-bottom:4px; display:block;">លេខអ្នកទទួល *</label>
+              <input type="tel" id="ord-input-rec-phone" class="form-input" placeholder="012 345 678" required>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:10px;">
+            <label for="ord-input-address" style="font-size:12px; font-weight:600; color:#FFFFFF; margin-bottom:4px; display:block;">អាសយដ្ឋានដឹក (Address) *</label>
+            <input type="text" id="ord-input-address" class="form-input" placeholder="ឧ. ភ្នំពេញ, សៀមរាប, បាត់ដំបង..." required>
+          </div>
+
+          <div class="form-group" style="margin-bottom:0;">
+            <label for="ord-input-delivery" style="font-size:12px; font-weight:600; color:#FFFFFF; margin-bottom:4px; display:block;">ដឹកជញ្ជូនតាម (Delivery Method) *</label>
+            <select id="ord-input-delivery" class="form-select">
+              <option value="VET(COD)" selected>VET (COD) - ក្រុមហ៊ុន</option>
+              <option value="J&T (COD)">J&T (COD)</option>
+              <option value="Motor">Motor (ម៉ូតូ)</option>
+              <option value="Thai ✅COD">Thai ✅COD (ដឹកទៅថៃ)</option>
+              <option value="VET">VET (បានទូទាត់មុន)</option>
+              <option value="J&T">J&T (បានទូទាត់មុន)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 7. កំណត់ចំណាំ (Note) -->
+        <div class="form-group">
+          <label for="ord-input-note">កំណត់ចំណាំបន្ថែម (Note - Optional)</label>
+          <input type="text" id="ord-input-note" class="form-input" placeholder="ចំណាំពិសេស...">
+        </div>
+
+        <!-- 8. ស្វ័យប្រវត្តិកម្ម Sync (Auto-Sync Options) -->
+        <div class="order-sync-badge-card">
+          <label class="order-sync-item">
+            <input type="checkbox" id="ord-sync-gform" checked>
+            <span><strong>បញ្ជូនទៅ Google Form ក្រុមហ៊ុន</strong> (ដើម្បីឱ្យ Bot បាញ់សារចូល Telegram ដូចធម្មតា)</span>
+          </label>
+          <label class="order-sync-item">
+            <input type="checkbox" id="ord-sync-sheet" checked>
+            <span><strong>កត់ត្រាចូល Master Sheet A1 & Dashboard ផ្ទាល់</strong> (មិនបាច់ Copy & Paste ទៀតទេ)</span>
+          </label>
+        </div>
+
+        <!-- Modal Submit & Cancel -->
+        <div class="modal-actions-row">
+          <button type="button" class="btn-secondary" onclick="closeOrderModal()">បោះបង់</button>
+          <button type="submit" class="btn-primary" id="btn-submit-direct-order" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);">
+            <i data-lucide="check"></i>
+            <span id="btn-submit-direct-order-text">បញ្ជូនការកុម្ម៉ង់ (Submit Order)</span>
+          </button>
+        </div>
+      </form>
+
+      <!-- ========================================================
+           TAB 2: Paste ពី Telegram (Smart Telegram Orders Parser)
+           ======================================================== -->
+      <div id="order-paste-panel" style="display: none;">
+        <!-- Direct Google Form Order Link Banner -->
+        <div style="background:linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(5,150,105,0.2) 100%); border:1px solid rgba(16,185,129,0.35); border-radius:12px; padding:11px 16px; margin-bottom:12px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg, #10B981, #059669); display:flex; align-items:center; justify-content:center; color:#FFFFFF; box-shadow:0 0 12px rgba(16,185,129,0.4);">
+              <i data-lucide="external-link" style="width:18px; height:18px;"></i>
+            </div>
+            <div>
+              <div style="font-weight:700; font-size:13px; color:#10B981;">បើក Google Form ដើមរបស់ក្រុមហ៊ុន</div>
+              <div style="font-size:11.5px; color:var(--text-muted);">ករណីចង់បើកមើលទម្រង់ Google Form ផ្ទាល់ក្នុង Browser</div>
+            </div>
+          </div>
+          <a href="https://docs.google.com/forms/d/e/1FAIpQLSd_hP30dqB-F5gCV44AuxcftgmoDjo5zzkN-NSMiK-1rDEqPQ/viewform" target="_blank" rel="noopener noreferrer" style="background:linear-gradient(135deg, #10B981, #059669); color:#FFFFFF; font-weight:700; font-size:12px; padding:7px 14px; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 12px rgba(16,185,129,0.35);">
+            <i data-lucide="external-link" style="width:14px; height:14px;"></i>
+            <span>បើក Google Form</span>
+          </a>
+        </div>
+
+        <!-- Quick Instruction Chips -->
+        <div style="background:rgba(0,180,216,0.1); border:1px solid rgba(0,180,216,0.25); border-radius:10px; padding:10px 14px; margin-bottom:14px; font-size:12px; color:var(--text-muted); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <i data-lucide="sparkles" style="color:var(--primary-accent); width:16px; height:16px;"></i>
+            <span>អាច Paste ទាំងទម្រង់ <strong>🔔 មានការកុម្មង់...</strong> (Telegram) ឬទម្រង់អត្ថបទសាមញ្ញ <strong>ឈ្មោះ/លេខ/ទីតាំង...</strong></span>
+          </div>
+          <button type="button" class="quick-chip" onclick="pasteSampleOrderTelegram()" style="background:rgba(0,180,216,0.2); color:#00B4D8; border-color:rgba(0,180,216,0.4); font-size:11px;">
+            📋 សាកល្បងគំរូ Telegram
+          </button>
+        </div>
+
+        <!-- Textarea for Pasting -->
+        <div class="form-group">
+          <label for="order-paste-input" style="font-size:13px; font-weight:600; color:#FFFFFF; margin-bottom:6px; display:flex; justify-content:space-between;">
+            <span>ប្រអប់ទម្លាក់ទិន្នន័យ (Paste Order Text Here)</span>
+            <span id="order-parsed-count-badge" style="color:#10B981; font-weight:700;">0 ការកម្ម៉ង់</span>
+          </label>
+          <textarea id="order-paste-input" class="order-paste-textarea" placeholder="Paste ព័ត៌មានកម្ម៉ង់ពី Telegram នៅទីនេះ...
 ឧទាហរណ៍៖
 🔔 មានការកុម្មង់ទំនិញថ្មីចូល 🔔
 🆔 Order Row: #638
@@ -453,28 +695,29 @@
 ▪️ លេខអ្នកទទួល(Receiver No): 0974999965
 ▪️ អាសយដ្ឋាន(Address): ស្រយ៉ង់កោះកេរ្ត៍ (ព្រះវិហារ)
 ▪️ ដឹកជញ្ជូនតាម(Delivery): VET(COD)" oninput="onOrderPasteInput(this.value)"></textarea>
-      </div>
+        </div>
 
-      <!-- Parsed Orders Live Preview List -->
-      <div style="margin-top:16px;">
-        <h4 style="font-size:13px; font-weight:700; color:#93C5FD; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
-          <i data-lucide="layers" style="width:15px; height:15px;"></i>
-          <span>លទ្ធផលញែកស្វ័យប្រវត្តិ (Parsed Orders Preview)</span>
-        </h4>
-        <div id="order-parsed-list" style="display:flex; flex-direction:column; gap:10px; max-height:240px; overflow-y:auto; padding-right:4px;">
-          <div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12.5px; border:1px dashed rgba(255,255,255,0.15); border-radius:10px;">
-            សូម Copy & Paste អត្ថបទការកម្ម៉ង់ក្នុងប្រអប់ខាងលើ ដើម្បីមើលទិន្នន័យ
+        <!-- Parsed Orders Live Preview List -->
+        <div style="margin-top:16px;">
+          <h4 style="font-size:13px; font-weight:700; color:#93C5FD; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+            <i data-lucide="layers" style="width:15px; height:15px;"></i>
+            <span>លទ្ធផលញែកស្វ័យប្រវត្តិ (Parsed Orders Preview)</span>
+          </h4>
+          <div id="order-parsed-list" style="display:flex; flex-direction:column; gap:10px; max-height:240px; overflow-y:auto; padding-right:4px;">
+            <div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12.5px; border:1px dashed rgba(255,255,255,0.15); border-radius:10px;">
+              សូម Copy & Paste អត្ថបទការកម្ម៉ង់ក្នុងប្រអប់ខាងលើ ដើម្បីមើលទិន្នន័យ
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Actions: Submit to Sheet & Cancel -->
-      <div class="modal-actions-row" style="margin-top:20px;">
-        <button type="button" class="btn-secondary" onclick="closeOrderModal()">បោះបង់</button>
-        <button type="button" class="btn-primary" id="btn-save-orders" onclick="handleSaveParsedOrders()" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);">
-          <i data-lucide="cloud-upload"></i>
-          <span id="btn-save-orders-text">រក្សាទុក និងបញ្ជូនចូល Sheet</span>
-        </button>
+        <!-- Actions: Submit to Sheet & Cancel -->
+        <div class="modal-actions-row" style="margin-top:20px;">
+          <button type="button" class="btn-secondary" onclick="closeOrderModal()">បោះបង់</button>
+          <button type="button" class="btn-primary" id="btn-save-orders" onclick="handleSaveParsedOrders()" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);">
+            <i data-lucide="cloud-upload"></i>
+            <span id="btn-save-orders-text">រក្សាទុក និងបញ្ជូនចូល Sheet</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -839,6 +1082,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=20261019_v33"></script>
+  <script src="app.js?v=20261019_v34"></script>
 </body>
 </html>

@@ -2456,12 +2456,12 @@ function renderDashboardModule() {
       </div>
     ` : ''}
 
-      <!-- Dual Action Pills: 🛍️ ការបញ្ជាទិញ (Google Form) & 👛 ចំណាយប្រចាំថ្ងៃ -->
+      <!-- Dual Action Pills: 🛍️ ការបញ្ជាទិញ (Direct In-App Order) & 👛 ចំណាយប្រចាំថ្ងៃ -->
       <div class="hero-action-row">
-        <a href="https://docs.google.com/forms/d/e/1FAIpQLSd_hP30dqB-F5gCV44AuxcftgmoDjo5zzkN-NSMiK-1rDEqPQ/viewform" target="_blank" rel="noopener noreferrer" class="hero-action-pill telegram-pill" title="${lang === 'en' ? 'Place Order (Google Form)' : 'ចូលទៅបញ្ជាទិញទំនិញតាម Google Form'}">
+        <button type="button" class="hero-action-pill telegram-pill" onclick="openOrderModal('form')" title="${lang === 'en' ? 'Place Order' : 'បញ្ជាទិញ & កុម្ម៉ង់ទំនិញ'}">
           <div class="hero-action-icon telegram-icon"><i data-lucide="shopping-bag"></i></div>
-          <span>${lang === 'en' ? 'Place Order (Form)' : 'ការបញ្ជាទិញ (Form)'}</span>
-        </a>
+          <span>${lang === 'en' ? 'Place Order' : 'ការបញ្ជាទិញ'}</span>
+        </button>
 
         <button type="button" class="hero-action-pill expense-pill" onclick="openExpenseModal()">
           <div class="hero-action-icon expense-icon"><i data-lucide="wallet"></i></div>
@@ -4543,21 +4543,298 @@ window.handleSaveQuickAds = async function(e) {
 
 /**
  * ==========================================================================
- * Smart Order Import & Sheet Sync Handlers (Telegram & Chat Auto-Parser)
+ * Smart Order Import & Direct In-App Orders (Auto-Sync to Google Sheet & Form)
  * ==========================================================================
  */
-window.openOrderModal = function() {
-  const modal = document.getElementById('order-modal-overlay');
-  if (modal) {
-    modal.style.display = 'flex';
-    const txtArea = document.getElementById('order-paste-input');
-    if (txtArea) txtArea.focus();
+window.orderFormState = {
+  products: {
+    'Kidney Pro': 1,
+    'Pro D.O': 0,
+    'Emmi': 0,
+    'S.G Pro': 0,
+    'Yong Liang Plus': 0,
+    'Yong Liang': 0
   }
+};
+
+window.openOrderModal = function(initialTab = 'form') {
+  const modal = document.getElementById('order-modal-overlay');
+  if (!modal) return;
+  modal.style.display = 'flex';
+
+  // Set today's date if empty
+  const dateInput = document.getElementById('ord-input-date');
+  if (dateInput && !dateInput.value) {
+    const now = new Date();
+    dateInput.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  }
+
+  // Switch to requested tab
+  window.switchOrderModalTab(initialTab);
+  window.updateDirectOrderSummary();
+
+  if (window.lucide) window.lucide.createIcons();
 };
 
 window.closeOrderModal = function() {
   const modal = document.getElementById('order-modal-overlay');
   if (modal) modal.style.display = 'none';
+};
+
+window.switchOrderModalTab = function(tab) {
+  const formPanel = document.getElementById('direct-order-form');
+  const pastePanel = document.getElementById('order-paste-panel');
+  const btnForm = document.getElementById('order-tab-btn-form');
+  const btnPaste = document.getElementById('order-tab-btn-paste');
+
+  if (tab === 'paste') {
+    if (formPanel) formPanel.style.display = 'none';
+    if (pastePanel) pastePanel.style.display = 'block';
+    if (btnForm) btnForm.classList.remove('active');
+    if (btnPaste) btnPaste.classList.add('active');
+    const txtArea = document.getElementById('order-paste-input');
+    if (txtArea) txtArea.focus();
+  } else {
+    if (formPanel) formPanel.style.display = 'block';
+    if (pastePanel) pastePanel.style.display = 'none';
+    if (btnForm) btnForm.classList.add('active');
+    if (btnPaste) btnPaste.classList.remove('active');
+  }
+  if (window.lucide) window.lucide.createIcons();
+};
+
+window.stepOrderProduct = function(prodName, delta) {
+  if (!window.orderFormState.products[prodName] && window.orderFormState.products[prodName] !== 0) {
+    window.orderFormState.products[prodName] = 0;
+  }
+  const current = window.orderFormState.products[prodName] || 0;
+  const next = Math.max(0, current + delta);
+  window.orderFormState.products[prodName] = next;
+
+  const idMap = {
+    'Kidney Pro': 'ord-qty-kidney',
+    'Pro D.O': 'ord-qty-prodo',
+    'Emmi': 'ord-qty-emmi',
+    'S.G Pro': 'ord-qty-sgpro',
+    'Yong Liang Plus': 'ord-qty-ylplus',
+    'Yong Liang': 'ord-qty-yongliang'
+  };
+  const elId = idMap[prodName];
+  if (elId) {
+    const el = document.getElementById(elId);
+    if (el) el.textContent = next;
+  }
+
+  window.updateDirectOrderSummary(true);
+};
+
+window.setDirectOrderPreset = function(prodName, qty, price) {
+  Object.keys(window.orderFormState.products).forEach(k => {
+    window.orderFormState.products[k] = 0;
+  });
+  window.orderFormState.products[prodName] = qty;
+
+  const idMap = {
+    'Kidney Pro': 'ord-qty-kidney',
+    'Pro D.O': 'ord-qty-prodo',
+    'Emmi': 'ord-qty-emmi',
+    'S.G Pro': 'ord-qty-sgpro',
+    'Yong Liang Plus': 'ord-qty-ylplus',
+    'Yong Liang': 'ord-qty-yongliang'
+  };
+  Object.keys(idMap).forEach(k => {
+    const el = document.getElementById(idMap[k]);
+    if (el) el.textContent = window.orderFormState.products[k] || 0;
+  });
+
+  const priceInput = document.getElementById('ord-input-price');
+  if (priceInput) priceInput.value = price;
+
+  window.updateDirectOrderSummary(false);
+};
+
+window.updateDirectOrderSummary = function(autoPrice = false) {
+  const prods = window.orderFormState.products;
+  const totalBoxes = Object.values(prods).reduce((sum, v) => sum + (v || 0), 0);
+
+  const badge = document.getElementById('ord-total-boxes-badge');
+  if (badge) {
+    badge.textContent = `សរុប៖ ${totalBoxes} ប្រអប់`;
+  }
+
+  const priceInput = document.getElementById('ord-input-price');
+  if (priceInput && autoPrice) {
+    if (totalBoxes === 1) priceInput.value = 50;
+    else if (totalBoxes === 2) priceInput.value = 90;
+    else if (totalBoxes === 3) priceInput.value = 135;
+    else if (totalBoxes >= 4) priceInput.value = totalBoxes * 45;
+  }
+
+  const curPrice = parseFloat(priceInput ? priceInput.value : 50) || 0;
+  const hint = document.getElementById('ord-price-khr-hint');
+  if (hint) {
+    const khr = Math.round(curPrice * 4100);
+    hint.textContent = `ស្មើនឹង៖ ${khr.toLocaleString()} ៛ KHR (អត្រា 1$ = 4,100 ៛)`;
+  }
+};
+
+window.onDirectOrderPriceInput = function(val) {
+  const curPrice = parseFloat(val) || 0;
+  const hint = document.getElementById('ord-price-khr-hint');
+  if (hint) {
+    const khr = Math.round(curPrice * 4100);
+    hint.textContent = `ស្មើនឹង៖ ${khr.toLocaleString()} ៛ KHR (អត្រា 1$ = 4,100 ៛)`;
+  }
+};
+
+window.handleDirectOrderSubmit = async function(event) {
+  if (event) event.preventDefault();
+
+  const prods = window.orderFormState.products;
+  const totalBoxes = Object.values(prods).reduce((sum, v) => sum + (v || 0), 0);
+  if (totalBoxes === 0) {
+    alert('សូមជ្រើសរើសចំនួនផលិតផលយ៉ាងហោចណាស់ 1 ប្រអប់!');
+    return;
+  }
+
+  const date = document.getElementById('ord-input-date').value || new Date().toISOString().split('T')[0];
+  const team = document.getElementById('ord-input-team').value || 'Bech_Nora';
+  const seller = document.getElementById('ord-input-seller').value || 'យឹម សីហា';
+  const sellerPhone = document.getElementById('ord-input-seller-phone').value || '0968180188';
+  const priceUsd = parseFloat(document.getElementById('ord-input-price').value) || 0;
+  const receiverName = document.getElementById('ord-input-rec-name').value.trim();
+  const receiverPhone = document.getElementById('ord-input-rec-phone').value.trim();
+  const address = document.getElementById('ord-input-address').value.trim();
+  const delivery = document.getElementById('ord-input-delivery').value || 'VET(COD)';
+  const note = document.getElementById('ord-input-note') ? document.getElementById('ord-input-note').value.trim() : '';
+
+  const syncGForm = document.getElementById('ord-sync-gform') ? document.getElementById('ord-sync-gform').checked : true;
+  const syncSheet = document.getElementById('ord-sync-sheet') ? document.getElementById('ord-sync-sheet').checked : true;
+
+  const prodItems = [];
+  Object.keys(prods).forEach(k => {
+    if (prods[k] > 0) prodItems.push(`${k} (${prods[k]})`);
+  });
+  const productNames = prodItems.join(', ');
+
+  const btn = document.getElementById('btn-submit-direct-order');
+  const btnText = document.getElementById('btn-submit-direct-order-text');
+  if (btn) btn.disabled = true;
+  if (btnText) btnText.innerHTML = '<i data-lucide="loader-2" class="spin-anim"></i> កំពុងបញ្ជូនការកុម្ម៉ង់...';
+  if (window.lucide) window.lucide.createIcons();
+
+  const orderId = 'ORD-' + Math.floor(1000 + Math.random() * 9000);
+
+  const orderObj = {
+    orderId,
+    date,
+    team,
+    seller,
+    sellerPhone,
+    products: prodItems,
+    productNames,
+    productsMap: prods,
+    totalBoxes,
+    priceUsd,
+    priceKhr: Math.round(priceUsd * 4100),
+    receiverName,
+    receiverPhone,
+    address,
+    delivery,
+    note,
+    goodsSource: 'ចេញពីក្រុមហ៊ុន',
+    cogs: getOrderCogsAmount(totalBoxes, true),
+    deliveryFee: getDeliveryFeeByMethod(delivery),
+    submitToGoogleForm: syncGForm
+  };
+
+  try {
+    fetch('/api/submit-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(orderObj)
+    }).catch(() => {});
+
+    if (syncGForm) {
+      const gFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSd_hP30dqB-F5gCV44AuxcftgmoDjo5zzkN-NSMiK-1rDEqPQ/formResponse';
+      const formParams = new URLSearchParams();
+      formParams.append('entry.1581364351', date);
+      formParams.append('entry.2053044994', team);
+      formParams.append('entry.193760049', seller);
+      formParams.append('entry.1250998064', sellerPhone);
+      formParams.append('entry.615821671', String(priceUsd));
+      formParams.append('entry.485783433', receiverName);
+      formParams.append('entry.1618786820', receiverPhone);
+      formParams.append('entry.1844490282', address);
+      formParams.append('entry.77621526', delivery);
+      formParams.append('entry.1529022117', note);
+
+      if (prods['Kidney Pro']) formParams.append('entry.1166279805', String(prods['Kidney Pro']));
+      if (prods['Pro D.O']) formParams.append('entry.1229436075', String(prods['Pro D.O']));
+      if (prods['Emmi']) formParams.append('entry.1958386252', String(prods['Emmi']));
+      if (prods['S.G Pro']) formParams.append('entry.629009419', String(prods['S.G Pro']));
+      if (prods['Yong Liang Plus']) formParams.append('entry.404230430', String(prods['Yong Liang Plus']));
+      if (prods['Yong Liang']) formParams.append('entry.2028258738', String(prods['Yong Liang']));
+
+      fetch(gFormUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: formParams.toString()
+      }).catch(() => {});
+    }
+
+    if (syncSheet && SHEET_CONFIG.webhookUrl) {
+      fetch(SHEET_CONFIG.webhookUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'addOrder', ...orderObj })
+      }).catch(() => {});
+    }
+  } catch (err) {}
+
+  state.customOrders.unshift(orderObj);
+  localStorage.setItem('yem_custom_orders', JSON.stringify(state.customOrders));
+
+  state.data.incomes.unshift({
+    date: date,
+    month: date.substring(0, 7),
+    description: `លក់ ${productNames} (Order #${orderId}) - ${seller}`,
+    category: 'ចំណេញពីការលក់អនឡាញ (Business Profit)',
+    bank: delivery.includes('COD') ? 'COD (ប្រមូលប្រាក់ពេលដឹក)' : 'ABA Bank',
+    amountUsd: priceUsd,
+    amountKhr: priceUsd * 4100,
+    note: `អតិថិជន៖ ${receiverName || 'អតិថិជន'} (${receiverPhone}) | ទីតាំង៖ ${address}`
+  });
+
+  if (state.data.teamSales && state.data.teamSales.length > 0) {
+    const sFound = state.data.teamSales.find(s => s.name.includes(seller) || seller.includes(s.name.split(' ')[0]));
+    if (sFound) {
+      sFound.company += totalBoxes;
+      sFound.total += totalBoxes;
+      sFound.amountUsd += (totalBoxes * 3);
+    }
+  }
+
+  if (btn) btn.disabled = false;
+  if (btnText) btnText.textContent = 'បញ្ជូនការកុម្ម៉ង់ (Submit Order)';
+  window.closeOrderModal();
+
+  const recNameInput = document.getElementById('ord-input-rec-name');
+  if (recNameInput) recNameInput.value = '';
+  const recPhoneInput = document.getElementById('ord-input-rec-phone');
+  if (recPhoneInput) recPhoneInput.value = '';
+  const addrInput = document.getElementById('ord-input-address');
+  if (addrInput) addrInput.value = '';
+  const noteInput = document.getElementById('ord-input-note');
+  if (noteInput) noteInput.value = '';
+
+  window.setDirectOrderPreset('Kidney Pro', 1, 50);
+
+  renderModuleContent(state.activeModule);
+
+  alert(`🎉 ជោគជ័យ! ការកុម្ម៉ង់ ${totalBoxes} ប្រអប់ (${productNames}) ចំនួន $${priceUsd.toFixed(2)} ត្រូវបានបញ្ជូនទៅ Google Form ក្រុមហ៊ុន និង Save ចូល Google Sheet A1 រួចរាល់!`);
 };
 
 window.parseTelegramOrdersText = function(text) {
@@ -5864,11 +6141,11 @@ function renderOrdersModule() {
         </div>
       </div>
       <div class="orders-banner-action-wrap" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-        <a href="https://docs.google.com/forms/d/e/1FAIpQLSd_hP30dqB-F5gCV44AuxcftgmoDjo5zzkN-NSMiK-1rDEqPQ/viewform" target="_blank" rel="noopener noreferrer" class="btn-large-paste-orders" style="background:linear-gradient(135deg, #10B981, #059669); color:#FFFFFF; text-decoration:none; display:inline-flex; align-items:center; gap:8px; box-shadow:0 0 16px rgba(16,185,129,0.4);">
+        <button type="button" class="btn-large-paste-orders" onclick="openOrderModal('form')" style="background:linear-gradient(135deg, #10B981, #059669); color:#FFFFFF; border:none; display:inline-flex; align-items:center; gap:8px; box-shadow:0 0 16px rgba(16,185,129,0.4);">
           <i data-lucide="shopping-bag"></i>
-          <span>✦ បញ្ជាទិញទំនិញ (Google Form)</span>
-        </a>
-        <button type="button" class="btn-large-paste-orders" onclick="openOrderModal()">
+          <span>✦ បញ្ជាទិញទំនិញថ្មី (New Order)</span>
+        </button>
+        <button type="button" class="btn-large-paste-orders" onclick="openOrderModal('paste')">
           <i data-lucide="clipboard-paste"></i>
           <span>✦ Paste បញ្ចូលការកម្ម៉ង់ពី Telegram</span>
         </button>

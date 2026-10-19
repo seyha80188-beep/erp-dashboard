@@ -4879,14 +4879,167 @@ body.theme-glass .order-modal-card {
   border-radius: 20px;
   background: linear-gradient(135deg, #10B981 0%, #059669 100%);
   color: #FFFFFF;
+  border: 1px solid rgba(16, 185, 129, 0.5);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+}
+
+/* In-App Direct Order Form Elements */
+.order-modal-tabs {
+  display: flex;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 4px;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.order-tab-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 12px;
+  border-radius: 9px;
+  background: transparent;
   border: none;
+  color: var(--text-muted);
   font-family: inherit;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 0 14px rgba(16, 185, 129, 0.4);
-  transition: all var(--transition-fast);
+  transition: all 0.2s ease;
 }
+
+.order-tab-btn:hover {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.order-tab-btn.active {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+}
+
+.order-tab-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.order-product-card {
+  background: rgba(6, 14, 34, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+}
+
+.order-product-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.order-product-row:last-child {
+  border-bottom: none;
+  padding-bottom: 2px;
+}
+
+.order-product-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.order-prod-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.order-prod-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.order-stepper-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  padding: 2px 4px;
+}
+
+.stepper-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 15px;
+  line-height: 1;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.stepper-btn:hover {
+  background: rgba(16, 185, 129, 0.3);
+  border-color: #10B981;
+}
+
+.stepper-val {
+  min-width: 24px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #10B981;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.order-sync-badge-card {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-top: 10px;
+  margin-bottom: 14px;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.order-sync-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.92);
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.order-sync-item input[type="checkbox"] {
+  accent-color: #10B981;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+
 
 .header-action-btn-order:hover {
   opacity: 0.92;
