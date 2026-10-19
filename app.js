@@ -4765,7 +4765,76 @@ window.updateSettingsModalActiveStates = function() {
   const curLangBadge = document.getElementById('settings-current-lang-badge');
   if (curLangBadge) curLangBadge.textContent = (state.lang || 'km') === 'en' ? 'English' : 'ខ្មែរ';
 
+  // 5. Telegram / iOS Inset Grouped row value indicators
+  const iosThemeVal = document.getElementById('ios-val-theme');
+  if (iosThemeVal) {
+    const themeTitles = { 'sage': '🌿 Sage', 'warm': '🌾 Alabaster', 'midnight': '🌙 Midnight' };
+    iosThemeVal.textContent = themeTitles[state.theme] || '🌿 Sage';
+  }
+
+  const iosFontVal = document.getElementById('ios-val-font');
+  if (iosFontVal) {
+    const fontTitles = {
+      'kantumruy': 'Kantumruy Pro',
+      'noto': 'Noto Sans',
+      'koh-santepheap': 'Koh Santepheap',
+      'battambang': 'Battambang',
+      'siemreap': 'Siemreap'
+    };
+    iosFontVal.textContent = fontTitles[state.fontFamily || 'kantumruy'] || 'Kantumruy Pro';
+  }
+
+  const iosSizeVal = document.getElementById('ios-val-size');
+  if (iosSizeVal) {
+    const sizeTitles = {
+      'small': 'តូច (85%)',
+      'normal': 'ធម្មតា (100%)',
+      'large': 'ធំ (115%)',
+      'xlarge': 'ធំខ្លាំង (130%)'
+    };
+    iosSizeVal.textContent = sizeTitles[state.fontSize || 'normal'] || 'ធម្មតា (100%)';
+  }
+
+  const iosLangVal = document.getElementById('ios-val-lang');
+  if (iosLangVal) {
+    iosLangVal.textContent = (state.lang || 'km') === 'en' ? '🇬🇧 English' : '🇰🇭 ភាសាខ្មែរ';
+  }
+
+  const iosCurrencyVal = document.getElementById('ios-val-currency');
+  if (iosCurrencyVal) {
+    iosCurrencyVal.textContent = state.displayCurrency === 'KHR' ? '៛ KHR (រៀល)' : '$ USD (ដុល្លារ)';
+  }
+
   if (window.lucide) window.lucide.createIcons();
+};
+
+/**
+ * Toggle expandable settings drawer in Telegram / iOS style
+ */
+window.toggleSettingSection = function(secId) {
+  const panel = document.getElementById(`setting-expand-${secId}`);
+  const chevron = document.getElementById(`setting-chevron-${secId}`);
+  if (!panel) return;
+  const isHidden = (panel.style.display === 'none' || panel.style.display === '');
+  panel.style.display = isHidden ? 'block' : 'none';
+  if (chevron) {
+    chevron.style.transform = isHidden ? 'rotate(90deg)' : 'rotate(0deg)';
+  }
+};
+
+/**
+ * Quick currency toggle from iOS settings card
+ */
+window.toggleAppDisplayCurrency = function() {
+  const next = (state.displayCurrency === 'USD') ? 'KHR' : 'USD';
+  if (typeof window.setAppDisplayCurrency === 'function') {
+    window.setAppDisplayCurrency(next);
+  } else {
+    state.displayCurrency = next;
+    localStorage.setItem('yem_display_currency', next);
+    renderModuleContent(state.activeModule);
+  }
+  updateSettingsModalActiveStates();
 };
 
 /**

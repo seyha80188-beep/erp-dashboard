@@ -7893,4 +7893,224 @@ body.font-size-xlarge {
   color: #38A3A5 !important;
 }
 
+/* --------------------------------------------------------------------------
+   TELEGRAM / iOS INSET GROUPED SETTINGS (ឈ្នូតៗ)
+   -------------------------------------------------------------------------- */
+.ios-settings-card {
+  background: #FFFFFF;
+  border-radius: 28px;
+  max-width: 480px;
+  width: 92%;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+  border: 1px solid #E2E8F0;
+}
+
+body.theme-sage .ios-settings-card {
+  background: #E8F0EE !important;
+  border-color: #D4E2DE !important;
+}
+
+body.theme-warm .ios-settings-card {
+  background: #EFECE6 !important;
+  border-color: #E5DFD6 !important;
+}
+
+body.theme-midnight .ios-settings-card,
+body.theme-dark .ios-settings-card,
+body.theme-glass .ios-settings-card {
+  background: #0F172A !important;
+  border-color: rgba(45, 212, 191, 0.25) !important;
+  color: #F8FAFC !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7) !important;
+}
+
+.ios-settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 14px 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+body.theme-midnight .ios-settings-header {
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.ios-settings-scrollable {
+  padding: 16px 18px 24px 18px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Inset Grouped Block */
+.ios-group-block {
+  background: #FFFFFF;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  border: 1px solid #E2E8F0;
+}
+
+body.theme-sage .ios-group-block {
+  background: #F7FAF9 !important;
+  border-color: #D4E2DE !important;
+}
+
+body.theme-warm .ios-group-block {
+  background: #FAF8F5 !important;
+  border-color: #E5DFD6 !important;
+}
+
+body.theme-midnight .ios-group-block {
+  background: #1E293B !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.ios-group-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  padding: 0 16px 6px 16px;
+  margin-top: 4px;
+}
+
+/* Row Item */
+.ios-row-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s ease;
+}
+
+.ios-row-item:hover {
+  background: rgba(0, 0, 0, 0.025);
+}
+
+body.theme-midnight .ios-row-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.ios-row-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.ios-row-squircle {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.ios-row-squircle svg {
+  width: 17px;
+  height: 17px;
+}
+
+.ios-row-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.ios-row-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0F172A;
+}
+
+body.theme-midnight .ios-row-title {
+  color: #F8FAFC !important;
+}
+
+.ios-row-subtitle {
+  font-size: 11.5px;
+  color: #64748B;
+}
+
+body.theme-midnight .ios-row-subtitle {
+  color: #94A3B8 !important;
+}
+
+.ios-row-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.ios-row-value {
+  font-size: 13px;
+  font-weight: 500;
+  color: #0D9488;
+}
+
+body.theme-warm .ios-row-value {
+  color: #B45309 !important;
+}
+
+body.theme-midnight .ios-row-value {
+  color: #2DD4BF !important;
+}
+
+.ios-row-chevron {
+  color: #94A3B8;
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s ease;
+}
+
+/* Divider Line (ឈ្នូត) */
+.ios-row-divider {
+  height: 1px;
+  background: #E2E8F0;
+  margin-left: 60px;
+}
+
+body.theme-sage .ios-row-divider {
+  background: #D4E2DE !important;
+}
+
+body.theme-warm .ios-row-divider {
+  background: #E5DFD6 !important;
+}
+
+body.theme-midnight .ios-row-divider {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Expandable Options Drawer */
+.ios-row-expandable {
+  background: rgba(0, 0, 0, 0.02);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 12px 14px 14px 14px;
+  animation: fadeIn 0.2s ease;
+}
+
+body.theme-midnight .ios-row-expandable {
+  background: rgba(0, 0, 0, 0.25) !important;
+  border-top-color: rgba(255, 255, 255, 0.06) !important;
+}
+
 

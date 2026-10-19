@@ -22,7 +22,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Battambang:wght@400;700&family=Kantumruy+Pro:ital,wght@0,300..700;1,300..700&family=Koh+Santepheap:wght@300;400;700&family=Noto+Sans+Khmer:wght@300;400;500;600;700&family=Siemreap&display=swap" rel="stylesheet">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" href="style.css?v=20261019_v24">
+  <link rel="stylesheet" href="style.css?v=20261019_v25">
 </head>
 <body>
   <!-- Mobile Pull-to-Refresh Indicator Container -->
@@ -476,17 +476,18 @@
     </div>
   </div>
 
-  <!-- Settings & Appearance Modal Overlay (ការកំណត់: ពណ៌, Font, ទំហំអក្សរ, ភាសា) -->
+  <!-- Telegram / iOS Inset Grouped Settings Modal Overlay (ឈ្នូតៗ) -->
   <div id="theme-modal-overlay" class="modal-overlay" style="display: none; z-index: 99999;" onclick="if(event.target === this) closeThemeModal()">
-    <div class="theme-modal-card settings-modal-card">
-      <div class="modal-header-row" style="padding-bottom: 14px; border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.08));">
-        <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:0;">
-          <div class="theme-palette-icon" style="background: linear-gradient(135deg, #0F766E, #2DD4BF);">
+    <div class="ios-settings-card">
+      <!-- Header -->
+      <div class="ios-settings-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="ios-row-squircle" style="background: linear-gradient(135deg, #0F766E, #2DD4BF);">
             <i data-lucide="settings"></i>
           </div>
           <div>
-            <h3 class="modal-title" id="settings-modal-title">ការកំណត់ប្រព័ន្ធ & រចនាបថ</h3>
-            <span class="modal-subtitle" id="settings-modal-sub">Settings: Theme, Font, Size & Language</span>
+            <h3 style="font-size:16px; font-weight:700; margin:0; color:var(--text-main);">ការកំណត់ (Settings)</h3>
+            <span style="font-size:11.5px; color:var(--text-muted);">ប្រព័ន្ធ និងការកែប្រែរចនាបថ</span>
           </div>
         </div>
         <button type="button" class="modal-close-icon-btn" onclick="closeThemeModal()" aria-label="បិទ">
@@ -494,155 +495,314 @@
         </button>
       </div>
 
-      <div class="settings-modal-scrollable">
-        <!-- Section 1: 🎨 ពណ៌ប្រព័ន្ធ (Eye-Friendly Themes) -->
-        <div class="settings-group-section">
-          <div class="settings-group-header">
-            <span class="settings-group-title"><i data-lucide="palette"></i> ពណ៌ប្រព័ន្ធ (Themes)</span>
-            <span class="settings-group-badge" id="settings-current-theme-badge">🌿 Sage</span>
-          </div>
-          <div class="theme-options-grid">
-            <!-- 1. Modern Emerald & Sage -->
-            <div class="theme-option-card" id="theme-opt-sage" onclick="selectTheme('sage')">
-              <div class="theme-swatch sage-swatch" style="background: linear-gradient(135deg, #0F766E 0%, #2DD4BF 100%);">
-                <i data-lucide="leaf" style="color:#FFF; width:20px; height:20px;"></i>
+      <div class="ios-settings-scrollable">
+        <!-- 1. Profile Block (Matching Telegram Screenshot Top) -->
+        <div class="ios-group-block">
+          <div class="ios-row-item" style="padding: 14px 16px;">
+            <div class="ios-row-left">
+              <div class="user-greeting-avatar" style="width: 44px; height: 44px; margin-right: 2px;">
+                <img src="data:image/jpeg;base64,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" alt="YEM SEYHA">
+                <span class="user-greeting-check"><i data-lucide="check"></i></span>
               </div>
-              <div class="theme-info">
-                <span class="theme-name">🌿 Modern Emerald & Sage</span>
-                <span class="theme-desc">BG: #E8F0EE | Cards: #F7FAF9 (បៃតងខ្ចីស្រទន់ភ្នែក)</span>
+              <div class="ios-row-titles">
+                <span class="ios-row-title">យឹម សីហា (Yem Seyha)</span>
+                <span class="ios-row-subtitle">CEO & Founder / គណនីអ្នកគ្រប់គ្រង</span>
               </div>
-              <div class="theme-check-mark"><i data-lucide="check"></i></div>
             </div>
-
-            <!-- 2. Luxury Warm Alabaster & Gold -->
-            <div class="theme-option-card" id="theme-opt-warm" onclick="selectTheme('warm')">
-              <div class="theme-swatch warm-swatch" style="background: linear-gradient(135deg, #B45309 0%, #EFECE6 100%);">
-                <i data-lucide="sun" style="color:#FFF; width:20px; height:20px;"></i>
-              </div>
-              <div class="theme-info">
-                <span class="theme-name">🌾 Luxury Warm Alabaster & Gold</span>
-                <span class="theme-desc">BG: #EFECE6 | Cards: #FAF8F5 (ពងមាន់ស្រទន់ គ្មានពន្លឺចាំង)</span>
-              </div>
-              <div class="theme-check-mark"><i data-lucide="check"></i></div>
-            </div>
-
-            <!-- 3. Midnight Teal Glass -->
-            <div class="theme-option-card" id="theme-opt-midnight" onclick="selectTheme('midnight')">
-              <div class="theme-swatch midnight-swatch" style="background: linear-gradient(135deg, #0F172A 0%, #2DD4BF 100%);">
-                <i data-lucide="moon" style="color:#38BDF8; width:20px; height:20px;"></i>
-              </div>
-              <div class="theme-info">
-                <span class="theme-name">🌙 Midnight Teal Glass</span>
-                <span class="theme-desc">BG: #0F172A | Cards: #1E293B (ងងឹតស្រទន់ការពារភ្នែកពេលយប់)</span>
-              </div>
-              <div class="theme-check-mark"><i data-lucide="check"></i></div>
+            <div class="ios-row-right">
+              <span class="order-tag green" style="font-size: 11px;">សកម្ម</span>
             </div>
           </div>
         </div>
 
-        <!-- Section 2: 🔍 ទំហំអក្សរ (Font Size) -->
-        <div class="settings-group-section">
-          <div class="settings-group-header">
-            <span class="settings-group-title"><i data-lucide="type"></i> ទំហំអក្សរ (Text Size)</span>
-            <span class="settings-group-badge" id="settings-current-size-badge">ធម្មតា</span>
-          </div>
-          <div class="font-size-pills-grid">
-            <button type="button" class="font-size-pill" id="font-size-small" onclick="selectFontSize('small')">
-              <span class="size-preview-sample" style="font-size: 11px;">A</span>
-              <span class="size-label">តូច (Small)</span>
-            </button>
-            <button type="button" class="font-size-pill" id="font-size-normal" onclick="selectFontSize('normal')">
-              <span class="size-preview-sample" style="font-size: 13.5px;">A</span>
-              <span class="size-label">ធម្មតា (Normal)</span>
-            </button>
-            <button type="button" class="font-size-pill" id="font-size-large" onclick="selectFontSize('large')">
-              <span class="size-preview-sample" style="font-size: 16.5px;">A</span>
-              <span class="size-label">ធំ (Large)</span>
-            </button>
-            <button type="button" class="font-size-pill" id="font-size-xlarge" onclick="selectFontSize('xlarge')">
-              <span class="size-preview-sample" style="font-size: 19.5px;">A</span>
-              <span class="size-label">ធំខ្លាំង (Extra)</span>
-            </button>
+        <!-- 2. Appearance Group (ពណ៌ & ពុម្ពអក្សរ & ទំហំ) with Dividers (ឈ្នូតៗ) -->
+        <div>
+          <div class="ios-group-label">ការបង្ហាញ & រចនាបថ (Appearance)</div>
+          <div class="ios-group-block">
+            <!-- Row 1: Theme Color -->
+            <div class="ios-row-item" onclick="toggleSettingSection('theme')">
+              <div class="ios-row-left">
+                <div class="ios-row-squircle" style="background: linear-gradient(135deg, #10B981, #059669);">
+                  <i data-lucide="palette"></i>
+                </div>
+                <div class="ios-row-titles">
+                  <span class="ios-row-title">ពណ៌ប្រព័ន្ធ (Theme Colors)</span>
+                  <span class="ios-row-subtitle">ប្តូរពណ៌ផ្ទៃ និងកាត Dashboard</span>
+                </div>
+              </div>
+              <div class="ios-row-right">
+                <span class="ios-row-value" id="ios-val-theme">🌿 Sage</span>
+                <i data-lucide="chevron-right" class="ios-row-chevron" id="setting-chevron-theme"></i>
+              </div>
+            </div>
+            <!-- Expanded Theme Drawer -->
+            <div id="setting-expand-theme" class="ios-row-expandable" style="display: none;">
+              <div class="theme-options-grid">
+                <div class="theme-option-card" id="theme-opt-sage" onclick="selectTheme('sage')">
+                  <div class="theme-swatch sage-swatch" style="background: linear-gradient(135deg, #0F766E 0%, #2DD4BF 100%);">
+                    <i data-lucide="leaf" style="color:#FFF; width:18px; height:18px;"></i>
+                  </div>
+                  <div class="theme-info">
+                    <span class="theme-name">🌿 Modern Emerald & Sage</span>
+                    <span class="theme-desc">BG: #E8F0EE | Cards: #F7FAF9 (បៃតងខ្ចីស្រទន់ភ្នែក)</span>
+                  </div>
+                  <div class="theme-check-mark"><i data-lucide="check"></i></div>
+                </div>
+
+                <div class="theme-option-card" id="theme-opt-warm" onclick="selectTheme('warm')">
+                  <div class="theme-swatch warm-swatch" style="background: linear-gradient(135deg, #B45309 0%, #EFECE6 100%);">
+                    <i data-lucide="sun" style="color:#FFF; width:18px; height:18px;"></i>
+                  </div>
+                  <div class="theme-info">
+                    <span class="theme-name">🌾 Luxury Warm Alabaster & Gold</span>
+                    <span class="theme-desc">BG: #EFECE6 | Cards: #FAF8F5 (ពងមាន់ស្រទន់ គ្មានពន្លឺចាំង)</span>
+                  </div>
+                  <div class="theme-check-mark"><i data-lucide="check"></i></div>
+                </div>
+
+                <div class="theme-option-card" id="theme-opt-midnight" onclick="selectTheme('midnight')">
+                  <div class="theme-swatch midnight-swatch" style="background: linear-gradient(135deg, #0F172A 0%, #2DD4BF 100%);">
+                    <i data-lucide="moon" style="color:#38BDF8; width:18px; height:18px;"></i>
+                  </div>
+                  <div class="theme-info">
+                    <span class="theme-name">🌙 Midnight Teal Glass</span>
+                    <span class="theme-desc">BG: #0F172A | Cards: #1E293B (ងងឹតស្រទន់ការពារភ្នែកពេលយប់)</span>
+                  </div>
+                  <div class="theme-check-mark"><i data-lucide="check"></i></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Divider Line 1 (ឈ្នូត) -->
+            <div class="ios-row-divider"></div>
+
+            <!-- Row 2: Font Family -->
+            <div class="ios-row-item" onclick="toggleSettingSection('font')">
+              <div class="ios-row-left">
+                <div class="ios-row-squircle" style="background: linear-gradient(135deg, #8B5CF6, #6D28D9);">
+                  <i data-lucide="case-sensitive"></i>
+                </div>
+                <div class="ios-row-titles">
+                  <span class="ios-row-title">ពុម្ពអក្សរ (Font Family)</span>
+                  <span class="ios-row-subtitle">ជ្រើសរើសពុម្ពអក្សរខ្មែរស្អាតៗ</span>
+                </div>
+              </div>
+              <div class="ios-row-right">
+                <span class="ios-row-value" id="ios-val-font">Kantumruy Pro</span>
+                <i data-lucide="chevron-right" class="ios-row-chevron" id="setting-chevron-font"></i>
+              </div>
+            </div>
+            <!-- Expanded Font Drawer -->
+            <div id="setting-expand-font" class="ios-row-expandable" style="display: none;">
+              <div class="font-family-options-list">
+                <div class="font-option-row" id="font-opt-kantumruy" onclick="selectFont('kantumruy')">
+                  <div class="font-preview-wrap" style="font-family: 'Kantumruy Pro', sans-serif;">
+                    <div class="font-name-title">Kantumruy Pro <span class="font-badge-rec">ពេញនិយម</span></div>
+                    <div class="font-sample-khmer">សួស្តី យឹម សីហា! សមតុល្យ 17,634,100 ៛ ($4,301)</div>
+                  </div>
+                  <div class="theme-check-mark"><i data-lucide="check"></i></div>
+                </div>
+
+                <div class="font-option-row" id="font-opt-noto" onclick="selectFont('noto')">
+                  <div class="font-preview-wrap" style="font-family: 'Noto Sans Khmer', sans-serif;">
+                    <div class="font-name-title">Noto Sans Khmer <span class="font-badge-sub">Google Standard</span></div>
+                    <div class="font-sample-khmer">សួស្តី យឹម សីហា! សមតុល្យ 17,634,100 ៛ ($4,301)</div>
+                  </div>
+                  <div class="theme-check-mark"><i data-lucide="check"></i></div>
+                </div>
+
+                <div class="font-option-row" id="font-opt-koh-santepheap" onclick="selectFont('koh-santepheap')">
+                  <div class="font-preview-wrap" style="font-family: 'Koh Santepheap', serif, sans-serif;">
+                    <div class="font-name-title">Koh Santepheap <span class="font-badge-sub">កោះសន្តិភាព ផ្លូវការ</span></div>
+                    <div class="font-sample-khmer">សួស្តី យឹម សីហា! សមតុល្យ 17,634,100 ៛ ($4,301)</div>
+                  </div>
+                  <div class="theme-check-mark"><i data-lucide="check"></i></div>
+                </div>
+
+                <div class="font-option-row" id="font-opt-battambang" onclick="selectFont('battambang')">
+                  <div class="font-preview-wrap" style="font-family: 'Battambang', sans-serif;">
+                    <div class="font-name-title">Battambang <span class="font-badge-sub">បាត់ដំបង ច្បាស់ៗ</span></div>
+                    <div class="font-sample-khmer">សួស្តី យឹម សីហា! សមតុល្យ 17,634,100 ៛ ($4,301)</div>
+                  </div>
+                  <div class="theme-check-mark"><i data-lucide="check"></i></div>
+                </div>
+
+                <div class="font-option-row" id="font-opt-siemreap" onclick="selectFont('siemreap')">
+                  <div class="font-preview-wrap" style="font-family: 'Siemreap', cursive, sans-serif;">
+                    <div class="font-name-title">Siemreap <span class="font-badge-sub">សៀមរាប រចនាបទខ្មែរ</span></div>
+                    <div class="font-sample-khmer">សួស្តី យឹម សីហា! សមតុល្យ 17,634,100 ៛ ($4,301)</div>
+                  </div>
+                  <div class="theme-check-mark"><i data-lucide="check"></i></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Divider Line 2 (ឈ្នូត) -->
+            <div class="ios-row-divider"></div>
+
+            <!-- Row 3: Text Size -->
+            <div class="ios-row-item" onclick="toggleSettingSection('size')">
+              <div class="ios-row-left">
+                <div class="ios-row-squircle" style="background: linear-gradient(135deg, #F59E0B, #D97706);">
+                  <i data-lucide="type"></i>
+                </div>
+                <div class="ios-row-titles">
+                  <span class="ios-row-title">ទំហំអក្សរ (Text Size)</span>
+                  <span class="ios-row-subtitle">ពង្រីក ឬបង្រួមអក្សរពេញប្រព័ន្ធ</span>
+                </div>
+              </div>
+              <div class="ios-row-right">
+                <span class="ios-row-value" id="ios-val-size">ធម្មតា (100%)</span>
+                <i data-lucide="chevron-right" class="ios-row-chevron" id="setting-chevron-size"></i>
+              </div>
+            </div>
+            <!-- Expanded Size Drawer -->
+            <div id="setting-expand-size" class="ios-row-expandable" style="display: none;">
+              <div class="font-size-pills-grid">
+                <button type="button" class="font-size-pill" id="font-size-small" onclick="selectFontSize('small')">
+                  <span class="size-preview-sample" style="font-size: 11px;">A</span>
+                  <span class="size-label">តូច (Small)</span>
+                </button>
+                <button type="button" class="font-size-pill" id="font-size-normal" onclick="selectFontSize('normal')">
+                  <span class="size-preview-sample" style="font-size: 13.5px;">A</span>
+                  <span class="size-label">ធម្មតា (Normal)</span>
+                </button>
+                <button type="button" class="font-size-pill" id="font-size-large" onclick="selectFontSize('large')">
+                  <span class="size-preview-sample" style="font-size: 16.5px;">A</span>
+                  <span class="size-label">ធំ (Large)</span>
+                </button>
+                <button type="button" class="font-size-pill" id="font-size-xlarge" onclick="selectFontSize('xlarge')">
+                  <span class="size-preview-sample" style="font-size: 19.5px;">A</span>
+                  <span class="size-label">ធំខ្លាំង (Extra)</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Section 3: 🔤 ពុម្ពអក្សរ (Font Family) -->
-        <div class="settings-group-section">
-          <div class="settings-group-header">
-            <span class="settings-group-title"><i data-lucide="case-sensitive"></i> ពុម្ពអក្សរ (Font Family)</span>
-            <span class="settings-group-badge" id="settings-current-font-badge">Kantumruy</span>
-          </div>
-          <div class="font-family-options-list">
-            <!-- 1. Kantumruy Pro -->
-            <div class="font-option-row" id="font-opt-kantumruy" onclick="selectFont('kantumruy')">
-              <div class="font-preview-wrap" style="font-family: 'Kantumruy Pro', sans-serif;">
-                <div class="font-name-title">Kantumruy Pro <span class="font-badge-rec">ពេញនិយម</span></div>
-                <div class="font-sample-khmer">សួស្តី យឹម សីហា! សមតុល្យសរុប 17,634,100 ៛ ($4,301.00)</div>
+        <!-- 3. General & Localization Group with Dividers (ឈ្នូតៗ) -->
+        <div>
+          <div class="ios-group-label">ភាសា & ប្រព័ន្ធ (General & Localization)</div>
+          <div class="ios-group-block">
+            <!-- Row 1: Language -->
+            <div class="ios-row-item" onclick="toggleSettingSection('lang')">
+              <div class="ios-row-left">
+                <div class="ios-row-squircle" style="background: linear-gradient(135deg, #0284C7, #0369A1);">
+                  <i data-lucide="globe"></i>
+                </div>
+                <div class="ios-row-titles">
+                  <span class="ios-row-title">ភាសាប្រព័ន្ធ (Language)</span>
+                  <span class="ios-row-subtitle">ភាសាខ្មែរ / English</span>
+                </div>
               </div>
-              <div class="theme-check-mark"><i data-lucide="check"></i></div>
+              <div class="ios-row-right">
+                <span class="ios-row-value" id="ios-val-lang">🇰🇭 ភាសាខ្មែរ</span>
+                <i data-lucide="chevron-right" class="ios-row-chevron" id="setting-chevron-lang"></i>
+              </div>
+            </div>
+            <!-- Expanded Lang Drawer -->
+            <div id="setting-expand-lang" class="ios-row-expandable" style="display: none;">
+              <div class="lang-pills-grid">
+                <button type="button" class="lang-option-pill" id="lang-opt-km" onclick="selectLanguage('km')">
+                  <span class="lang-flag">🇰🇭</span>
+                  <div class="lang-text-wrap">
+                    <span class="lang-primary">ភាសាខ្មែរ</span>
+                    <span class="lang-secondary">Khmer</span>
+                  </div>
+                  <div class="theme-check-mark"><i data-lucide="check"></i></div>
+                </button>
+                <button type="button" class="lang-option-pill" id="lang-opt-en" onclick="selectLanguage('en')">
+                  <span class="lang-flag">🇬🇧</span>
+                  <div class="lang-text-wrap">
+                    <span class="lang-primary">English</span>
+                    <span class="lang-secondary">អង់គ្លេស</span>
+                  </div>
+                  <div class="theme-check-mark"><i data-lucide="check"></i></div>
+                </button>
+              </div>
             </div>
 
-            <!-- 2. Noto Sans Khmer -->
-            <div class="font-option-row" id="font-opt-noto" onclick="selectFont('noto')">
-              <div class="font-preview-wrap" style="font-family: 'Noto Sans Khmer', sans-serif;">
-                <div class="font-name-title">Noto Sans Khmer <span class="font-badge-sub">Google Standard</span></div>
-                <div class="font-sample-khmer">សួស្តី យឹម សីហា! សមតុល្យសរុប 17,634,100 ៛ ($4,301.00)</div>
+            <!-- Divider Line 3 (ឈ្នូត) -->
+            <div class="ios-row-divider"></div>
+
+            <!-- Row 2: Currency Toggle -->
+            <div class="ios-row-item" onclick="toggleAppDisplayCurrency()">
+              <div class="ios-row-left">
+                <div class="ios-row-squircle" style="background: linear-gradient(135deg, #10B981, #047857);">
+                  <i data-lucide="badge-dollar-sign"></i>
+                </div>
+                <div class="ios-row-titles">
+                  <span class="ios-row-title">រូបិយប័ណ្ណបង្ហាញ (Currency)</span>
+                  <span class="ios-row-subtitle">អត្រាប្តូរប្រាក់ 1$ = 4,100 ៛</span>
+                </div>
               </div>
-              <div class="theme-check-mark"><i data-lucide="check"></i></div>
+              <div class="ios-row-right">
+                <span class="ios-row-value" id="ios-val-currency">$ USD (ដុល្លារ)</span>
+                <i data-lucide="repeat" style="width: 15px; height: 15px; color: #94A3B8;"></i>
+              </div>
             </div>
 
-            <!-- 3. Koh Santepheap -->
-            <div class="font-option-row" id="font-opt-koh-santepheap" onclick="selectFont('koh-santepheap')">
-              <div class="font-preview-wrap" style="font-family: 'Koh Santepheap', serif, sans-serif;">
-                <div class="font-name-title">Koh Santepheap <span class="font-badge-sub">កោះសន្តិភាព ផ្លូវការ</span></div>
-                <div class="font-sample-khmer">សួស្តី យឹម សីហា! សមតុល្យសរុប 17,634,100 ៛ ($4,301.00)</div>
-              </div>
-              <div class="theme-check-mark"><i data-lucide="check"></i></div>
-            </div>
+            <!-- Divider Line 4 (ឈ្នូត) -->
+            <div class="ios-row-divider"></div>
 
-            <!-- 4. Battambang -->
-            <div class="font-option-row" id="font-opt-battambang" onclick="selectFont('battambang')">
-              <div class="font-preview-wrap" style="font-family: 'Battambang', sans-serif;">
-                <div class="font-name-title">Battambang <span class="font-badge-sub">បាត់ដំបង ច្បាស់ៗ</span></div>
-                <div class="font-sample-khmer">សួស្តី យឹម សីហា! សមតុល្យសរុប 17,634,100 ៛ ($4,301.00)</div>
+            <!-- Row 3: Google Order Form Direct Link -->
+            <div class="ios-row-item" onclick="window.openGoogleOrderForm()">
+              <div class="ios-row-left">
+                <div class="ios-row-squircle" style="background: linear-gradient(135deg, #EC4899, #DB2777);">
+                  <i data-lucide="shopping-bag"></i>
+                </div>
+                <div class="ios-row-titles">
+                  <span class="ios-row-title">ទម្រង់បញ្ជាទិញ (Order Form)</span>
+                  <span class="ios-row-subtitle">បើកទម្រង់កម្ម៉ង់ Google Form ផ្ទាល់</span>
+                </div>
               </div>
-              <div class="theme-check-mark"><i data-lucide="check"></i></div>
-            </div>
-
-            <!-- 5. Siemreap -->
-            <div class="font-option-row" id="font-opt-siemreap" onclick="selectFont('siemreap')">
-              <div class="font-preview-wrap" style="font-family: 'Siemreap', cursive, sans-serif;">
-                <div class="font-name-title">Siemreap <span class="font-badge-sub">សៀមរាប រចនាបទខ្មែរ</span></div>
-                <div class="font-sample-khmer">សួស្តី យឹម សីហា! សមតុល្យសរុប 17,634,100 ៛ ($4,301.00)</div>
+              <div class="ios-row-right">
+                <span class="ios-row-value" style="color:#EC4899;">បើក Form ↗</span>
+                <i data-lucide="external-link" style="width: 14px; height: 14px; color: #EC4899;"></i>
               </div>
-              <div class="theme-check-mark"><i data-lucide="check"></i></div>
             </div>
           </div>
         </div>
 
-        <!-- Section 4: 🌐 ភាសាប្រព័ន្ធ (Language) -->
-        <div class="settings-group-section">
-          <div class="settings-group-header">
-            <span class="settings-group-title"><i data-lucide="globe"></i> ភាសាប្រព័ន្ធ (Language)</span>
-            <span class="settings-group-badge" id="settings-current-lang-badge">ខ្មែរ</span>
-          </div>
-          <div class="lang-pills-grid">
-            <button type="button" class="lang-option-pill" id="lang-opt-km" onclick="selectLanguage('km')">
-              <span class="lang-flag">🇰🇭</span>
-              <div class="lang-text-wrap">
-                <span class="lang-primary">ភាសាខ្មែរ</span>
-                <span class="lang-secondary">Khmer</span>
+        <!-- 4. Data & Sync Group with Dividers (ឈ្នូតៗ) -->
+        <div>
+          <div class="ios-group-label">ទិន្នន័យ & ប្រព័ន្ធ (System & Sync)</div>
+          <div class="ios-group-block">
+            <!-- Row 1: Sync Sheets -->
+            <div class="ios-row-item" onclick="syncData()">
+              <div class="ios-row-left">
+                <div class="ios-row-squircle" style="background: linear-gradient(135deg, #06B6D4, #0891B2);">
+                  <i data-lucide="refresh-cw"></i>
+                </div>
+                <div class="ios-row-titles">
+                  <span class="ios-row-title">ធ្វើបច្ចុប្បន្នភាពទិន្នន័យ (Sync Sheets)</span>
+                  <span class="ios-row-subtitle">ទាញទិន្នន័យថ្មីពី Google Sheets ផ្ទាល់</span>
+                </div>
               </div>
-              <div class="theme-check-mark"><i data-lucide="check"></i></div>
-            </button>
-            <button type="button" class="lang-option-pill" id="lang-opt-en" onclick="selectLanguage('en')">
-              <span class="lang-flag">🇬🇧</span>
-              <div class="lang-text-wrap">
-                <span class="lang-primary">English</span>
-                <span class="lang-secondary">អង់គ្លេស</span>
+              <div class="ios-row-right">
+                <span class="ios-row-value" style="color:#06B6D4;">Sync ឥឡូវ</span>
+                <i data-lucide="chevron-right" class="ios-row-chevron"></i>
               </div>
-              <div class="theme-check-mark"><i data-lucide="check"></i></div>
-            </button>
+            </div>
+
+            <!-- Divider Line 5 (ឈ្នូត) -->
+            <div class="ios-row-divider"></div>
+
+            <!-- Row 2: Logout -->
+            <div class="ios-row-item" onclick="logoutUser()">
+              <div class="ios-row-left">
+                <div class="ios-row-squircle" style="background: linear-gradient(135deg, #EF4444, #B91C1C);">
+                  <i data-lucide="log-out"></i>
+                </div>
+                <div class="ios-row-titles">
+                  <span class="ios-row-title" style="color: #EF4444;">ចាកចេញពីប្រព័ន្ធ (Logout)</span>
+                  <span class="ios-row-subtitle">ចាកចេញពីគណនីបច្ចុប្បន្ន</span>
+                </div>
+              </div>
+              <div class="ios-row-right">
+                <i data-lucide="chevron-right" class="ios-row-chevron" style="color:#EF4444;"></i>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -676,6 +836,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=20261019_v26"></script>
+  <script src="app.js?v=20261019_v27"></script>
 </body>
 </html>
