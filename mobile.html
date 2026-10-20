@@ -365,15 +365,18 @@
     <div class="brand-title">
       <img src="apple-touch-icon.png" alt="YS Logo" class="brand-logo">
       <div class="brand-text">
-        <h1>YEM SEYHA ERP (Mobile View)</h1>
-        <p>ទម្រង់ទូរស័ព្ទ iPhone Preview</p>
+        <h1>YEM SEYHA ERP (iPhone 12 Pro Max)</h1>
+        <p>ទម្រង់ទូរស័ព្ទ iPhone 12 Pro Max Preview (428 × 926 px)</p>
       </div>
     </div>
 
     <div class="toolbar-actions">
       <!-- Device Switcher -->
       <div class="device-pill-group">
-        <button type="button" class="device-btn active" onclick="setDevice('16pro', this)">
+        <button type="button" class="device-btn active" onclick="setDevice('12promax', this)">
+          <i data-lucide="smartphone" style="width:14px; height:14px;"></i> iPhone 12 Pro Max
+        </button>
+        <button type="button" class="device-btn" onclick="setDevice('16pro', this)">
           <i data-lucide="smartphone" style="width:14px; height:14px;"></i> iPhone 16 Pro
         </button>
         <button type="button" class="device-btn" onclick="setDevice('15plus', this)">
@@ -411,14 +414,20 @@
           </div>
         </div>
 
-        <!-- Dynamic Island -->
+        <!-- iPhone 12 Pro Max Classic Notch -->
+        <div class="iphone-notch" id="iphone-notch">
+          <div class="notch-speaker"></div>
+          <div class="notch-camera"></div>
+        </div>
+
+        <!-- Dynamic Island (For 16 Pro Mode) -->
         <div class="dynamic-island" id="dynamic-island">
           <div class="island-camera"></div>
           <div class="island-sensor"></div>
         </div>
 
         <!-- Embedded ERP Web App -->
-        <iframe src="index.html?v=20261019_v39" id="erp-frame" class="app-iframe" title="YEM SEYHA ERP"></iframe>
+        <iframe src="index.html?v=20261020_v43" id="erp-frame" class="app-iframe" title="YEM SEYHA ERP"></iframe>
 
         <!-- iOS Home Indicator -->
         <div class="home-indicator"></div>
@@ -456,21 +465,31 @@
 
       const phoneCase = document.getElementById('iphone-case');
       const island = document.getElementById('dynamic-island');
+      const notch = document.getElementById('iphone-notch');
 
-      if (type === '16pro') {
+      if (type === '12promax') {
+        phoneCase.style.width = '432px';
+        phoneCase.style.height = '928px';
+        phoneCase.style.borderRadius = '50px';
+        if (notch) notch.style.display = 'flex';
+        if (island) island.style.display = 'none';
+      } else if (type === '16pro') {
         phoneCase.style.width = '395px';
         phoneCase.style.height = '835px';
         phoneCase.style.borderRadius = '54px';
+        if (notch) notch.style.display = 'none';
         if (island) island.style.display = 'flex';
       } else if (type === '15plus') {
         phoneCase.style.width = '430px';
         phoneCase.style.height = '890px';
         phoneCase.style.borderRadius = '56px';
+        if (notch) notch.style.display = 'none';
         if (island) island.style.display = 'flex';
       } else if (type === 'se') {
         phoneCase.style.width = '375px';
         phoneCase.style.height = '720px';
         phoneCase.style.borderRadius = '40px';
+        if (notch) notch.style.display = 'none';
         if (island) island.style.display = 'none';
       }
     }

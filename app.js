@@ -1037,10 +1037,10 @@ function renderDailySellersCardHtml(targetDate) {
   return `
     <div class="hero-daily-sellers-card">
       <div class="hero-daily-sellers-header">
-        <span class="card-subtitle">
-          <i data-lucide="users" style="width:14px; height:14px;"></i>
-          ${lang === 'en' ? 'Daily Sales by Seller' : 'ចំនួនលក់ប្រចាំថ្ងៃតាមឈ្មោះ'}
-        </span>
+        <div class="hero-daily-title-wrap">
+          <i data-lucide="users" class="hero-daily-icon" style="width:15px; height:15px; color:#34D399 !important;"></i>
+          <span class="hero-daily-title-text" style="color:#FFFFFF !important; font-weight:700 !important; font-size:13px; text-shadow:0 1px 2px rgba(0,0,0,0.45);">${lang === 'en' ? 'Daily Sales by Seller' : 'ចំនួនលក់ប្រចាំថ្ងៃតាមឈ្មោះ'}</span>
+        </div>
         <span class="hero-daily-total-pill ${hasAnySales ? 'active' : ''}">
           ${lang === 'en' ? 'Total Day:' : 'សរុបថ្ងៃនេះ៖'}
           <strong>${summary.totalBoxes} ${lang === 'en' ? 'boxes' : 'ប្រអប់'}</strong>
@@ -1056,8 +1056,8 @@ function renderDailySellersCardHtml(targetDate) {
             <div class="daily-seller-chip ${hasSales ? 'has-sales' : ''}">
               <div class="seller-chip-avatar ${avClass}">${s.avatar || 'Y'}</div>
               <div class="seller-chip-info">
-                <span class="seller-chip-name" title="${s.name}">${s.name}</span>
-                <span class="seller-chip-count ${hasSales ? 'highlight' : ''}">
+                <span class="seller-chip-name" title="${s.name}" style="color:#FFFFFF !important; font-weight:700 !important;">${s.name}</span>
+                <span class="seller-chip-count ${hasSales ? 'highlight' : ''}" style="${hasSales ? 'color:#FBBF24 !important; font-weight:800 !important;' : 'color:rgba(255,255,255,0.85) !important;'}">
                   ${s.boxes} ${lang === 'en' ? 'box' : 'ប្រអប់'} ${s.revenue > 0 ? `($${s.revenue.toFixed(0)})` : ''}
                 </span>
               </div>
