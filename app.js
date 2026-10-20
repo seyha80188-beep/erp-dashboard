@@ -968,10 +968,21 @@ function getDailySellerSalesSummary(targetDate) {
     };
   });
 
-  // 1. Check A1 Daily Sales Sheet
+  // Track sheet order identifiers to avoid duplicate counting with local custom orders
+  const seenOrderKeys = new Set();
+
+  // 1. Check A1 Daily Sales Sheet (Authoritative live records)
   if (state.data && state.data.a1DailySales && state.data.a1DailySales.length > 0) {
     const dayRows = state.data.a1DailySales.filter(s => s.date === dateStr);
     dayRows.forEach(s => {
+      const code = (s.orderCode || '').toLowerCase().trim();
+      const phone = (s.phone || '').replace(/[^0-9]/g, '');
+      const cust = (s.customer || '').toLowerCase().trim();
+
+      if (code) seenOrderKeys.add(code);
+      if (phone) seenOrderKeys.add(`ph_${phone}`);
+      if (cust) seenOrderKeys.add(`cust_${cust}`);
+
       const sSeller = s.seller || s.sellerName || '';
       let matchedKey = null;
       if (sSeller.includes('វឌ្ឍនា')) {
@@ -983,7 +994,7 @@ function getDailySellerSalesSummary(targetDate) {
       if (matchedKey && sellerMap[matchedKey]) {
         const b = s.boxes || 0;
         const rev = s.priceUsd || (b * 45);
-        const prf = s.netProfitUsd || 0;
+        const prf = s.netProfitUsd || (rev - (s.cogsUsd || (b * 24)) - (s.deliveryUsd || 0));
         sellerMap[matchedKey].boxes += b;
         sellerMap[matchedKey].revenue += rev;
         sellerMap[matchedKey].profit += prf;
@@ -991,10 +1002,19 @@ function getDailySellerSalesSummary(targetDate) {
     });
   }
 
-  // 2. Check In-App Custom Orders
+  // 2. Check In-App Custom Orders (Only include orders that haven't been synced to Google Sheet)
   if (state.customOrders && state.customOrders.length > 0) {
     const dayCustom = state.customOrders.filter(o => o.date === dateStr);
     dayCustom.forEach(o => {
+      const code = (o.orderId || o.orderCode || o.id || '').toLowerCase().trim();
+      const phone = (o.receiverPhone || o.phone || '').replace(/[^0-9]/g, '');
+      const cust = (o.receiverName || o.customer || '').toLowerCase().trim();
+
+      // Skip duplicate order if already retrieved from Google Sheet
+      if (code && seenOrderKeys.has(code)) return;
+      if (phone && seenOrderKeys.has(`ph_${phone}`)) return;
+      if (cust && seenOrderKeys.has(`cust_${cust}`)) return;
+
       const sSeller = o.seller || o.sellerName || '';
       let matchedKey = null;
       if (sSeller.includes('វឌ្ឍនា')) {
@@ -1004,10 +1024,14 @@ function getDailySellerSalesSummary(targetDate) {
       }
 
       if (matchedKey && sellerMap[matchedKey]) {
-        const b = o.totalBoxes || 1;
+        const b = o.totalBoxes || o.boxes || 1;
         const rev = o.priceUsd || (b * 45);
+        const cogs = o.cogs || (b * 24);
+        const deliv = o.deliveryFee || 0;
+        const prf = o.netProfitUsd || (rev - (cogs + deliv));
         sellerMap[matchedKey].boxes += b;
         sellerMap[matchedKey].revenue += rev;
+        sellerMap[matchedKey].profit += prf;
       }
     });
   }
@@ -2153,7 +2177,7 @@ function getFlexibleSalesData() {
   let ads = 0.00;
   let ordersList = [];
 
-  const allCustomOrders = state.customOrders || [];
+  const allOrders = getAllBusinessSalesOrders();
 
   if (mode === 'day') {
     periodLabelKm = `ថ្ងៃ ${targetDate}`;
@@ -2161,15 +2185,15 @@ function getFlexibleSalesData() {
     const adsInfo = getActualAdsSpendForDate(targetDate);
     ads = adsInfo.count > 0 ? adsInfo.sum : (targetDate === '2026-10-18' ? 16.00 : 0.00);
 
-    const matchingCustom = allCustomOrders.filter(ord => ord.date === targetDate || (ord.date && ord.date.includes(targetDate)));
-    matchingCustom.forEach(ord => {
+    const matchingOrders = allOrders.filter(ord => ord.date === targetDate || (ord.date && ord.date.includes(targetDate)));
+    matchingOrders.forEach(ord => {
       const boxes = ord.totalBoxes || 1;
       const rev = ord.priceUsd || (boxes * 45);
       const isCompany = !ord.goodsSource || ord.goodsSource.includes('ក្រុមហ៊ុន') || !ord.goodsSource.includes('ផ្ទាល់ខ្លួន');
       boxesSold += boxes;
       revenue += rev;
-      cogs += getOrderCogsAmount(boxes, isCompany);
-      delivery += getDeliveryFeeByMethod(ord.delivery);
+      cogs += (typeof ord.cogsUsd === 'number') ? ord.cogsUsd : getOrderCogsAmount(boxes, isCompany);
+      delivery += (typeof ord.deliveryUsd === 'number') ? ord.deliveryUsd : getDeliveryFeeByMethod(ord.delivery);
       ordersList.push(ord);
     });
 
@@ -2199,34 +2223,36 @@ function getFlexibleSalesData() {
     const adsInfo = getActualAdsSpendForRange(startDate, endDate, null);
     ads = adsInfo.count > 0 ? adsInfo.sum : (diffDays * 7.00);
 
-    const baseDays = {
-      '2026-10-01': { boxes: 1, rev: 45, cogs: 24, deliv: 2.50 },
-      '2026-10-02': { boxes: 2, rev: 90, cogs: 48, deliv: 5.00 },
-      '2026-10-03': { boxes: 3, rev: 135, cogs: 72, deliv: 6.00 },
-      '2026-10-04': { boxes: 4, rev: 180, cogs: 96, deliv: 6.00 },
-      '2026-10-05': { boxes: 3, rev: 135, cogs: 72, deliv: 6.00 },
-      '2026-10-06': { boxes: 2, rev: 90, cogs: 48, deliv: 5.50 }
-    };
-    Object.keys(baseDays).forEach(d => {
-      if (d >= startDate && d <= endDate) {
-        boxesSold += baseDays[d].boxes;
-        revenue += baseDays[d].rev;
-        cogs += baseDays[d].cogs;
-        delivery += baseDays[d].deliv;
-      }
-    });
-
-    const matchingCustom = allCustomOrders.filter(ord => ord.date >= startDate && ord.date <= endDate);
-    matchingCustom.forEach(ord => {
+    const matchingOrders = allOrders.filter(ord => ord.date >= startDate && ord.date <= endDate);
+    matchingOrders.forEach(ord => {
       const boxes = ord.totalBoxes || 1;
       const rev = ord.priceUsd || (boxes * 45);
       const isCompany = !ord.goodsSource || ord.goodsSource.includes('ក្រុមហ៊ុន') || !ord.goodsSource.includes('ផ្ទាល់ខ្លួន');
       boxesSold += boxes;
       revenue += rev;
-      cogs += getOrderCogsAmount(boxes, isCompany);
-      delivery += getDeliveryFeeByMethod(ord.delivery);
+      cogs += (typeof ord.cogsUsd === 'number') ? ord.cogsUsd : getOrderCogsAmount(boxes, isCompany);
+      delivery += (typeof ord.deliveryUsd === 'number') ? ord.deliveryUsd : getDeliveryFeeByMethod(ord.delivery);
       ordersList.push(ord);
     });
+
+    if (boxesSold === 0) {
+      const baseDays = {
+        '2026-10-01': { boxes: 1, rev: 45, cogs: 24, deliv: 2.50 },
+        '2026-10-02': { boxes: 2, rev: 90, cogs: 48, deliv: 5.00 },
+        '2026-10-03': { boxes: 3, rev: 135, cogs: 72, deliv: 6.00 },
+        '2026-10-04': { boxes: 4, rev: 180, cogs: 96, deliv: 6.00 },
+        '2026-10-05': { boxes: 3, rev: 135, cogs: 72, deliv: 6.00 },
+        '2026-10-06': { boxes: 2, rev: 90, cogs: 48, deliv: 5.50 }
+      };
+      Object.keys(baseDays).forEach(d => {
+        if (d >= startDate && d <= endDate) {
+          boxesSold += baseDays[d].boxes;
+          revenue += baseDays[d].rev;
+          cogs += baseDays[d].cogs;
+          delivery += baseDays[d].deliv;
+        }
+      });
+    }
   } else if (mode === 'month') {
     periodLabelKm = `ខែ ${targetMonth}`;
     periodLabelEn = `Month: ${targetMonth}`;
@@ -2314,33 +2340,78 @@ function getSalesDataForDate(targetDate) {
  * Gather all business sales entries across team members and recorded orders
  */
 function getAllBusinessSalesOrders() {
-  const allOrders = [...(state.customOrders || [])];
-  const seenIds = new Set(allOrders.map(o => o.id || `${o.date}_${o.customer}`));
+  const allOrders = [];
+  const seenOrderCodes = new Set();
+  const seenPhones = new Set();
+  const seenIds = new Set();
 
-  // 1. Live entries from Google Sheets A1 (បញ្ចូលទិន្នន័យ - gid 613388513)
+  // 1. Live entries from Google Sheets A1 (Master authoritative source)
   if (state.data && state.data.a1DailySales && state.data.a1DailySales.length > 0) {
     state.data.a1DailySales.forEach((s, idx) => {
+      const code = (s.orderCode || '').toLowerCase().trim();
+      const phone = (s.phone || '').replace(/[^0-9]/g, '');
+      const date = s.date || '';
+      if (code) seenOrderCodes.add(code);
+      if (phone && date) seenPhones.add(`${date}_${phone}`);
+
       const id = s.orderCode ? `a1-${s.orderCode}` : `a1-${s.date}-${s.seller || s.sellerName}-${idx}`;
-      if (!seenIds.has(id)) {
-        seenIds.add(id);
-        allOrders.push({
-          id: id,
-          date: s.date,
-          sellerName: s.seller || s.sellerName || 'យឹម សីហា',
-          customer: s.customer || s.orderCode || (s.seller || 'យឹម សីហា'),
-          product: 'KD-09',
-          totalBoxes: s.boxes || 1,
-          priceUsd: s.priceUsd || ((s.boxes || 1) * 45),
-          delivery: s.courier ? (s.courier.includes('COD') ? 'Thai COD' : 'VET ក្រុមហ៊ុន') : 'VET ក្រុមហ៊ុន',
-          goodsSource: 'ក្រុមហ៊ុន (Company)',
-          status: s.deliveryStatus || 'បានប្រគល់',
-          cogsUsd: s.cogsUsd,
-          netProfitUsd: s.netProfitUsd
-        });
-      }
+      seenIds.add(id);
+
+      allOrders.push({
+        id: id,
+        orderCode: s.orderCode || '',
+        date: s.date,
+        sellerName: s.seller || s.sellerName || 'យឹម សីហា',
+        customer: s.customer || s.orderCode || (s.seller || 'យឹម សីហា'),
+        phone: s.phone || '',
+        product: 'KD-09',
+        totalBoxes: s.boxes || 1,
+        priceUsd: s.priceUsd || ((s.boxes || 1) * 45),
+        delivery: s.courier ? (s.courier.includes('COD') ? 'Thai COD' : 'VET ក្រុមហ៊ុន') : 'VET ក្រុមហ៊ុន',
+        goodsSource: 'ក្រុមហ៊ុន (Company)',
+        status: s.deliveryStatus || 'បានប្រគល់',
+        cogsUsd: typeof s.cogsUsd === 'number' ? s.cogsUsd : undefined,
+        deliveryUsd: typeof s.deliveryUsd === 'number' ? s.deliveryUsd : undefined,
+        netProfitUsd: s.netProfitUsd
+      });
     });
   }
 
+  // 2. Custom Orders from app (Only include if not already present in Google Sheets)
+  if (state.customOrders && state.customOrders.length > 0) {
+    state.customOrders.forEach(o => {
+      const code = (o.orderId || o.orderCode || o.id || '').toLowerCase().trim();
+      const phone = (o.receiverPhone || o.phone || '').replace(/[^0-9]/g, '');
+      const date = o.date || '';
+
+      if (code && seenOrderCodes.has(code)) return;
+      if (phone && date && seenPhones.has(`${date}_${phone}`)) return;
+
+      const id = o.id || o.orderId || `custom-${o.date}-${o.receiverName || o.customer}`;
+      if (seenIds.has(id)) return;
+      seenIds.add(id);
+
+      allOrders.push({
+        id: id,
+        orderCode: o.orderId || o.orderCode || '',
+        date: o.date,
+        sellerName: o.seller || o.sellerName || 'យឹម សីហា',
+        customer: o.receiverName || o.customer || (o.seller || 'យឹម សីហា'),
+        phone: o.receiverPhone || o.phone || '',
+        product: o.productNames || 'KD-09',
+        totalBoxes: o.totalBoxes || o.boxes || 1,
+        priceUsd: o.priceUsd || ((o.totalBoxes || 1) * 45),
+        delivery: o.delivery || 'VET ក្រុមហ៊ុន',
+        goodsSource: o.goodsSource || 'ក្រុមហ៊ុន (Company)',
+        status: o.status || 'បានបញ្ជូន',
+        cogsUsd: o.cogs || getOrderCogsAmount(o.totalBoxes || 1, true),
+        deliveryUsd: o.deliveryFee !== undefined ? o.deliveryFee : undefined,
+        netProfitUsd: (o.priceUsd || ((o.totalBoxes || 1) * 45)) - (o.cogs || getOrderCogsAmount(o.totalBoxes || 1, true)) - (o.deliveryFee || 0)
+      });
+    });
+  }
+
+  // 3. Team member recent sales (historical fallback if not in seenIds)
   DEFAULT_TEAM_MEMBERS.forEach(m => {
     if (m.recentSales) {
       m.recentSales.forEach(s => {
@@ -2349,9 +2420,11 @@ function getAllBusinessSalesOrders() {
           seenIds.add(id);
           allOrders.push({
             id: id,
+            orderCode: '',
             date: s.date,
             sellerName: m.name,
             customer: s.customer,
+            phone: '',
             product: s.product || 'KD-09',
             totalBoxes: s.qty || 1,
             priceUsd: s.amount || ((s.qty || 1) * 45),
@@ -2427,8 +2500,8 @@ function getBusinessKpiData(period, month, targetDate) {
       const boxes = ord.totalBoxes || 1;
       const rev = ord.priceUsd || (boxes * 45);
       const isCompany = !ord.goodsSource || ord.goodsSource.includes('ក្រុមហ៊ុន') || !ord.goodsSource.includes('ផ្ទាល់ខ្លួន');
-      const stockCost = getOrderCogsAmount(boxes, isCompany);
-      const delivCost = getDeliveryFeeByMethod(ord.delivery);
+      const stockCost = (typeof ord.cogsUsd === 'number') ? ord.cogsUsd : getOrderCogsAmount(boxes, isCompany);
+      const delivCost = (typeof ord.deliveryUsd === 'number') ? ord.deliveryUsd : getDeliveryFeeByMethod(ord.delivery);
 
       boxesSold += boxes;
       revenue += rev;
@@ -2669,13 +2742,14 @@ function getBusinessKpiData(period, month, targetDate) {
     };
   }
 
-  // Include any custom orders created in the app
-  if (state.customOrders && state.customOrders.length > 0) {
+  // Include only un-synced custom orders for month or year aggregation (orders not already in Google Sheets)
+  // Note: period === 'day' and period === 'week' already drew from allOrders (getAllBusinessSalesOrders) which is clean & deduplicated
+  if ((period === 'month' || period === 'year') && state.customOrders && state.customOrders.length > 0) {
+    const sheetCodes = new Set((state.data.a1DailySales || []).map(s => (s.orderCode || '').toLowerCase().trim()).filter(Boolean));
     const matchingOrders = state.customOrders.filter(ord => {
+      const code = (ord.orderId || ord.orderCode || ord.id || '').toLowerCase().trim();
+      if (code && sheetCodes.has(code)) return false; // Already in Google Sheet
       const ordDate = ord.date || todayStr;
-      if (period === 'tomorrow') return ordDate === tomorrowStr || ordDate.includes(tomorrowStr);
-      if (period === 'day') return ordDate === selectedDay || ordDate.includes(selectedDay);
-      if (period === 'week') return ordDate >= sevenDaysAgo && ordDate <= selectedDay;
       if (period === 'month') return isOct ? (ordDate.startsWith('2026-10') || !ordDate.startsWith('2026-09')) : ordDate.startsWith('2026-09');
       return true;
     });
@@ -2684,8 +2758,8 @@ function getBusinessKpiData(period, month, targetDate) {
       const boxes = ord.totalBoxes || 1;
       const rev = ord.priceUsd || (boxes * 45);
       const isCompany = !ord.goodsSource || ord.goodsSource.includes('ក្រុមហ៊ុន') || !ord.goodsSource.includes('ផ្ទាល់ខ្លួន');
-      const stockCost = getOrderCogsAmount(boxes, isCompany);
-      const delivCost = getDeliveryFeeByMethod(ord.delivery);
+      const stockCost = (typeof ord.cogsUsd === 'number') ? ord.cogsUsd : getOrderCogsAmount(boxes, isCompany);
+      const delivCost = (typeof ord.deliveryUsd === 'number') ? ord.deliveryUsd : getDeliveryFeeByMethod(ord.delivery);
       const profit = rev - (stockCost + delivCost);
 
       kpi.boxesSold += boxes;
@@ -5129,7 +5203,9 @@ window.handleDirectOrderSubmit = async function(event) {
   const orderId = 'ORD-' + Math.floor(1000 + Math.random() * 9000);
 
   const orderObj = {
+    id: orderId,
     orderId,
+    orderCode: orderId,
     date,
     team,
     seller,
