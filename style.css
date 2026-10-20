@@ -5812,6 +5812,19 @@ body.theme-vet .dash-quick-sub {
   color: rgba(255, 255, 255, 0.92);
 }
 
+.hero-substats-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.hero-substats-row .hero-expense-row,
+.hero-substats-row .hero-net-remaining-row {
+  margin-bottom: 0;
+}
+
 .hero-expense-row {
   display: inline-flex;
   align-items: center;
@@ -5820,7 +5833,6 @@ body.theme-vet .dash-quick-sub {
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 9999px;
   padding: 3px 10px 3px 6px;
-  margin-bottom: 12px;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.08);
@@ -5884,6 +5896,94 @@ body.theme-vet .dash-quick-sub {
   font-weight: 500;
   color: rgba(255, 255, 255, 0.72);
   line-height: 1;
+}
+
+/* Net Remaining Pill (ចំណេញដកចំណាយសរុបនៅសល់គិតជា $) */
+.hero-net-remaining-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.24);
+  border: 1px solid rgba(52, 211, 153, 0.32);
+  border-radius: 9999px;
+  padding: 3px 10px 3px 6px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+.hero-net-remaining-row:hover {
+  background: rgba(0, 0, 0, 0.34);
+  border-color: rgba(52, 211, 153, 0.55);
+  transform: translateY(-1px);
+}
+
+.hero-net-remaining-row:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.hero-net-remaining-row.is-negative {
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+.hero-net-remaining-row.is-negative:hover {
+  border-color: rgba(239, 68, 68, 0.55);
+}
+
+.hero-net-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1;
+}
+
+.hero-net-icon-bubble {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.25);
+  color: #34D399;
+  flex-shrink: 0;
+}
+
+.hero-net-remaining-row.is-negative .hero-net-icon-bubble {
+  background: rgba(239, 68, 68, 0.22);
+  color: #FF6B6B;
+}
+
+.hero-net-icon-bubble svg,
+.hero-net-label svg {
+  width: 11px;
+  height: 11px;
+  stroke-width: 2.5;
+  color: #34D399;
+}
+
+.hero-net-remaining-row.is-negative .hero-net-icon-bubble svg,
+.hero-net-remaining-row.is-negative .hero-net-label svg {
+  color: #FF6B6B;
+}
+
+.hero-net-val-usd {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  color: #34D399; /* Vibrant mint green for net remaining */
+  letter-spacing: 0.2px;
+  line-height: 1;
+}
+
+.hero-net-remaining-row.is-negative .hero-net-val-usd {
+  color: #FF8787;
 }
 
 /* Time Filter Capsule */
@@ -6421,17 +6521,19 @@ body.theme-teal .hero-balance-usd {
 }
 
 body.theme-sage .hero-expense-row,
-body.theme-teal .hero-expense-row {
+body.theme-teal .hero-expense-row,
+body.theme-sage .hero-net-remaining-row,
+body.theme-teal .hero-net-remaining-row {
   background: rgba(0, 0, 0, 0.22) !important;
-  border: 1px solid rgba(255, 255, 255, 0.18) !important;
   border-radius: 9999px !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
 }
 
 body.theme-sage .hero-expense-row:hover,
-body.theme-teal .hero-expense-row:hover {
+body.theme-teal .hero-expense-row:hover,
+body.theme-sage .hero-net-remaining-row:hover,
+body.theme-teal .hero-net-remaining-row:hover {
   background: rgba(0, 0, 0, 0.32) !important;
-  border-color: rgba(255, 255, 255, 0.3) !important;
 }
 
 body.theme-sage .hero-expense-label,
@@ -6945,17 +7047,19 @@ body.theme-vet .hero-balance-usd {
 }
 
 body.theme-warm .hero-expense-row,
-body.theme-vet .hero-expense-row {
+body.theme-vet .hero-expense-row,
+body.theme-warm .hero-net-remaining-row,
+body.theme-vet .hero-net-remaining-row {
   background: rgba(0, 0, 0, 0.24) !important;
-  border: 1px solid rgba(255, 255, 255, 0.18) !important;
   border-radius: 9999px !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
 }
 
 body.theme-warm .hero-expense-row:hover,
-body.theme-vet .hero-expense-row:hover {
+body.theme-vet .hero-expense-row:hover,
+body.theme-warm .hero-net-remaining-row:hover,
+body.theme-vet .hero-net-remaining-row:hover {
   background: rgba(0, 0, 0, 0.34) !important;
-  border-color: rgba(255, 255, 255, 0.3) !important;
 }
 
 body.theme-warm .hero-expense-label,
@@ -7505,9 +7609,11 @@ body.theme-glass .hero-balance-usd {
 
 body.theme-midnight .hero-expense-row,
 body.theme-dark .hero-expense-row,
-body.theme-glass .hero-expense-row {
+body.theme-glass .hero-expense-row,
+body.theme-midnight .hero-net-remaining-row,
+body.theme-dark .hero-net-remaining-row,
+body.theme-glass .hero-net-remaining-row {
   background: rgba(0, 0, 0, 0.28) !important;
-  border: 1px solid rgba(255, 255, 255, 0.16) !important;
   border-radius: 9999px !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
@@ -7516,9 +7622,11 @@ body.theme-glass .hero-expense-row {
 
 body.theme-midnight .hero-expense-row:hover,
 body.theme-dark .hero-expense-row:hover,
-body.theme-glass .hero-expense-row:hover {
+body.theme-glass .hero-expense-row:hover,
+body.theme-midnight .hero-net-remaining-row:hover,
+body.theme-dark .hero-net-remaining-row:hover,
+body.theme-glass .hero-net-remaining-row:hover {
   background: rgba(0, 0, 0, 0.38) !important;
-  border-color: rgba(255, 255, 255, 0.28) !important;
 }
 
 body.theme-midnight .hero-expense-label,

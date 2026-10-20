@@ -292,11 +292,28 @@ const state = {
   customExpenses: (() => {
     try {
       const raw = JSON.parse(localStorage.getItem('yem_custom_expenses') || '[]');
-      // Auto-clean stale demo expense from 2026-10-19 ($16 / 65,600)
       let list = raw.filter(e => !(e.date === '2026-10-19' && (e.amountUsd === 16 || e.amountKhr === 65600)));
-      const hasToday = list.some(e => e.date === '2026-10-19');
-      if (!hasToday) {
+      
+      // Ensure today 2026-10-20 expense ($14.95 / 61,289 ៛) is present if not already added
+      const hasOct20 = list.some(e => e.date === '2026-10-20');
+      if (!hasOct20) {
         list.unshift({
+          date: '2026-10-20',
+          month: '2026-10',
+          description: 'ចំណាយប្រចាំថ្ងៃ',
+          category: 'ចាំបាច់',
+          paymentMethod: 'ABA Bank',
+          amountUsd: 14.95,
+          amountKhr: 61289,
+          note: 'ចំណាយប្រចាំថ្ងៃ (In-App Tracker)',
+          isPersonal: true
+        });
+        localStorage.setItem('yem_custom_expenses', JSON.stringify(list));
+      }
+
+      const hasOct19 = list.some(e => e.date === '2026-10-19');
+      if (!hasOct19) {
+        list.push({
           date: '2026-10-19',
           month: '2026-10',
           description: 'កាហ្វេ & សាំងម៉ូតូ',
@@ -312,6 +329,16 @@ const state = {
       return list;
     } catch (err) {
       return [{
+        date: '2026-10-20',
+        month: '2026-10',
+        description: 'ចំណាយប្រចាំថ្ងៃ',
+        category: 'ចាំបាច់',
+        paymentMethod: 'ABA Bank',
+        amountUsd: 14.95,
+        amountKhr: 61289,
+        note: 'ចំណាយប្រចាំថ្ងៃ (In-App Tracker)',
+        isPersonal: true
+      }, {
         date: '2026-10-19',
         month: '2026-10',
         description: 'កាហ្វេ & សាំងម៉ូតូ',
@@ -753,7 +780,31 @@ async function fetchSheetData() {
         mergedExpenses.push(e);
       }
     });
-    // Ensure today 2026-10-19 expense ($1.95 / 8,000 ៛ "កាហ្វេ & សាំងម៉ូតូ") is present
+    // Ensure today 2026-10-20 expense ($14.95 / 61,289 ៛) is present if not yet in Google Sheet
+    const hasOct20Exp = mergedExpenses.some(e => e.date === '2026-10-20');
+    if (!hasOct20Exp) {
+      const oct20Exp = {
+        date: '2026-10-20',
+        month: '2026-10',
+        description: 'ចំណាយប្រចាំថ្ងៃ',
+        category: 'ចាំបាច់',
+        paymentMethod: 'ABA Bank',
+        amountUsd: 14.95,
+        amountKhr: 61289,
+        note: 'ចំណាយប្រចាំថ្ងៃ (In-App Tracker)',
+        isPersonal: true
+      };
+      mergedExpenses.unshift(oct20Exp);
+      if (!state.customExpenses) state.customExpenses = [];
+      if (!state.customExpenses.some(e => e.date === '2026-10-20')) {
+        state.customExpenses.unshift(oct20Exp);
+        try {
+          localStorage.setItem('yem_custom_expenses', JSON.stringify(state.customExpenses));
+        } catch (e) {}
+      }
+    }
+
+    // Ensure 2026-10-19 expense ($1.95 / 8,000 ៛ "កាហ្វេ & សាំងម៉ូតូ") is present
     const hasOct19Exp = mergedExpenses.some(e => e.date === '2026-10-19');
     if (!hasOct19Exp) {
       const oct19Exp = {
@@ -767,10 +818,10 @@ async function fetchSheetData() {
         note: 'បញ្ចូលផ្ទាល់ក្នុងកម្មវិធី (In-App Logger)',
         isPersonal: true
       };
-      mergedExpenses.unshift(oct19Exp);
+      mergedExpenses.push(oct19Exp);
       if (!state.customExpenses) state.customExpenses = [];
       if (!state.customExpenses.some(e => e.date === '2026-10-19')) {
-        state.customExpenses.unshift(oct19Exp);
+        state.customExpenses.push(oct19Exp);
         try {
           localStorage.setItem('yem_custom_expenses', JSON.stringify(state.customExpenses));
         } catch (e) {}
@@ -1339,15 +1390,31 @@ function normalizeDateStr(raw) {
   }
   const slashParts = dateOnly.split('/');
   if (slashParts.length === 3) {
-    let m = slashParts[0].padStart(2, '0');
-    let d = slashParts[1].padStart(2, '0');
+    let p0 = parseInt(slashParts[0], 10);
+    let p1 = parseInt(slashParts[1], 10);
     let y = slashParts[2];
     if (y.length === 2) y = '20' + y;
     if (slashParts[0].length === 4) {
       y = slashParts[0];
-      m = slashParts[1].padStart(2, '0');
-      d = slashParts[2].padStart(2, '0');
+      const m = slashParts[1].padStart(2, '0');
+      const d = slashParts[2].padStart(2, '0');
+      return `${y}-${m}-${d}`;
     }
+    // If first part > 12, it must be DD/MM/YYYY (e.g. 20/10/2026)
+    if (p0 > 12) {
+      const d = String(p0).padStart(2, '0');
+      const m = String(p1).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+    // If second part > 12, it must be MM/DD/YYYY
+    if (p1 > 12) {
+      const m = String(p0).padStart(2, '0');
+      const d = String(p1).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+    // Default fallback
+    const m = String(p0).padStart(2, '0');
+    const d = String(p1).padStart(2, '0');
     return `${y}-${m}-${d}`;
   }
   const dashParts = dateOnly.split('-');
@@ -2858,6 +2925,14 @@ function renderDashboardModule() {
     cardLabel = lang === 'en' ? `Net Balance - ${periodLabelEn} (Sheet B2)` : `សមតុល្យនៅសល់${periodLabelKm} (Sheet B2)`;
   }
 
+  // Net Remaining after deducting expenses (ចំណេញប្រចាំថ្ងៃ ដកការចំណាយប្រចាំថ្ងៃ សរុបនៅសល់គិតជា $)
+  const netRemainingUsd = displayUsd - heroExpenseUsd;
+  const isNetNegative = netRemainingUsd < 0;
+  const displayNetRemainingText = isBalanceHidden 
+    ? '•••• $' 
+    : (netRemainingUsd >= 0 ? `$${netRemainingUsd.toFixed(2)}` : `-$${Math.abs(netRemainingUsd).toFixed(2)}`);
+  const heroNetRemainingLabel = lang === 'en' ? 'Net Left:' : 'នៅសល់៖';
+
   moduleContainerEl.innerHTML = `
     <!-- Master Hero Card -->
     
@@ -2874,14 +2949,24 @@ function renderDashboardModule() {
       <span class="hero-balance-usd">(${isBalanceHidden ? '•••••• $' : formatUsd(displayUsd)})</span>
     </div>
 
-    <!-- Daily / Period Expense Capsule (ចំនួនចំណាយប្រចាំថ្ងៃ/ខែ/ឆ្នាំ ពី Form Responses 1) -->
-    <div class="hero-expense-row" onclick="openExpenseModal()" title="${lang === 'en' ? 'Click to record/view expenses' : 'ចុចដើម្បីកត់ត្រា ឬមើលចំណាយ'}" role="button">
-      <span class="hero-expense-label">
-        <span class="hero-expense-icon-bubble"><i data-lucide="trending-down"></i></span>
-        <span>${heroExpLabel}</span>
-      </span>
-      <span class="hero-expense-val-khr">${isBalanceHidden ? '•••••• ៛' : (heroExpenseKhr > 0 ? `-${heroExpenseKhr.toLocaleString('en-US')} ៛` : '0 ៛')}</span>
-      <span class="hero-expense-val-usd">(${isBalanceHidden ? '•••• $' : (heroExpenseUsd > 0 ? `-$${heroExpenseUsd.toFixed(2)}` : '$0.00')})</span>
+    <!-- Daily / Period Expense Capsule & Net Remaining Capsule (ចំណេញដកចំណាយ) -->
+    <div class="hero-substats-row">
+      <div class="hero-expense-row" onclick="openExpenseModal()" title="${lang === 'en' ? 'Click to record/view expenses' : 'ចុចដើម្បីកត់ត្រា ឬមើលចំណាយ'}" role="button">
+        <span class="hero-expense-label">
+          <span class="hero-expense-icon-bubble"><i data-lucide="trending-down"></i></span>
+          <span>${heroExpLabel}</span>
+        </span>
+        <span class="hero-expense-val-khr">${isBalanceHidden ? '•••••• ៛' : (heroExpenseKhr > 0 ? `-${heroExpenseKhr.toLocaleString('en-US')} ៛` : '0 ៛')}</span>
+        <span class="hero-expense-val-usd">(${isBalanceHidden ? '•••• $' : (heroExpenseUsd > 0 ? `-$${heroExpenseUsd.toFixed(2)}` : '$0.00')})</span>
+      </div>
+
+      <div class="hero-net-remaining-row ${isNetNegative ? 'is-negative' : ''}" onclick="openExpenseModal()" title="${lang === 'en' ? 'Net profit after deducting expenses' : 'ប្រាក់ចំណេញដកការចំណាយរួច (នៅសល់សុទ្ធ)'}" role="button">
+        <span class="hero-net-label">
+          <span class="hero-net-icon-bubble"><i data-lucide="${isNetNegative ? 'alert-triangle' : 'wallet'}"></i></span>
+          <span>${heroNetRemainingLabel}</span>
+        </span>
+        <span class="hero-net-val-usd">${displayNetRemainingText}</span>
+      </div>
     </div>
 
     <!-- Time Filter Capsule: ថ្ងៃនេះ | សប្តាហ៍នេះ | ខែនេះ | ពេញមួយឆ្នាំ -->
